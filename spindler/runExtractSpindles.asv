@@ -1,13 +1,13 @@
 dirName = 'D:\Research\AlphaCharacterization\NewVersion\originalDrivingData';
 outDir = 'D:\TestData\Alpha\DrivingSpindles\BCITSupervisedA';
 
-% EEGFile = 'S1015.set';
-% eventFile = 'S1015_labels.mat';
-% outFile = 'S1015SpindlesGroupNewG.mat';
+EEGFile = 'S1015.set';
+eventFile = 'S1015_labels.mat';
+outFile = 'S1015SpindlesGroupNewG.mat';
 
-EEGFile = 'S1010.set';
-eventFile = 'S1010_labels.mat';
-outFile = 'S1010SpindlesGroupNewG.mat';
+% EEGFile = 'S1010.set';
+% eventFile = 'S1010_labels.mat';
+% outFile = 'S1010SpindlesGroupNewG.mat';
 %outFile = 'S1010SpindlesGroupNewC.mat';
 %channelNumbers = [20, 31, 57];
 %channelNumbers = 20;
@@ -48,6 +48,6 @@ channelLabels = {channelLabels.labels};
 if ~exist(outDir, 'dir')
     mkdir(outDir);
 end;
-save([outDir filesep outFile], 'spindles', 'spindleRatios', 'srate', ...
+save([outDir filesep outFile], 'events', 'spindles', 'srate', ...
     'frames', 'channelNumbers', 'channelLabels', 'atomsPerSecond', ...
     'baseThresholds', 'atomFrequencies', 'atomScales', '-v7.3');

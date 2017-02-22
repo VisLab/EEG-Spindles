@@ -56,14 +56,14 @@ xMedianRatio = median(xAll, 2);
 xMadRatio = mad(xAll, 1, 2);
 xMeanRatio = mean(xAll, 2);
 xStdRatio = std(xAll, 0, 2);
-[iMedianMinAtoms, xMedianMin] = ...
+[iMedianAtoms, xMedianMin] = ...
                      findMinAfterMax(atomsPerSecond', xMedianRatio);
-[iMeanMinAtoms, xMeanMin] = ...
+[iMeanAtoms, xMeanMin] = ...
                      findMinAfterMax(atomsPerSecond', xMeanRatio);
 theTitle = {'Spindle time/spindle hits vs atoms/second'; ...
             theName; ...
-            ['MedMin=' num2str(xMedianMin) ' at ' num2str(iMedianMinAtoms) ',' ...
-            'MeanMin=' num2str(xMeanMin) ' at ' num2str(iMeanMinAtoms) ]};
+            ['MedMin=' num2str(xMedianMin) ' at ' num2str(iMedianAtoms) ',' ...
+            'MeanMin=' num2str(xMeanMin) ' at ' num2str(iMeanAtoms) ]};
 h5 = figure('Name', [theName ':Spindle time/spindle hits vs atoms/second']);
 hold on
 for j = 1:numberThresholds
@@ -81,17 +81,14 @@ plot(atomsPerSecond', xMedianRatio+xMadRatio, 'LineWidth', 2, ...
     'Color', [0.75, 0.75, 0.75], 'LineStyle', '--');
 plot(atomsPerSecond', xMedianRatio-xMadRatio, 'LineWidth', 2, ...
     'Color', [0.75, 0.75, 0.75], 'LineStyle', '--');
-
+hold off
 summaryLegends = {'Mean', 'Mean+std', 'Mean-std', ...
                   'Median', 'Median+mad', 'Median-mad'};
 allLegends = [legends', summaryLegends];
-legend(allLegends);
-yLimits = get(gca, 'YLim');
-line([iMeanMinAtoms, iMeanMinAtoms], yLimits, 'Color', [0, 0, 0]);
 ylabel('Spindle time/spindle hits');
 xlabel('Atoms/second');
 box on
-hold off
+legend(allLegends);
 title(theTitle, 'Interpreter', 'None');
 saveas(h5, [outDir filesep theName 'SpindleTimeDivHits.png'], 'png');  
 
@@ -129,8 +126,6 @@ hold off
 summaryLegends = {'Mean', 'Mean+std', 'Mean-std', ...
                   'Median', 'Median+mad', 'Median-mad'};
 allLegends = [legends', summaryLegends];
-yLimits = get(gca, 'YLim');
-line([iMeanMaxAtoms, iMeanMaxAtoms], yLimits, 'Color', [0, 0, 0]);
 hold off
 box on
 ylabel('Spindle hits/spindle time')
@@ -328,7 +323,8 @@ for j = 1:numberThresholds
 end
 plot(atomsPerSecond', xMeanRatio, 'LineWidth', 3, 'Color', [0.6, 0.6, 0.6]);
 legend(legendBoth, 'Location', 'SouthEast');
-line([iMeanMaxAtoms, iMeanMaxAtoms], [0, 1], 'Color', [0, 0, 0]);
+
+line([iMedianMaxAtoms, iMedianMaxAtoms], [0, 1], 'Color', [0, 0, 0]);
 hold off
 ylabel('Performance')
 xlabel('Atoms/second')

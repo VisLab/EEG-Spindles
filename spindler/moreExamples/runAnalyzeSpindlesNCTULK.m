@@ -1,7 +1,7 @@
-inDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80';
-outDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80Images';
-
+inDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80_MinTime0p1';
+outDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80_MinTime0p1Images';
 fileList = getFiles('FILES', inDir, '.mat');
+
 %% Set the parameters
 doPerformance = false;
 verbose = false;

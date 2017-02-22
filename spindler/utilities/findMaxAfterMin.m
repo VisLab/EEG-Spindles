@@ -5,9 +5,9 @@ function [xMax, yMax, maxPos] = findMaxAfterMin(x, y)
 % y = median(xAll, 2);
 
 %%
-xMin = [];
-yMin = [];
-minPos = [];
+xMax = [];
+yMax = [];
+maxPos = [];
 ySlope = diff(y);
 minPos = find(ySlope > 0, 1, 'first');
 if isempty(minPos)

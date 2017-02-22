@@ -87,7 +87,9 @@ summaryLegends = {'Mean', 'Mean+std', 'Mean-std', ...
 allLegends = [legends', summaryLegends];
 legend(allLegends);
 yLimits = get(gca, 'YLim');
-line([iMeanMinAtoms, iMeanMinAtoms], yLimits, 'Color', [0, 0, 0]);
+if ~isempty(iMeanMinAtoms)
+   line([iMeanMinAtoms, iMeanMinAtoms], yLimits, 'Color', [0, 0, 0]);
+end
 ylabel('Spindle time/spindle hits');
 xlabel('Atoms/second');
 box on
@@ -130,7 +132,9 @@ summaryLegends = {'Mean', 'Mean+std', 'Mean-std', ...
                   'Median', 'Median+mad', 'Median-mad'};
 allLegends = [legends', summaryLegends];
 yLimits = get(gca, 'YLim');
-line([iMeanMaxAtoms, iMeanMaxAtoms], yLimits, 'Color', [0, 0, 0]);
+if ~isempty(iMeanMaxAtoms)
+   line([iMeanMaxAtoms, iMeanMaxAtoms], yLimits, 'Color', [0, 0, 0]);
+end
 hold off
 box on
 ylabel('Spindle hits/spindle time')

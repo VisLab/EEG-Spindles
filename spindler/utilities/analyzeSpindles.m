@@ -1,4 +1,4 @@
-function [] = analyzeSpindles(theFile, outDir, doPerformance, verbose)
+function [] = analyzeSpindles(theFile, outDir, outSuffix, doPerformance, verbose)
 
 
 %% Make sure the outDir exists
@@ -34,6 +34,7 @@ theColors = jet(numberThresholds);
 
 %% Show the spindle values for each dataset individually
 [~, theName] = fileparts(theFile);
+outName = [theName outSuffix];
 legendStrings = cell(1, numberThresholds);
 for k = 1:numberThresholds
     legendStrings{k} = num2str(baseThresholds(k));
@@ -61,10 +62,10 @@ xStdRatio = std(xAll, 0, 2);
 [iMeanMinAtoms, xMeanMin] = ...
                      findMinAfterMax(atomsPerSecond', xMeanRatio);
 theTitle = {'Spindle time/spindle hits vs atoms/second'; ...
-            theName; ...
+             outName; ...
             ['MedMin=' num2str(xMedianMin) ' at ' num2str(iMedianMinAtoms) ',' ...
             'MeanMin=' num2str(xMeanMin) ' at ' num2str(iMeanMinAtoms) ]};
-h5 = figure('Name', [theName ':Spindle time/spindle hits vs atoms/second']);
+h5 = figure('Name', [outName ':Spindle time/spindle hits vs atoms/second']);
 hold on
 for j = 1:numberThresholds
    plot(atomsPerSecond, spindleTime(:, j)./spindleHits(:, j), 'LineWidth', 2, ...
@@ -95,7 +96,7 @@ xlabel('Atoms/second');
 box on
 hold off
 title(theTitle, 'Interpreter', 'None');
-saveas(h5, [outDir filesep theName 'SpindleTimeDivHits.png'], 'png');  
+saveas(h5, [outDir filesep theName 'SpindleTimeDivHits' outSuffix '.png'], 'png');  
 
 %% Spindle hits/spindle time hits versus atoms/second
 spindleRatio = spindleHits./spindleTime;
@@ -106,10 +107,10 @@ xStdRatio = std(spindleRatio, 0, 2);
 [iMedianMaxAtoms, xMedianMax] = findMaxAfterMin(atomsPerSecond', xMedianRatio);
 [iMeanMaxAtoms, xMeanMax] = findMaxAfterMin(atomsPerSecond', xMeanRatio);
 plotType = 'Spindle hits/spindle time vs atoms/second';
-theTitle = { plotType; theName; ...
+theTitle = { plotType; outName; ...
             ['MedMin=' num2str(xMedianMax) ' at ' num2str(iMedianMaxAtoms) ',' ...
             'MeanMin=' num2str(xMeanMax) ' at ' num2str(iMeanMaxAtoms) ]};
-h6 = figure('Name', [theName ':' plotType]);
+h6 = figure('Name', [outName ':' plotType]);
 
 hold on
 for j = 1:numberThresholds
@@ -141,11 +142,11 @@ ylabel('Spindle hits/spindle time')
 xlabel('Atoms/second')
 title(theTitle, 'Interpreter', 'None');
 legend(allLegends);
-saveas(h6, [outDir filesep theName 'SpindleHitsDivTime.png'], 'png');
+saveas(h6, [outDir filesep theName 'SpindleHitsDivTime' outSuffix '.png'], 'png');
 
 %% Spindle time/second versus atoms/second
 if verbose
-    theTitle = [theName ': Spindle time/second vs atoms/second'];
+    theTitle = [outName ': Spindle time/second vs atoms/second'];
     h1 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -158,12 +159,12 @@ if verbose
     title(theTitle, 'Interpreter', 'None');
     legend(legendStrings, 'Location', 'NorthWest');
     box on;
-    saveas(h1, [outDir filesep theName 'SpindleTime.png'], 'png');
+    saveas(h1, [outDir filesep theName 'SpindleTime' outSuffix '.png'], 'png');
 end
 
 %% Spindle hits/second versus atoms/second
 if verbose
-    theTitle = [theName ': Spindle hits/second vs atoms/second'];
+    theTitle = [outName ': Spindle hits/second vs atoms/second'];
     h2 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -176,37 +177,37 @@ if verbose
     title(theTitle, 'Interpreter', 'None');
     legend(legendStrings, 'Location', 'NorthWest');
     box on;
-    saveas(h2, [outDir filesep theName 'SpindleHits.png'], 'png');
+    saveas(h2, [outDir filesep theName 'SpindleHits' outSuffix '.png'], 'png');
 end
 %% Spindle hits STD vs atoms/second
 if verbose
     spindleSTD = std(spindleHits, 0, 2);
-    theTitle = [theName ': STD of spindleHits'];
+    theTitle = [outName ': STD of spindleHits'];
     h3 = figure('Name', theTitle);
     plot(atomsPerSecond, spindleSTD, 'LineWidth', 2);
     ylabel('STD spindle hits/second')
     xlabel('Atoms/second')
     title(theTitle, 'Interpreter', 'None');
     box on;
-    saveas(h3, [outDir filesep theName 'SpindleSTD.png'], 'png');
+    saveas(h3, [outDir filesep theName 'SpindleSTD' outSuffix '.png'], 'png');
 end
 
 %% Log of spindle hits STD vs atoms/second
 if verbose
     spindleSTD = std(spindleHits, 0, 2);
-    theTitle = [theName ': Log STD of spindle hits'];
+    theTitle = [outName ': Log STD of spindle hits'];
     h4 = figure('Name', theTitle);
     semilogy(atomsPerSecond, spindleSTD, 'LineWidth', 2);
     ylabel('Log STD spindle hits/second')
     xlabel('Atoms/second')
     title(theTitle, 'Interpreter', 'None');
     box on;
-    saveas(h4, [outDir filesep theName 'SpindleLogSTD.png'], 'png');
+    saveas(h4, [outDir filesep theName 'SpindleLogSTD' outSuffix '.png'], 'png');
 end
 
 %% Spindle hits versus spindle time
 if verbose
-    theTitle = [theName ': Spindle hits vs spindle time'];
+    theTitle = [outName ': Spindle hits vs spindle time'];
     frameMask = atomsPerSecond >= 0.1 & atomsPerSecond <= 0.35;
     numSpins = spindleHits(frameMask, :);
     spinTime = spindleTime(frameMask, :);
@@ -229,7 +230,7 @@ if verbose
     xlabel('Number spindles/second')
     title(theTitle, 'Interpreter', 'None');
     hold off
-    saveas(h7, [outDir filesep theName 'SpindleHitsVsTime.png'], 'png');
+    saveas(h7, [outDir filesep theName 'SpindleHitsVsTime' outSuffix '.png'], 'png');
 end
 %% Do the performance
 if ~doPerformance
@@ -238,7 +239,7 @@ end
 
 %% F1Mod time vs atoms/second
 if verbose
-    theTitle = [theName ': F1Mod time vs atoms/second'];
+    theTitle = [outName ': F1Mod time vs atoms/second'];
     h8 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -251,12 +252,12 @@ if verbose
     title(theTitle, 'Interpreter', 'None');
     legend(legendStrings, 'Location', 'SouthEast');
     box on;
-    saveas(h8, [outDir filesep theName 'F1ModTime.png'], 'png'); 
+    saveas(h8, [outDir filesep theName 'F1ModTime' outSuffix '.png'], 'png'); 
 end
 
 %% F1Mod hits vs atoms/second
 if verbose
-    theTitle = [theName ': F1Mod hits vs atoms/second'];
+    theTitle = [outName ': F1Mod hits vs atoms/second'];
     h9 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -269,12 +270,12 @@ if verbose
     title(theTitle, 'Interpreter', 'None');
     legend(legendStrings, 'Location', 'SouthEast');
     box on;
-    saveas(h9, [outDir filesep theName 'F1ModHits.png'], 'png'); 
+    saveas(h9, [outDir filesep theName 'F1ModHits' outSuffix '.png'], 'png'); 
 end
 
 %% F1Mod onsets vs atoms/second
 if verbose
-    theTitle = [theName ': F1Mod onsets vs atoms/second'];
+    theTitle = [outName ': F1Mod onsets vs atoms/second'];
     h8 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -287,12 +288,12 @@ if verbose
     title(theTitle, 'Interpreter', 'None');
     legend(legendStrings, 'Location', 'SouthEast');
     box on;
-    saveas(h8, [outDir filesep theName 'F1ModOnsets.png'], 'png'); 
+    saveas(h8, [outDir filesep theName 'F1ModOnsets' outSuffix '.png'], 'png'); 
 end
 
 %% F1Mod inter vs atoms/second
 if verbose
-    theTitle = [theName ': F1Mod inter vs atoms/second'];
+    theTitle = [outName ': F1Mod inter vs atoms/second'];
     h8 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -305,7 +306,7 @@ if verbose
     title(theTitle, 'Interpreter', 'None');
     legend(legendStrings, 'Location', 'SouthEast');
     box on;
-    saveas(h8, [outDir filesep theName 'F1ModInter.png'], 'png'); 
+    saveas(h8, [outDir filesep theName 'F1ModInter' outSuffix '.png'], 'png'); 
 end
 
 %% F1Mod all measures vs atoms/second
@@ -316,7 +317,7 @@ for k = 1:numberThresholds
     legendBoth{4*k - 1} = [legendStrings{k} ' O'];
     legendBoth{4*k} = [legendStrings{k} ' I'];
 end
-theTitle = [theName ': F1Mod hits vs atoms/second'];
+theTitle = [outName ': F1Mod hits vs atoms/second'];
 h10 = figure('Name', theTitle);
 hold on
 newColors = jet(numberThresholds);
@@ -339,7 +340,7 @@ xlabel('Atoms/second')
 title(theTitle, 'Interpreter', 'None');
 legend(legendBoth, 'Location', 'SouthEast');
 box on;
-saveas(h10, [outDir filesep theName 'F1ModBoth.png'], 'png');
+saveas(h10, [outDir filesep theName 'F1ModBoth' outSuffix '.png'], 'png');
 
 %% Calculate ROC curves   
 if verbose
@@ -371,7 +372,7 @@ if verbose
     recallInter = reshape(recallInter, numberAtoms, numberThresholds);
  
     %% Plot traditional ROC curve
-    theTitle = [theName ': ROC'];
+    theTitle = [outName ': ROC'];
     h11 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -384,10 +385,10 @@ if verbose
     legend(legendStrings, 'Location', 'SouthWest')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h11, [outDir filesep theName 'FPRvsTPR.png'], 'png'); 
+    saveas(h11, [outDir filesep theName 'FPRvsTPR' outSuffix '.png'], 'png'); 
     
     %% Plot precision-recall using time measures
-    theTitle = [theName ': Precision-recall time'];
+    theTitle = [outName ': Precision-recall time'];
     h12 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -400,10 +401,10 @@ if verbose
     legend(legendStrings, 'Location', 'SouthWest')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h12, [outDir filesep theName 'RecallVsPercisionTime.png'], 'png'); 
+    saveas(h12, [outDir filesep theName 'RecallVsPercisionTime' outSuffix '.png'], 'png'); 
     
     %% Plot precision recall using hit measures
-    theTitle = [theName ': Precision-recall hits'];
+    theTitle = [outName ': Precision-recall hits'];
     h13 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -416,10 +417,10 @@ if verbose
     legend(legendStrings, 'Location', 'SouthEast')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h13, [outDir filesep theName 'RecallVsPercisionHits.png'], 'png');
+    saveas(h13, [outDir filesep theName 'RecallVsPercisionHits' outSuffix '.png'], 'png');
     
     %% Plot precision-recall using Inter measures
-    theTitle = [theName ': Precision-recall inter'];
+    theTitle = [outName ': Precision-recall inter'];
     h13 = figure('Name', theTitle);
     hold on
     for j = 1:numberThresholds
@@ -432,5 +433,5 @@ if verbose
     legend(legendStrings, 'Location', 'SouthEast')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h13, [outDir filesep theName 'RecallVsPercisionInter.png'], 'png');
+    saveas(h13, [outDir filesep theName 'RecallVsPercisionInter' outSuffix '.png'], 'png');
 end

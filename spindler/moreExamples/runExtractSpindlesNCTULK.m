@@ -1,5 +1,6 @@
 dirName = 'E:\CTADATA\NCTU\Level0\01. NCTU lane-keeping task\session';
-outDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80_MinTime0p2';
+%outDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80_MinTime0p2';
+outDir = 'D:\TestData\Alpha\DrivingSpindles\NCTULK80_MinTime0p05';
 theFiles = getFileList('FILES2', dirName);
 
 %channelLabels = {'T5', 'P3', 'P4', 'Pz', 'T6'};
@@ -15,7 +16,7 @@ atomsPerSecond = 0.02:0.02:0.6;
 baseThresholds = [0.0001, 0.001, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1];
 timeError = 0.1;
 minLength = 0.25;
-minTime = 0.20;
+minTime = 0.05;
 onsetTolerance = 0.3;
 intersectTolerance = 0.2;
 expertEvents = [];

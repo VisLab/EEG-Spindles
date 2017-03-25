@@ -1,20 +1,23 @@
-function [] = analyzeSpindles(theFile, outDir, outSuffix, doPerformance, verbose)
-
+function [] = showSpindles(theFile, outDir, outSuffix, doPerformance, verbose)
+%% Analyze the spindles 
 
 %% Make sure the outDir exists
 if ~exist(outDir, 'dir')
     mkdir(outDir);
 end
 
-%% Load the data
+%% Load the data and initialize variables
 load(theFile)
-numberAtoms = length(atomsPerSecond); 
+atomsPerSecond = params.spindleAtomsPerSecond;
+baseThresholds = params.spindleBaseThresholds;
+numberAtoms = length(params.spindleAtomsPerSecond); 
 numberThresholds = length(baseThresholds);
 spindleHits = cellfun(@double, {spindles.numberSpindles});
-spindleHits  = reshape(spindleHits, numberAtoms, numberThresholds);
+spindleHits = reshape(spindleHits, numberAtoms, numberThresholds);
 spindleTime = cellfun(@double, {spindles.spindleTime});
-spindleTime  = reshape(spindleTime, numberAtoms, numberThresholds);
-
+spindleTime = reshape(spindleTime, numberAtoms, numberThresholds);
+eFraction = cellfun(@double, {spindles.eFraction});
+eFraction = reshape(eFraction, numberAtoms, numberThresholds);
 if isfield(spindles, 'f1ModTime')
     f1ModTime = cellfun(@double, {spindles.f1ModTime});
     f1ModTime  = reshape(f1ModTime, numberAtoms, numberThresholds);
@@ -22,7 +25,7 @@ if isfield(spindles, 'f1ModTime')
     f1ModHits  = reshape(f1ModHits, numberAtoms, numberThresholds);
     f1ModOnsets = cellfun(@double, {spindles.f1ModOnsets});
     f1ModOnsets  = reshape(f1ModOnsets, numberAtoms, numberThresholds); 
-    f1ModInter = cellfun(@double, {spindles.f1ModOnsets});
+    f1ModInter = cellfun(@double, {spindles.f1ModInter});
     f1ModInter  = reshape(f1ModInter, numberAtoms, numberThresholds); 
 else
     f1ModTime = NaN;
@@ -144,6 +147,22 @@ title(theTitle, 'Interpreter', 'None');
 legend(allLegends);
 saveas(h6, [outDir filesep theName 'SpindleHitsDivTime' outSuffix '.png'], 'png');
 
+%% Fraction of energy captures
+theTitle = [outName ': Fraction of energy in spindles'];
+h2 = figure('Name', theTitle);
+hold on
+for j = 1:numberThresholds
+    plot(atomsPerSecond, eFraction(:, j), 'LineWidth', 2, ...
+        'Color', theColors(j, :));
+end
+hold off
+ylabel('Fraction of energy')
+xlabel('Atoms/second')
+title(theTitle, 'Interpreter', 'None');
+legend(legendStrings, 'Location', 'NorthEast');
+box on;
+saveas(h2, [outDir filesep theName 'SpindleFraction' outSuffix '.png'], 'png');
+    
 %% Spindle time/second versus atoms/second
 if verbose
     theTitle = [outName ': Spindle time/second vs atoms/second'];
@@ -162,7 +181,7 @@ if verbose
     saveas(h1, [outDir filesep theName 'SpindleTime' outSuffix '.png'], 'png');
 end
 
-%% Spindle hits/second versus atoms/second
+%% Plot hits/second vs atoms/second
 if verbose
     theTitle = [outName ': Spindle hits/second vs atoms/second'];
     h2 = figure('Name', theTitle);
@@ -179,6 +198,7 @@ if verbose
     box on;
     saveas(h2, [outDir filesep theName 'SpindleHits' outSuffix '.png'], 'png');
 end
+
 %% Spindle hits STD vs atoms/second
 if verbose
     spindleSTD = std(spindleHits, 0, 2);

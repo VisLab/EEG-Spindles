@@ -1,5 +1,5 @@
-function [r, atomParams, scaledB, r2Values] = temporalMP(y, B, nonnegative, maxiter, ...
-                                            mindelta,deadzone)
+function [r, atomParams, scaledB, r2Values] = ...
+                  temporalMP(y, B, nonnegative, maxiter, mindelta,deadzone)
     %[ws,r,atomParams] = temporalMP(y,B,nonnegative,maxiter,maxr2,deadzone)
     %Perform matching pursuit (MP) on a one-dimensional signal y 
     %

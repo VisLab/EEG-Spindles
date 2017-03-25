@@ -1,5 +1,26 @@
-function gabors = getGabors(srate, atomFrequencies, atomScales)
-deviationFactor = 3;  
+function [gabors, sigmaFreq] = getGabors(srate, params)
+%% Create a dictionary of zero-phase Gabor atoms for specified parameters
+%
+%  Parameters:
+%     srate            sampling rate in Hz of the Gabor dictionary
+%     params           structure with optional parameters
+%        gaborFrequencies
+%        gaborScales
+%        gaborSupportFactor
+%
+%  Output:
+%     gabors         K x L array containing K gabor atoms of length L
+%     sigmaFreq      K x 2 array containing SD and frequency of the
+%                      K Gabor atoms in the columns
+%  
+%  Written by:  Kay Robbins, 2015-2017, UTSA
+%
+
+%% Set up the parameters
+params = processSpindleParameters('getGabors', nargin, 1, params);
+atomSupportFactor = params.gaborSupportFactor; 
+atomScales = params.gaborScales;
+atomFrequencies = params.gaborFrequencies;
 numberScales = length(atomScales);
 numberFreq = length(atomFrequencies);
 numberGabors = numberFreq*numberScales;
@@ -13,7 +34,10 @@ for n = 1:numberScales
     end
 end
 maxSD = max(atomScales)/2;
-t = -deviationFactor*maxSD:1/srate:deviationFactor*maxSD;  % time in seconds
+
+%% Create the time vector, making sure there are an odd number of elements
+t = 1/srate:1/srate:atomSupportFactor*maxSD;
+t = [fliplr(-t), 0, t];
 
 %% Create Gabors
 gabors = zeros(length(t), numberGabors);
@@ -21,6 +45,7 @@ for k = 1:numberGabors
     factor = sigmaFreq(k, 1)*sqrt(2*pi);
     gabors(:, k) = exp(-.5*(t.^2)*sigmaFreq(k, 1).^(-2)).*cos(2*pi*t*sigmaFreq(k, 2))./factor;
 end
-%Scale the gabors to have sum(gabors.^2)
+
+%% Scale the Gabors by sum(gabors.^2)
 scales = 1./sqrt(sum(gabors.^2));
 gabors = bsxfun(@times, gabors, scales);

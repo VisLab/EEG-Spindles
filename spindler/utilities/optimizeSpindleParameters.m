@@ -1,20 +1,23 @@
-function [] = analyzeSpindles(theFile, outDir, outSuffix, doPerformance, verbose)
-
+function [] = optimizeSpindleParameters(theFile, outDir, outSuffix, doPerformance, verbose)
+%% Analyze the spindles 
 
 %% Make sure the outDir exists
 if ~exist(outDir, 'dir')
     mkdir(outDir);
 end
 
-%% Load the data
+%% Load the data and initialize variables
 load(theFile)
-numberAtoms = length(atomsPerSecond); 
+atomsPerSecond = params.spindleAtomsPerSecond;
+baseThresholds = params.spindleBaseThresholds;
+numberAtoms = length(params.spindleAtomsPerSecond); 
 numberThresholds = length(baseThresholds);
 spindleHits = cellfun(@double, {spindles.numberSpindles});
-spindleHits  = reshape(spindleHits, numberAtoms, numberThresholds);
+spindleHits = reshape(spindleHits, numberAtoms, numberThresholds);
 spindleTime = cellfun(@double, {spindles.spindleTime});
-spindleTime  = reshape(spindleTime, numberAtoms, numberThresholds);
-
+spindleTime = reshape(spindleTime, numberAtoms, numberThresholds);
+eFraction = cellfun(@double, {spindles.eFraction});
+eFraction = reshape(eFraction, numberAtoms, numberThresholds);
 if isfield(spindles, 'f1ModTime')
     f1ModTime = cellfun(@double, {spindles.f1ModTime});
     f1ModTime  = reshape(f1ModTime, numberAtoms, numberThresholds);
@@ -22,7 +25,7 @@ if isfield(spindles, 'f1ModTime')
     f1ModHits  = reshape(f1ModHits, numberAtoms, numberThresholds);
     f1ModOnsets = cellfun(@double, {spindles.f1ModOnsets});
     f1ModOnsets  = reshape(f1ModOnsets, numberAtoms, numberThresholds); 
-    f1ModInter = cellfun(@double, {spindles.f1ModOnsets});
+    f1ModInter = cellfun(@double, {spindles.f1ModInter});
     f1ModInter  = reshape(f1ModInter, numberAtoms, numberThresholds); 
 else
     f1ModTime = NaN;
@@ -34,7 +37,7 @@ theColors = jet(numberThresholds);
 
 %% Show the spindle values for each dataset individually
 [~, theName] = fileparts(theFile);
-outName = [theName outsuffix];
+outName = [theName outSuffix];
 legendStrings = cell(1, numberThresholds);
 for k = 1:numberThresholds
     legendStrings{k} = num2str(baseThresholds(k));
@@ -62,7 +65,7 @@ xStdRatio = std(xAll, 0, 2);
 [iMeanMinAtoms, xMeanMin] = ...
                      findMinAfterMax(atomsPerSecond', xMeanRatio);
 theTitle = {'Spindle time/spindle hits vs atoms/second'; ...
-            [outName ; ...
+             outName; ...
             ['MedMin=' num2str(xMedianMin) ' at ' num2str(iMedianMinAtoms) ',' ...
             'MeanMin=' num2str(xMeanMin) ' at ' num2str(iMeanMinAtoms) ]};
 h5 = figure('Name', [outName ':Spindle time/spindle hits vs atoms/second']);
@@ -144,6 +147,22 @@ title(theTitle, 'Interpreter', 'None');
 legend(allLegends);
 saveas(h6, [outDir filesep theName 'SpindleHitsDivTime' outSuffix '.png'], 'png');
 
+%% Fraction of energy captures
+theTitle = [outName ': Fraction of energy in spindles'];
+h2 = figure('Name', theTitle);
+hold on
+for j = 1:numberThresholds
+    plot(atomsPerSecond, eFraction(:, j), 'LineWidth', 2, ...
+        'Color', theColors(j, :));
+end
+hold off
+ylabel('Fraction of energy')
+xlabel('Atoms/second')
+title(theTitle, 'Interpreter', 'None');
+legend(legendStrings, 'Location', 'NorthEast');
+box on;
+saveas(h2, [outDir filesep theName 'SpindleFraction' outSuffix '.png'], 'png');
+    
 %% Spindle time/second versus atoms/second
 if verbose
     theTitle = [outName ': Spindle time/second vs atoms/second'];
@@ -162,7 +181,7 @@ if verbose
     saveas(h1, [outDir filesep theName 'SpindleTime' outSuffix '.png'], 'png');
 end
 
-%% Spindle hits/second versus atoms/second
+%% Plot hits/second vs atoms/second
 if verbose
     theTitle = [outName ': Spindle hits/second vs atoms/second'];
     h2 = figure('Name', theTitle);
@@ -179,6 +198,7 @@ if verbose
     box on;
     saveas(h2, [outDir filesep theName 'SpindleHits' outSuffix '.png'], 'png');
 end
+
 %% Spindle hits STD vs atoms/second
 if verbose
     spindleSTD = std(spindleHits, 0, 2);
@@ -317,7 +337,7 @@ for k = 1:numberThresholds
     legendBoth{4*k - 1} = [legendStrings{k} ' O'];
     legendBoth{4*k} = [legendStrings{k} ' I'];
 end
-theTitle = [theName ': F1Mod hits vs atoms/second'];
+theTitle = [outName ': F1Mod hits vs atoms/second'];
 h10 = figure('Name', theTitle);
 hold on
 newColors = jet(numberThresholds);
@@ -385,7 +405,7 @@ if verbose
     legend(legendStrings, 'Location', 'SouthWest')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h11, [outDir filesep theName 'FPRvsTPR.png'], 'png'); 
+    saveas(h11, [outDir filesep theName 'FPRvsTPR' outSuffix '.png'], 'png'); 
     
     %% Plot precision-recall using time measures
     theTitle = [outName ': Precision-recall time'];
@@ -401,7 +421,7 @@ if verbose
     legend(legendStrings, 'Location', 'SouthWest')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h12, [outDir filesep theName 'RecallVsPercisionTime.png'], 'png'); 
+    saveas(h12, [outDir filesep theName 'RecallVsPercisionTime' outSuffix '.png'], 'png'); 
     
     %% Plot precision recall using hit measures
     theTitle = [outName ': Precision-recall hits'];
@@ -417,7 +437,7 @@ if verbose
     legend(legendStrings, 'Location', 'SouthEast')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h13, [outDir filesep theName 'RecallVsPercisionHits.png'], 'png');
+    saveas(h13, [outDir filesep theName 'RecallVsPercisionHits' outSuffix '.png'], 'png');
     
     %% Plot precision-recall using Inter measures
     theTitle = [outName ': Precision-recall inter'];
@@ -433,5 +453,5 @@ if verbose
     legend(legendStrings, 'Location', 'SouthEast')
     title(theTitle, 'Interpreter', 'None')
     box on;
-    saveas(h13, [outDir filesep theName 'RecallVsPercisionInter.png'], 'png');
+    saveas(h13, [outDir filesep theName 'RecallVsPercisionInter' outSuffix '.png'], 'png');
 end

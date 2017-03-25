@@ -1,10 +1,20 @@
-function [spindleCounts, spindleTime] = getSpindleCounts(events)
-
-spindleCounts = length(events);
-if spindleCounts == 0
-    spindleTime = 0.0;
+function [count, totalTime, meanTime] = getSpindleCounts(events)
+%% Calculate number of events, total time in event and mean event time
+%
+%  Parameters:
+%     events     n x 2 array with event start and end times in columns
+%     count     (output) number of events
+%     totalTime (output) total time in seconds in the events
+%     meanTime  (output) mean time in each event
+%
+%  Written by:  John La Rocco and Kay Robbins, 2016-17
+%
+count = length(events);
+if count == 0
+    totalTime = 0.0;
+    meanTime = 0.0;
     return;
 end
-startSpindles = cellfun(@double, events(:, 2));
-endSpindles = cellfun(@double, events(:, 3));
-spindleTime = sum(endSpindles - startSpindles);
+
+totalTime = sum(events(:, 2) - events(:, 1));
+meanTime = totalTime/count;

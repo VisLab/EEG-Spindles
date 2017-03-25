@@ -1,13 +1,21 @@
 function [xMin, yMin, minPos] = findMinAfterMax(x, y)
-% load('test.mat')
-% y = xAll;
-% x = atomsPerSecond';
-% y = median(xAll, 2);
+%% Find the first local minimum after the first local maximum
+%
+%  Parameters:
+%    x      Vector of x values
+%    y      Vector of y values
+%    xMax   (Output) x value of the local minimum
+%    yMax   (Output) y value of the local minimum
+%    maxPos (Output) index of the local minimum
+%
+% Written by:  Kay Robbins, UTSA, 2017
 
-%%
+%% Initialize the values
 xMin = [];
 yMin = [];
 minPos = [];
+
+%% Calculate the values
 ySlope = diff(y);
 maxPos = find(ySlope < 0, 1, 'first');
 if isempty(maxPos)

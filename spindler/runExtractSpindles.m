@@ -1,53 +1,60 @@
-dirName = 'D:\Research\AlphaCharacterization\NewVersion\originalDrivingData';
-outDir = 'D:\TestData\Alpha\DrivingSpindles\BCITSupervisedA';
+%% This script shows how to call getSpindles to get spindles for a range
+% of algorithm parameters. The analyzeSpindles selects best parameters.
 
-% EEGFile = 'S1015.set';
-% eventFile = 'S1015_labels.mat';
-% outFile = 'S1015SpindlesGroupNewG.mat';
+%% Setup the directories for input and output for driving data
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% spindleDir = 'D:\TestData\Alpha\spindleData\BCIT\spindles';
+% channelLabels = {'A25', 'PO7'};
+% paramsInit = struct();
 
-EEGFile = 'S1010.set';
-eventFile = 'S1010_labels.mat';
-outFile = 'S1010SpindlesGroupNewG.mat';
-%outFile = 'S1010SpindlesGroupNewC.mat';
-%channelNumbers = [20, 31, 57];
-%channelNumbers = 20;
-%channelNumbers = [25, 26];
-channelNumbers = 25;
-freqBounds = [6, 14];
-atomScales = [0.125, 0.25, 0.5];
-atomsPerSecond = 0.02:0.02:0.6;
-baseThresholds = [0.0001, 0.001, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1];
-freqInc = 1;
-atomFrequencies = freqBounds(1):freqInc:freqBounds(2);
-timeError = 0.1;
-minLength = 0.25;
-minTime = 0.25;
-onsetTolerance = 0.3;
-intersectTolerance = 0.2;
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+spindleDir = 'D:\TestData\Alpha\spindleData\nctu\spindles';
+channelLabels = {'PZ'};
+paramsInit = struct();
 
-%% Load the files
-EEG = pop_loadset([dirName filesep EEGFile]);
-load([dirName filesep eventFile]);
-expertEvents = expert_events;
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% spindleDir = 'D:\TestData\Alpha\spindleData\dreams\spindles';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.gaborFrequencies = 10:16;
+% paramsInit.spindleOnsetTolerance = 0.3;
+% paramsInit.spindleTimingTolerance = 0.1;
 
-%% Reconstruct signal
-% [events, finalEvents, spindles] = getSpindles(EEG, channelNumbers, atomsPerSecond, ...
-%                atomFrequencies, atomScales, baseThresholds, ...
-%                timeError, minLength, minTime, ...
-%                onsetTolerance, intersectTolerance, expertEvents);
-[spindles, spindleRatios] = getSpindles(EEG, channelNumbers, atomsPerSecond, ...
-               atomFrequencies, atomScales, baseThresholds, ...
-               timeError, minLength, minTime, ...
-               onsetTolerance, intersectTolerance, expertEvents);
-%% Save the results
-srate = EEG.srate;
-frames = size(EEG.data, 2);
-channelLabels = EEG.chanlocs(channelNumbers);
-channelLabels = {channelLabels.labels};
+%% Get the data and event file names and check that we have the same number
+dataFiles = getFiles('FILES', dataDir, '.set');
+if isempty(eventDir)
+    eventFiles = {};
+else
+    eventFiles = getFiles('FILES', eventDir, '.mat');
+    if length(eventFiles) ~= length(dataFiles)
+        error('Must have same number of event files as data files');
+    end
+end
 
-if ~exist(outDir, 'dir')
-    mkdir(outDir);
+%% Create the output file if it doesn't exist
+if ~exist(spindleDir, 'dir')
+    mkdir(spindleDir);
 end;
-save([outDir filesep outFile], 'spindles', 'spindleRatios', 'srate', ...
-    'frames', 'channelNumbers', 'channelLabels', 'atomsPerSecond', ...
-    'baseThresholds', 'atomFrequencies', 'atomScales', '-v7.3');
+
+%% Process the data
+for k = 1:length(dataFiles)
+    %% Load data file
+    EEG = pop_loadset(dataFiles{k});
+    
+    %% Load the event file
+    if isempty(eventDir)
+        expertEvents = [];
+    else
+        expertEvents = readEvents(eventFiles{k});
+    end
+    %% Calculate the spindle representations for a range of parameters
+    channelNumbers = getChannelNumbers(EEG, channelLabels);
+    [spindles, params] = extractSpindles(EEG, channelNumbers, expertEvents, paramsInit);
+    
+    %% Save the results
+    [~, fileName, ~] = fileparts(dataFiles{k});
+    save([spindleDir filesep fileName, '.mat'], 'spindles',  'params', '-v7.3');
+end

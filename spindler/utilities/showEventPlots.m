@@ -39,9 +39,8 @@ plot(EEGOrigTimes, EEGOrigData, 'k');
 
 
 yMPCoord = 2;
-eventMPTimes = cellfun(@double, events(:, 2:3))';
-yMPCoords = repmat(yMPCoord, size(eventMPTimes));
-line(eventMPTimes, yMPCoords.*eventScale, 'LineWidth', 3, 'Color', [0, 0, 1]);
+yMPCoords = repmat(yMPCoord, size(expertEvents));
+line(expertEvents, yMPCoords.*eventScale, 'LineWidth', 3, 'Color', [0, 0, 1]);
 
 
 if nargin>=6
@@ -79,9 +78,9 @@ for j=1:size(spindles,2)
     eve1=spindles(1,params(id));
     eve=eve1.events;
     yMPCoord = 2+(.1*j);
-    eventMPTimes = cellfun(@double, eve(:, 2:3))';
-    yMPCoords = repmat(yMPCoord, size(eventMPTimes));
-    line(eventMPTimes, yMPCoords.*eventScale, 'LineWidth', 3, 'Color', [0, j/length(params), 0]);
+    expertEvents = cellfun(@double, eve(:, 2:3))';
+    yMPCoords = repmat(yMPCoord, size(expertEvents));
+    line(expertEvents, yMPCoords.*eventScale, 'LineWidth', 3, 'Color', [0, j/length(params), 0]);
     
 end
 hold off

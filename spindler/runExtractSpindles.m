@@ -8,20 +8,20 @@
 % channelLabels = {'A25', 'PO7'};
 % paramsInit = struct();
 
-dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-spindleDir = 'D:\TestData\Alpha\spindleData\nctu\spindles';
-channelLabels = {'PZ'};
-paramsInit = struct();
-
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% spindleDir = 'D:\TestData\Alpha\spindleData\dreams\spindles';
-% channelLabels = {'C3-A1', 'CZ-A1'};
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% spindleDir = 'D:\TestData\Alpha\spindleData\nctu\spindles';
+% channelLabels = {'PZ'};
 % paramsInit = struct();
-% paramsInit.gaborFrequencies = 10:16;
-% paramsInit.spindleOnsetTolerance = 0.3;
-% paramsInit.spindleTimingTolerance = 0.1;
+
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+spindleDir = 'D:\TestData\Alpha\spindleData\dreams\spindles';
+channelLabels = {'C3-A1', 'CZ-A1'};
+paramsInit = struct();
+paramsInit.gaborFrequencies = 10:16;
+paramsInit.spindleOnsetTolerance = 0.3;
+paramsInit.spindleTimingTolerance = 0.1;
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');

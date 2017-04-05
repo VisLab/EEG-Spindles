@@ -1,15 +1,11 @@
-function events = detectEvents(data, srate, threshold, voteWeight)
+function events = detectEvents(data, srate, threshold)
 %% Apply a voting scheme to the signal decomposition to detect events
 %
 % Parameters:
 %
-%   data             Either a row vector or a matrix of data to threshold.
+%   data             A row vector of data to threshold.
 %   srate            Signal sampling rate in Hz.
-%   threshold        Threshold the dataIf the data points are
-%                       greater than this value then the threshold is 1. Else 
-%                       it is 0.
-%   voteWeight       A number from [0,1]. This input only applies when the
-%                       input data is contains more than one row. At least 
+%   threshold        Threshold for considering data in the event
 %   events           (output) n x 2 array with event start and end times in seconds
 %
 %  Written by: John La Rocco and Kay Robbins, 2016-17, UTSA
@@ -19,15 +15,11 @@ function events = detectEvents(data, srate, threshold, voteWeight)
 events = [];
 
 %% Scale the input signal based on 95th percentile of the data
-yScales = prctile(abs(data), 95, 2);
-scaledData = abs(bsxfun(@times, data, 1./yScales));
+yScales = prctile(abs(data(:)), 95);
+scaledData = abs(data./yScales);
 
 %% Convert to a threshold mask of 0's and 1's
-if size(scaledData, 1) > 1
-    thresholdMask = (mean(scaledData > threshold) >= voteWeight);
-else
-    thresholdMask = scaledData > threshold;
-end
+thresholdMask = scaledData > threshold;
 
 %% Find start and end indices of ones mask
 diffMask = diff(thresholdMask);

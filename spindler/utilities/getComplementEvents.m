@@ -8,6 +8,10 @@ function complementEvents = getComplementEvents(events, finalTime)
 %  
 %  Written by:  Kay Robbins, 2017, UTSA
 %
+if isempty(events)
+    complementEvents = [0, finalTime];
+    return;
+end
 eventStarts = events(:, 1);
 eventEnds = events(:, 2);
 complementStarts = [0; eventEnds];

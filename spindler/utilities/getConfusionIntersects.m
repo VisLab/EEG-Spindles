@@ -27,7 +27,7 @@ function [confusion, params] = getConfusionIntersects(trueEvents, labeledEvents,
 %  Written by:  Kay Robbins, UTSA, 2017
 
 %% Set up the parameters and initialize the variables
-params = processSpindleParameters('getIntersectConfusion', nargin, 3, params);
+params = processSpindlerParameters('getIntersectConfusion', nargin, 3, params);
 intersectTolerance = params.spindleIntersectTolerance;
 spindleSeconds = params.spindleSeconds;
 confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);

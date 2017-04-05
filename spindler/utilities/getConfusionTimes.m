@@ -6,7 +6,7 @@ function [confusion, params] = getConfusionTimes(trueEvents, labeledEvents, ...
 %     eventSet
 %% Process the defaults and initialize parameters
     confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
-    params = processSpindleParameters('getTimingConfusion', nargin, 4, params);
+    params = processSpindlerParameters('getTimingConfusion', nargin, 4, params);
     timingTolerance = params.spindleTimingTolerance;
    
     %% Initialize the variables and express frames in terms of events

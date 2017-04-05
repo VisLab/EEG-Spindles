@@ -15,6 +15,21 @@ confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
 numTrue = size(trueEvents, 1);
 numLabeled = size(labeledEvents, 1);
 
+%% Handle the boundary cases first
+if isempty(trueEvents)
+    confusion.tp = 0;
+    confusion.fp = numLabeled;
+    confusion.tn = 1;
+    confusion.fn = 0;
+    return;
+elseif isempty(labeledEvents)
+    confusion.tp = 0;
+    confusion.fp = 0;
+    confusion.tn = 1;
+    confusion.fn = numTrue;
+    return;
+end
+
 %% Match hits on true events
 trueMarks = zeros(numTrue, 1);
 labeledPos = 1;
@@ -66,3 +81,6 @@ confusion.fp = sum(labeledMarks == 0);
 confusion.tp = sum(trueMarks ~= 0);
 confusion.fn = sum(trueMarks == 0);
 confusion.tn = sum(nullMarks ~= 0);
+
+end
+

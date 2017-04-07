@@ -1,4 +1,5 @@
-function h = showEventPlots(EEG, channelNumbers, spindles, events, theTitle, expertEvents, otherEvents)
+function h = showEventPlots(EEG, channelNumbers, spindles, events, ...
+                            theTitle, expertEvents, otherEvents)
 
 % Last updated: January 2017, J. LaRocco, K. Robbins
 

@@ -1,4 +1,5 @@
-function [confusion, params] = getConfusionOnsets(trueEvents, labeledEvents, totalTime, params)
+function confusion = getConfusionOnsets(trueEvents, labeledEvents, ...
+                                totalTime, onsetTolerance, spindleDuration)
 %% Evaluate confusion matrix based on if start of events match within tolerance
 %
 %  Parameters:
@@ -15,15 +16,9 @@ function [confusion, params] = getConfusionOnsets(trueEvents, labeledEvents, tot
 %  Written by:  Kay Robbins, UTSA, 2017
 
 %% Set up the parameters and initialize the variables
-params = processSpindlerParameters('getOnsetConfusion', nargin, 3, params);
-onsetTolerance = params.spindleOnsetTolerance;
-spindleSeconds = params.spindleSeconds;
 confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
-
-%% 
 trueStarts = trueEvents(:, 1);
 labeledStarts = labeledEvents(:, 1);
-
 tp = 0;
 fp = 0;
 fn = 0;
@@ -47,4 +42,4 @@ end
 confusion.fp = fp;
 confusion.tp = tp;
 confusion.fn = fn;
-confusion.tn = round((totalTime - spindleSeconds * (tp + fp + fn))/spindleSeconds);
+confusion.tn = round((totalTime - spindleDuration * (tp + fp + fn))/spindleDuration);

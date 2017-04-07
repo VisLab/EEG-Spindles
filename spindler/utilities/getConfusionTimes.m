@@ -1,13 +1,12 @@
-function [confusion, params] = getConfusionTimes(trueEvents, labeledEvents, ...
-                      totalFrames, srate, params)
+function confusion = getConfusionTimes(trueEvents, labeledEvents, ...
+                                      totalFrames, srate, timingTolerance)
 %% Evaluate timing errors in comparing labelSet1(truth) against labeledSet2
 %
 %  Parameters
 %     eventSet
 %% Process the defaults and initialize parameters
     confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
-    params = processSpindlerParameters('getTimingConfusion', nargin, 4, params);
-    timingTolerance = params.spindleTimingTolerance;
+
    
     %% Initialize the variables and express frames in terms of events
     timingSamples = floor(timingTolerance * srate);

@@ -1,11 +1,12 @@
-function events = detectEvents(data, srate, threshold)
-%% Apply a voting scheme to the signal decomposition to detect events
+function events = detectEvents(data, srate, threshold, trimFactor)
+%% Detect events where scaled MP signal above a threshold
 %
 % Parameters:
 %
 %   data             A row vector of data to threshold.
 %   srate            Signal sampling rate in Hz.
 %   threshold        Threshold for considering data in the event
+%   trimFactor       
 %   events           (output) n x 2 array with event start and end times in seconds
 %
 %  Written by: John La Rocco and Kay Robbins, 2016-17, UTSA
@@ -14,8 +15,8 @@ function events = detectEvents(data, srate, threshold)
 %% Initialize the parameters
 events = [];
 
-%% Scale the input signal based on 95th percentile of the data
-yScales = prctile(abs(data(:)), 95);
+%% Scale the input signal based on trimFactor percentile of the data
+yScales = prctile(abs(data(:)), trimFactor);
 scaledData = abs(data./yScales);
 
 %% Convert to a threshold mask of 0's and 1's

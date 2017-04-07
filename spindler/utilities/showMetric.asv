@@ -1,5 +1,5 @@
 function figHan = showMetric(spindleParameters, metrics, metricName, ...
-                             imageDir, params)
+                             params)
 %% Plot the specified metric for the different evaluation methods
 %
 %  Parameters:
@@ -9,12 +9,11 @@ function figHan = showMetric(spindleParameters, metrics, metricName, ...
 
 %% Set up image directory if saving
 
-params = processSpindlerParameters('showMetric', nargin, 4, params);
+params = processSpindlerParameters('showMetric', nargin, 3, params);
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end
-theName = params.name;
-
+theName = params
 %% Make sure the metrics structure has all methods and specified metric
 if ~isfield(metrics, 'timeMetrics') || ...
    ~isfield(metrics, 'hitMetrics') || ...
@@ -120,7 +119,7 @@ hold off
 ylabel('Performance')
 xlabel('Atoms/second')
 title(theTitle, 'Interpreter', 'None');
-legend([legendBoth, 'STD spin/sec'], 'Location', 'eastoutside');
+legend([legendBoth, 'STD spin/sec'], 'Location', 'SouthEast');
 set(gca, 'YLim', yLimits);
 box on;
 
@@ -131,6 +130,6 @@ if ~isempty(imageDir)
             thisFormat], thisFormat);
     end
 end
-if params.figureClose
+if figureClose
    close(figHan);
 end

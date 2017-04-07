@@ -1,4 +1,5 @@
-function [confusion, params] = getConfusionIntersects(trueEvents, labeledEvents, totalTime, params)
+function confusion = getConfusionIntersects(trueEvents, ...
+            labeledEvents, totalTime, intersectTolerance, spindleDuration)
 %% Evaluate confusion matrix using the intersect method
 %
 %  Parameters:
@@ -27,9 +28,6 @@ function [confusion, params] = getConfusionIntersects(trueEvents, labeledEvents,
 %  Written by:  Kay Robbins, UTSA, 2017
 
 %% Set up the parameters and initialize the variables
-params = processSpindlerParameters('getIntersectConfusion', nargin, 3, params);
-intersectTolerance = params.spindleIntersectTolerance;
-spindleSeconds = params.spindleSeconds;
 confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
 
 %% Set up the structure and initialize the variables
@@ -125,7 +123,7 @@ confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
     confusion.tp = tp;
     confusion.fp = fp;
     confusion.fn = fn;
-    confusion.tn = round((totalTime - spindleSeconds * (tp + fp + fn))/spindleSeconds);
+    confusion.tn = round((totalTime - spindleDuration * (tp + fp + fn))/spindleDuration);
 
 
     function matches = getEventIntersect()

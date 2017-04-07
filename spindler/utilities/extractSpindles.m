@@ -26,12 +26,12 @@ params.channelLabels = EEG.chanlocs(channelNumber).labels;
 if isempty(channelNumber)
     error('extractSpindles:NoChannels', 'Must have non-empty');
 end  
-atomsPerSecond = params.spindleAtomsPerSecond;
-minLength = params.spindleMinLength;
-minSeparation = params.spindleMinSeparation;
+atomsPerSecond = params.spindlerAtomsPerSecond;
+minLength = params.spindlerMinLength;
+minSeparation = params.spindlerMinSeparation;
 
 %% Handle the baseThresholds (making sure thresholds 0 and 1 are included)
-baseThresholds = params.spindleBaseThresholds;
+baseThresholds = params.spindlerBaseThresholds;
 baseThresholds = sort(baseThresholds);
 if baseThresholds(1) ~= 0
     baseThresholds = [0, baseThresholds];
@@ -39,7 +39,7 @@ end
 if baseThresholds(end) ~= 1
     baseThresholds = [baseThresholds, 1];
 end
-params.baseThresholds = baseThresholds;
+params.spindlerBaseThresholds = baseThresholds;
 
 %% Extract the channels and filter the EEG signal before MP
 [numChans, numFrames] = size(EEG.data);
@@ -98,7 +98,7 @@ for k = 1:numAtoms
         spindles(p).atomsPerSecond = atomsPerSecond(k);
         spindles(p).numberAtoms = theAtoms(k);
         spindles(p).baseThreshold = baseThresholds(j);
-        events = detectEvents(y, srate, baseThresholds(j));
+        events = detectEvents(y, srate, baseThresholds(j), params.spindlerSignalTrimFactor);
         events = combineEvents(events, minLength, minSeparation);
         yPower = 0;
         sPower = 0;

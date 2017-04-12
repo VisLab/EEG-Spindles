@@ -2,19 +2,19 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT1';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT1';
-channelLabels = {'PO7'};
-paramsInit = struct();
-
-% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
-% channelLabels = {'P3'};
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT1';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT1';
+% channelLabels = {'PO7'};
 % paramsInit = struct();
+
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
+channelLabels = {'P3'};
+paramsInit = struct();
 
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';

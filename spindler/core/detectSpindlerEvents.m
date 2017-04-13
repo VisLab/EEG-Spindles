@@ -1,4 +1,4 @@
-function events = detectEvents(data, srate, threshold, trimFactor)
+function events = detectSpindlerEvents(data, srate, threshold, trimFactor)
 %% Detect events where scaled MP signal above a threshold
 %
 % Parameters:

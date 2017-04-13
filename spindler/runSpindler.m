@@ -2,19 +2,19 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT1';
-% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT1';
-% channelLabels = {'PO7'};
-% paramsInit = struct();
-
-dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
-channelLabels = {'P3'};
+dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT1';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT1';
+channelLabels = {'PO7'};
 paramsInit = struct();
+
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
+% channelLabels = {'P3'};
+% paramsInit = struct();
 
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
@@ -55,7 +55,7 @@ if ~exist(resultsDir, 'dir')
 end;
 
 paramsInit.figureClose = false;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
 for k = 1:length(dataFiles)
@@ -74,12 +74,12 @@ for k = 1:length(dataFiles)
     [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
     [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
-    spindlerParameters = getSpindlerParameters(spindles, imageDir, params);
+    spindlerCurves = getSpindlerCurves(spindles, imageDir, params);
      if ~isempty(eventDir)
         [metrics, expertEvents, params] = ...
                  getSpindlerPerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
-            showMetric(spindlerParameters, metrics, metricNames{n}, ...
+            showSpindlerMetric(spindlerCurves, metrics, metricNames{n}, ...
                        imageDir, params);
         end
      end
@@ -87,5 +87,5 @@ for k = 1:length(dataFiles)
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
     save([resultsDir filesep fileName, '_spindlerResults.mat'], ...
-        'spindles', 'metrics', 'params', 'spindlerParameters', '-v7.3');
+        'spindles', 'metrics', 'params', 'spindlerCurves', '-v7.3');
 end

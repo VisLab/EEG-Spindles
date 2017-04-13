@@ -18,7 +18,8 @@ function [spindles, params, atomParams, scaledGabors] = ...
 %
 
 %% Process the input parameters and set up the calculation
-params = processSpindlerParameters('extractEvents', nargin, 2, params);
+defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());
+params = processParameters('extractEvents', nargin, 2, params, defaults);
 params.srate = EEG.srate;
 params.frames = size(EEG.data, 2);
 params.channelNumber = channelNumber;
@@ -27,8 +28,8 @@ if isempty(channelNumber)
     error('extractSpindles:NoChannels', 'Must have non-empty');
 end  
 atomsPerSecond = params.spindlerAtomsPerSecond;
-minLength = params.spindlerMinLength;
-minSeparation = params.spindlerMinSeparation;
+minLength = params.minSpindleLength;
+minSeparation = params.minSpindleSeparation;
 
 %% Handle the baseThresholds (making sure thresholds 0 and 1 are included)
 baseThresholds = params.spindlerBaseThresholds;
@@ -98,7 +99,7 @@ for k = 1:numAtoms
         spindles(p).atomsPerSecond = atomsPerSecond(k);
         spindles(p).numberAtoms = theAtoms(k);
         spindles(p).baseThreshold = baseThresholds(j);
-        events = detectEvents(y, srate, baseThresholds(j), params.spindlerSignalTrimFactor);
+        events = detectSpindlerEvents(y, srate, baseThresholds(j), params.spindlerSignalTrimFactor);
         events = combineEvents(events, minLength, minSeparation);
         yPower = 0;
         sPower = 0;

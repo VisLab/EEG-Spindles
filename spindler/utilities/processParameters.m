@@ -1,4 +1,4 @@
-function params = processSpindlerParameters(functionName, actualArgs, reqArgs, params)
+function params = processParameters(functionName, actualArgs, reqArgs, params, defaults)
 % Check the specified parameters for functionName against defaults
     if nargin < 1  %% display help if not enough arguments
         eval(['help ' functionName]);
@@ -10,7 +10,6 @@ function params = processSpindlerParameters(functionName, actualArgs, reqArgs, p
         params = struct();
     end
 
-    defaults = getSpindlerDefaults();
     [params, errors] = checkDefaults(params, struct(), defaults);
     if ~isempty(errors)
         error([functionName ':BadParameters'], ['|' sprintf('%s|', errors{:})]);

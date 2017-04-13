@@ -15,8 +15,9 @@ function [metrics, expertEvents, params] = ...
 %
 
 %% Process the input parameters and set up the calculation
-params = processSpindlerParameters('calculatePerformance', nargin, 2, params);
-expertEvents = removeOverlapEvents(expertEvents, params.spindlerOverlapMethod);
+params = processParameters('calculatePerformance', ...
+                     nargin, 2, params, getGeneralDefaults());
+expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
 numExp = length(spindles);
 metrics(numExp) = struct('hitMetrics', NaN, 'intersectMetrics', NaN, ...
                         'onsetMetrics', NaN, 'timeMetrics', NaN);

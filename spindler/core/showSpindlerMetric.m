@@ -1,4 +1,4 @@
-function figHan = showMetric(spindleParameters, metrics, metricName, ...
+function figHan = showSpindlerMetric(spindleParameters, metrics, metricName, ...
                              imageDir, params)
 %% Plot the specified metric for the different evaluation methods
 %
@@ -8,8 +8,8 @@ function figHan = showMetric(spindleParameters, metrics, metricName, ...
 %     metricName            name of the metric to plot
 
 %% Set up image directory if saving
-
-params = processSpindlerParameters('showMetric', nargin, 4, params);
+defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());     
+params = processParameters('showMetric', nargin, 4, params, defaults);
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end

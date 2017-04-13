@@ -1,4 +1,4 @@
-function spindleParameters = getSpindlerParameters(spindles, outDir, params)
+function spindleCurves = getSpindlerCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -13,7 +13,7 @@ function spindleParameters = getSpindlerParameters(spindles, outDir, params)
 %  Written by:  Kay Robbins and John La Rocco, UTSA 2017
 
 %% Get the atoms per second and thresholds
-spindleParameters = struct('Name', NaN, ...
+spindleCurves = struct('Name', NaN, ...
              'atomsPerSecond', NaN, 'bestAtomsPerSecond', NaN, ....
              'baseThresholds', NaN, ...
              'bestThreshold', NaN, 'bestThresholdInd', NaN, ...
@@ -21,8 +21,8 @@ spindleParameters = struct('Name', NaN, ...
              'eFractionAverage', NaN, 'eFractMaxInd', NaN, ...
              'spindleSTD', NaN, 'spindleSTDScale', NaN, ...
              'diffSTD', NaN, 'diffSTDScale', NaN);
-         
-params = processSpindlerParameters('getSpindlerParameters', nargin, 2, params);
+defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());         
+params = processParameters('getSpindlerCurves', nargin, 2, params, defaults);
 atomsPerSecond = unique(cellfun(@double, {spindles.atomsPerSecond}))';
 baseThresholds = unique(cellfun(@double, {spindles.baseThreshold}));
 numAtoms = length(atomsPerSecond);
@@ -93,20 +93,20 @@ bestAtomsPerSecond = atomsPerSecond(eFractMaxInd);
 sHitsMean = (spindleHits(:,  minThresholdInd) + spindleHits(:, maxThresholdInd))/2;
 
 %% Now save the calculated spindle parameters
-spindleParameters.name = theName;
-spindleParameters.atomsPerSecond = atomsPerSecond;
-spindleParameters.bestAtomsPerSecond = bestAtomsPerSecond;
-spindleParameters.baseThresholds = baseThresholds;
-spindleParameters.bestThreshold = bestThreshold;
-spindleParameters.bestThresholdInd = bestThresholdInd;
-spindleParameters.atomRangeInd = atomRangeInd;
-spindleParameters.atomRange = [lowerAtomRange, upperAtomRange];
-spindleParameters.eFractionAverage = eFractionAverage;
-spindleParameters.eFractMaxInd = eFractMaxInd;
-spindleParameters.spindleSTD = spindleSTD;
-spindleParameters.spindleSTDScale = stdMax;
-spindleParameters.diffSTD = diffSTD;
-spindleParameters.diffSTDScale = diffSTDMax;
+spindleCurves.name = theName;
+spindleCurves.atomsPerSecond = atomsPerSecond;
+spindleCurves.bestAtomsPerSecond = bestAtomsPerSecond;
+spindleCurves.baseThresholds = baseThresholds;
+spindleCurves.bestThreshold = bestThreshold;
+spindleCurves.bestThresholdInd = bestThresholdInd;
+spindleCurves.atomRangeInd = atomRangeInd;
+spindleCurves.atomRange = [lowerAtomRange, upperAtomRange];
+spindleCurves.eFractionAverage = eFractionAverage;
+spindleCurves.eFractMaxInd = eFractMaxInd;
+spindleCurves.spindleSTD = spindleSTD;
+spindleCurves.spindleSTDScale = stdMax;
+spindleCurves.diffSTD = diffSTD;
+spindleCurves.diffSTDScale = diffSTDMax;
 %% Determine whether to display the results
 if isempty(outDir)
     return;

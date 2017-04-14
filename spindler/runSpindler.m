@@ -1,12 +1,20 @@
 %% This script shows how to call getSpindles to get spindles for a range
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
+% %% Setup the directories for input and output for driving data
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT1';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT1';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
+
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT1';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT1';
-channelLabels = {'PO7'};
+dataDir = 'E:\CTADATA\BCIT\level_0';
+eventDir = '';
+resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerAll';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerAll';
+channelLabels = {'PO3', 'H27'};
 paramsInit = struct();
 
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
@@ -54,7 +62,7 @@ if ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
 end;
 
-paramsInit.figureClose = false;
+%paramsInit.figureClose = false;
 %paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
@@ -63,7 +71,7 @@ for k = 1:length(dataFiles)
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
     %% Load the event file
-    if isempty(eventFiles{k})
+    if isempty(eventFiles) || isemtpy(eventFiles{k})
         expertEvents = [];
         metrics = [];
     else
@@ -72,6 +80,10 @@ for k = 1:length(dataFiles)
     
     %% Calculate the spindle representations for a range of parameters
     [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
+    if isempty(channelNumber)
+        warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
+        continue;
+    end
     [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
     spindlerCurves = getSpindlerCurves(spindles, imageDir, params);

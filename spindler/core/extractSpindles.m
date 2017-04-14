@@ -20,6 +20,7 @@ function [spindles, params, atomParams, scaledGabors] = ...
 %% Process the input parameters and set up the calculation
 defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());
 params = processParameters('extractEvents', nargin, 2, params, defaults);
+EEG = resampleToTarget(EEG, params.samplingRateTarget);
 params.srate = EEG.srate;
 params.frames = size(EEG.data, 2);
 params.channelNumber = channelNumber;

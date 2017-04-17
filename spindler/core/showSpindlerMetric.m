@@ -44,10 +44,11 @@ atomsPerSecond = spindleParameters.atomsPerSecond;
 baseThresholds = spindleParameters.baseThresholds;
 numAtoms = length(atomsPerSecond);
 numThresholds = length(baseThresholds);
-[~, minThreshInd] = min(baseThresholds);
-[~, maxThreshInd] = max(baseThresholds);
+[~, minInd] = min(baseThresholds);
+[~, maxInd] = max(baseThresholds);
 spindleSTD = spindleParameters.spindleSTD;
 eFractMaxInd = spindleParameters.eFractMaxInd;
+bestInd = spindleParameters.bestThresholdInd;
 
 %% Extract the values to plot
 hitMetric = zeros(length(sHits), 1);
@@ -62,27 +63,33 @@ for k = 1:length(sHits)
     timeMetric(k) = sTimes{k}.(metricName);
 end
 hitMetric = reshape(hitMetric, numAtoms, numThresholds);
-hitMetric = [hitMetric(:, minThreshInd), hitMetric(:, maxThreshInd)];
-hitMetric = [hitMetric(:, 1), mean(hitMetric, 2), hitMetric(:, 2)];
+hitMetricMean = mean([hitMetric(:, minInd), hitMetric(:, maxInd)], 2);
+hitMetric = [hitMetric(:, minInd), hitMetric(:, maxInd),  ...
+             hitMetricMean, hitMetric(:, bestInd)];
 
 intersectMetric = reshape(intersectMetric, numAtoms, numThresholds);
-intersectMetric = [intersectMetric(:, minThreshInd), intersectMetric(:, maxThreshInd)];
-intersectMetric = [intersectMetric(:, 1), mean(intersectMetric, 2), intersectMetric(:, 2)];
+intersectMetricMean = mean([intersectMetric(:, minInd), ...
+                            intersectMetric(:, maxInd)], 2);
+intersectMetric = [intersectMetric(:, minInd), intersectMetric(:, maxInd) ...
+         intersectMetricMean, intersectMetric(:, bestInd)];
 
 onsetMetric = reshape(onsetMetric, numAtoms, numThresholds);
-onsetMetric = [onsetMetric(:, minThreshInd), onsetMetric(:, maxThreshInd)];
-onsetMetric = [onsetMetric(:, 1), mean(onsetMetric, 2), onsetMetric(:, 2)];
+onsetMetricMean = mean([onsetMetric(:, minInd), onsetMetric(:, maxInd)], 2);
+onsetMetric = [onsetMetric(:, minInd), onsetMetric(:, minInd), ...
+               onsetMetricMean, onsetMetric(:, bestInd)];
 
 timeMetric = reshape(timeMetric, numAtoms, numThresholds);
-timeMetric = [timeMetric(:, minThreshInd), timeMetric(:, maxThreshInd)];
-timeMetric = [timeMetric(:, 1), mean(timeMetric, 2), timeMetric(:, 2)];
+timeMetricMean = mean([timeMetric(:, minInd), timeMetric(:, maxInd)], 2);
+timeMetric = [timeMetric(:, minInd), timeMetric(:, maxInd), ...
+              timeMetricMean, timeMetric(:, bestInd)];
 
 %% Set up the legends
-legendStrings = {'T_b=0', 'T_b center', 'T_b=1'};
+legendStrings = {'T_b=0', 'T_b=1', 'T_b center', ...
+                 ['T_b=' num2str(spindleParameters.bestThreshold)]};
 
 %% set up the graphics
-legendBoth = cell(1, 12);
-for k = 1:3
+legendBoth = cell(1, 16);
+for k = 1:4
     legendBoth{4*k - 3} = ['H:' legendStrings{k}];
     legendBoth{4*k - 2} = ['T:' legendStrings{k}];
     legendBoth{4*k - 1} = ['O:' legendStrings{k}];
@@ -91,15 +98,15 @@ end
 theTitle = [datasetName ': ' metricName ' vs atoms/second'];
 figHan = figure('Name', theTitle);
 hold on
-newColors = [0, 0, 0.8; 0, 0.8, 0; 0.8, 0, 0];
-for j = 1:3
+newColors = [0, 0, 0.8; 0.8, 0, 0; 0, 0.8, 0; 0, 0, 0];
+for j = 1:4
     plot(atomsPerSecond, hitMetric(:, j), 'LineWidth', 2, ...
           'Color', newColors(j, :));
     plot(atomsPerSecond, timeMetric(:, j), 'LineWidth', 2, 'LineStyle', '-.', ...
         'Color', newColors(j, :));
     plot(atomsPerSecond, onsetMetric(:, j), 'LineWidth', 2, 'LineStyle', ':', ...
         'Color', newColors(j, :));
-    plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', 2, 'LineStyle', '--', ...
+    plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', 3, 'LineStyle', '--', ...
         'Color', newColors(j, :));
 end
 plot(atomsPerSecond, spindleSTD, 'LineWidth', 2, 'Color', [0.5, 0.5, 0.5]);

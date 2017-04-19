@@ -1,4 +1,4 @@
-function [yMin, minPos] = findMinAfterMax(y)
+function [yMin, minPos] = findFirstMin(y)
 %% Find the first local minimum after the first local maximum
 %
 %  Parameters:
@@ -24,7 +24,7 @@ yNewSlope = ySlope(maxPos + 1:end);
 if isempty(yNewSlope)
     return;
 end
-minPos = find(yNewSlope > 0, 1, 'first');
+minPos = find(yNewSlope >= 0, 1, 'first');
 if isempty(minPos)
     return;
 end

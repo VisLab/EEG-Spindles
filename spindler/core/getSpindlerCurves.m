@@ -1,4 +1,4 @@
-function spindleCurves = getSpindlerCurves(spindles, outDir, params)
+function [spindleCurves, badFlag] = getSpindlerCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -13,6 +13,7 @@ function spindleCurves = getSpindlerCurves(spindles, outDir, params)
 %  Written by:  Kay Robbins and John La Rocco, UTSA 2017
 
 %% Get the atoms per second and thresholds
+badFlag = false;
 spindleCurves = struct('Name', NaN, ...
              'atomsPerSecond', NaN, 'bestAtomsPerSecond', NaN, ....
              'baseThresholds', NaN, ...
@@ -61,7 +62,7 @@ if isempty(lowerAtomInd) || isempty(upperAtomInd) || lowerAtomInd >= upperAtomIn
     warning('getSpinderCurves:BadSpindleSTD', ...
         ['Spindles/sec has non standard behavior for low ' ...
          'atoms/sec --- algorithm failed, likely because of large artifacts']);
-    spindleCurves = [];
+    badFlag = true;
     return;
 end
 
@@ -70,7 +71,7 @@ if sum(diffSTD(upperAtomInd:end) < 0) > 0
     warning('getSpindlerCurves:SpindleSTDNotMonotonic', ...
         ['STD spindles/sec not montonic function of atoms/sec ' ...
          '--- algorithm failed, likely because of large artifacts']); 
-    spindleCurves = [];
+    badFlag = true;
     return;
 end
 lowerAtomInd = max(1, lowerAtomInd - 1);
@@ -91,7 +92,7 @@ averL1THDist = mean(abs(xTHRatioScaled(atomRangeInd(1):atomRangeInd(2), :) - 1))
 %averL1THDist = mean(abs(xTHRatio(atomRangeInd(1):atomRangeInd(2), :) - 1));
 [~, bestThresholdInd] = min(averL1THDist);
 bestThreshold = baseThresholds(bestThresholdInd);
-[~, mInd] = findMinAfterMax(xTHRatio(atomRangeInd(1):atomRangeInd(2), bestThresholdInd));
+[~, mInd] = findFirstMin(xTHRatio(atomRangeInd(1):atomRangeInd(2), bestThresholdInd));
 if isempty(mInd)
     [~, mInd] = min(xTHRatio(atomRangeInd(1):atomRangeInd(2), bestThresholdInd));
 end
@@ -104,7 +105,12 @@ eFraction = reshape(eFraction, numAtoms, numThresholds);
 eFractionBest = eFraction(:, bestThresholdInd);
 eFractionMax = max(eFractionBest(:));
 eFractionBest = eFractionBest./eFractionMax;
-
+if eFractionBest(1)*0.5 > eFractionBest(end)
+    warning('getSpindlerCurves:BadEnergy', ...
+        ['Energy curve indicates large artifacts are present ' ...
+         'and the results are not reliable']);
+     badFlag = true;
+end
 %% Find the atoms/second with highest energy fraction in candidate range
 [~, eFractMaxInd] = max(eFractionBest(atomRangeInd(1):atomRangeInd(2)));
 eFractMaxInd = eFractMaxInd + lowerAtomInd - 1;

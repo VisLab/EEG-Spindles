@@ -64,7 +64,7 @@ end;
 
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
-badMask = false(length(dataFiles), 1);
+badmask = false(length(dataF
 %% Process the data
 for k = 1:length(dataFiles)
     %% Load data file
@@ -86,8 +86,8 @@ for k = 1:length(dataFiles)
     end
     [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
-    [spindlerCurves, badMask(k)] = getSpindlerCurves(spindles, imageDir, params);
-    if ~isempty(eventDir) && ~isempty(spindlerCurves) && ~badMask(k)
+    [spindlerCurves, badFlag] = getSpindlerCurves(spindles, imageDir, params);
+    if ~isempty(eventDir) && ~isempty(spindlerCurves) && ~badFlag
         [metrics, expertEvents, params] = ...
                  getSpindlerPerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
@@ -100,13 +100,4 @@ for k = 1:length(dataFiles)
     [~, fileName, ~] = fileparts(dataFiles{k});
     save([resultsDir filesep fileName, '_spindlerResults.mat'], ...
         'spindles', 'metrics', 'params', 'spindlerCurves', '-v7.3');
-end
-
-%% Now print out a message indicating bad files
-badFiles = dataFiles(badMask);
-if ~isempty(badFiles)
-    fprintf('The following files could not be processed due to artifacts:\n');
-    for k = 1:length(badFiles)
-        fprintf('--- %s\n', badFiles{k});
-    end
 end

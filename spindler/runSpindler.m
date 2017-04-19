@@ -66,7 +66,7 @@ paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = [123, 144, 147, 180, 183, 297, 374, 469, 660, 668] %123%1:length(dataFiles)
+for k = 147 %[123, 144, 147, 180, 183, 297, 374, 469, 660, 668] %123%1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

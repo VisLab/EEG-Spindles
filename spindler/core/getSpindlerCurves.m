@@ -7,7 +7,7 @@ function spindleCurves = getSpindlerCurves(spindles, outDir, params)
 %     theName      String identifying the name of the dataset
 %     outDir       Optional argument (if present and non empty, saves a
 %                  plot of the parameter selection results in outDir
-%     spindleParameters (output) Structure containing results of parameter
+%     spindleCurves (output) Structure containing results of parameter
 %                  selection
 %
 %  Written by:  Kay Robbins and John La Rocco, UTSA 2017
@@ -18,7 +18,8 @@ spindleCurves = struct('Name', NaN, ...
              'baseThresholds', NaN, ...
              'bestThreshold', NaN, 'bestThresholdInd', NaN, ...
               'atomRange', NaN, 'atomRangeInd', NaN,...
-             'eFractionAverage', NaN, 'eFractMaxInd', NaN, ...
+             'eFractionBest', NaN, 'eFractMaxInd', NaN, ...
+             'bestAtomInd', NaN, ...
              'spindleSTD', NaN, 'spindleSTDScale', NaN, ...
              'diffSTD', NaN, 'diffSTDScale', NaN);
 defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());         
@@ -41,12 +42,6 @@ spindleTime = reshape(spindleTime, numAtoms, numThresholds);
 spindleHits = spindleHits/totalSeconds;
 spindleTime = spindleTime/totalSeconds;
 
-%% Get the Fraction of energy
-eFraction = cellfun(@double, {spindles.eFraction});
-eFraction = reshape(eFraction, numAtoms, numThresholds);
-eFractionAverage = (eFraction(:, minThresholdInd) + eFraction(:, maxThresholdInd))/2;
-eFractionMax = max(eFractionAverage(:));
-eFractionAverage = eFractionAverage./eFractionMax;
 
 %% Get the standard deviations and slopes
 spindleSTDUnscaled = std(spindleHits, 0, 2);
@@ -63,10 +58,11 @@ if isempty(upperAtomInd)
 end
 lowerAtomInd = find(spindleSTD > stdLimits(1), 1, 'first');
 if isempty(lowerAtomInd) || lowerAtomInd >= upperAtomInd
-    warning('getSpinderParameters:BadBeginning', ...
-        ['Average spindle length has non standard behavior for low ' ...
-         'atoms/second']);
-    lowerAtomInd = 1;
+    warning('getSpinderCurves:BadSpindleSTD', ...
+        ['Spindles/sec has non standard behavior for low ' ...
+         'atoms/second --- algorithm failed, likely because of large artifacts  ']);
+    spindleCurves = [];
+    return;
 end
 lowerAtomInd = max(1, lowerAtomInd - 1);
 atomRangeInd = [lowerAtomInd, upperAtomInd];
@@ -83,13 +79,29 @@ xTHRatioScaled = bsxfun(@times, xTHRatio, xTHRatioDiv);
 
 %% Find the threshold whose scaled ratio is closed to the central ratio
 averL1THDist = mean(abs(xTHRatioScaled(atomRangeInd(1):atomRangeInd(2), :) - 1));
+%averL1THDist = mean(abs(xTHRatio(atomRangeInd(1):atomRangeInd(2), :) - 1));
 [~, bestThresholdInd] = min(averL1THDist);
 bestThreshold = baseThresholds(bestThresholdInd);
+[~, mInd] = findMinAfterMax(xTHRatio(atomRangeInd(1):atomRangeInd(2), bestThresholdInd));
+if isempty(mInd)
+    [~, mInd] = min(xTHRatio(atomRangeInd(1):atomRangeInd(2), bestThresholdInd));
+end
+bestAtomInd = mInd + lowerAtomInd - 1;
+bestAtomsPerSecond = atomsPerSecond(bestAtomInd);
+
+%% Get the Fraction of energy
+eFraction = cellfun(@double, {spindles.eFraction});
+eFraction = reshape(eFraction, numAtoms, numThresholds);
+eFractionBest = eFraction(:, bestThresholdInd);
+eFractionMax = max(eFractionBest(:));
+eFractionBest = eFractionBest./eFractionMax;
 
 %% Find the atoms/second with highest energy fraction in candidate range
-[~, eFractMaxInd] = max(eFractionAverage(atomRangeInd(1):atomRangeInd(2)));
+[~, eFractMaxInd] = max(eFractionBest(atomRangeInd(1):atomRangeInd(2)));
 eFractMaxInd = eFractMaxInd + lowerAtomInd - 1;
-bestAtomsPerSecond = atomsPerSecond(eFractMaxInd);
+%bestAtomsPerSecond = atomsPerSecond(eFractMaxInd);
+
+%%
 sHitsMean = (spindleHits(:,  minThresholdInd) + spindleHits(:, maxThresholdInd))/2;
 
 %% Now save the calculated spindle parameters
@@ -101,8 +113,9 @@ spindleCurves.bestThreshold = bestThreshold;
 spindleCurves.bestThresholdInd = bestThresholdInd;
 spindleCurves.atomRangeInd = atomRangeInd;
 spindleCurves.atomRange = [lowerAtomRange, upperAtomRange];
-spindleCurves.eFractionAverage = eFractionAverage;
+spindleCurves.eFractionBest = eFractionBest;
 spindleCurves.eFractMaxInd = eFractMaxInd;
+spindleCurves.bestAtomInd = bestAtomInd;
 spindleCurves.spindleSTD = spindleSTD;
 spindleCurves.spindleSTDScale = stdMax;
 spindleCurves.diffSTD = diffSTD;
@@ -124,6 +137,7 @@ theTitle = {baseTitle; ...
        ['STD range: [' num2str(lowerAtomRange) ',' ...
        num2str(upperAtomRange) '] ' ...
        'Energy max at: ' num2str(atomsPerSecond(eFractMaxInd)) ...
+       ' Best index at: ' num2str(atomsPerSecond(bestAtomInd)) ...
        ' Closest threshold: ' num2str(baseThresholds(bestThresholdInd))]};
 h1Fig = figure('Name', baseTitle);
 hold on
@@ -139,7 +153,7 @@ plot(ax(1), atomsPerSecond, xTHRatio(:, maxThresholdInd), ...
 
 set(h1, 'LineWidth', 3);
 set(h2, 'LineWidth', 3);
-plot(ax(1), atomsPerSecond, eFractionAverage, 'LineWidth', 3, 'Color', [0.1, 0.6, 0.1]);
+plot(ax(1), atomsPerSecond, eFractionBest, 'LineWidth', 3, 'Color', [0.1, 0.6, 0.1]);
 allLegends = [legendStrings, 'Energy Fract'];
 legend(ax(1), allLegends, 'Location', 'NorthWest');
 xLimits = get(ax(1), 'XLim');
@@ -147,7 +161,8 @@ line(ax(1), xLimits, [0, 0], 'Color', [0, 0, 0]);
 set(ax(1), 'YLimMode', 'auto', 'YTickMode', 'auto')
 yLimits = get(ax(1), 'YLim');
 
-ePos = atomsPerSecond(eFractMaxInd);
+ePos = atomsPerSecond(bestAtomInd);
+% ePos = atomsPerSecond(eFractMaxInd);
 line(ax(1), [ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
 
 line(ax(1), [lowerAtomRange, upperAtomRange], [-0.1, -0.1], ...
@@ -197,6 +212,10 @@ set(h2, 'LineWidth', 3);
 ylabel(ax(1), 'Spindles/sec');
 ylabel(ax(2), 'STD spindles/sec wrt threshold');
 set(ax(1), 'YLimMode', 'auto', 'YTickMode', 'auto');
+yLimits = get(ax(1), 'YLim');
+%ePos = atomsPerSecond(eFractMaxInd);
+line(ax(1), [ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
+
 yLimits = get(ax(2), 'YLim');
 line(ax(2), [lowerAtomRange, upperAtomRange], [0.1, 0.1]*yLimits(2), ...
     'LineWidth', 4, 'Color', [0.8, 0.8, 0.8]);

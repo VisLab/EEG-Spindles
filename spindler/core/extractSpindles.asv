@@ -69,11 +69,11 @@ if max(baseFreq) >= EEG.srate/2
 else
     EEGBase = pop_eegfiltnew(EEG, baseFreq(1), baseFreq(2));
 end
-% baseHigh = min(baseFreq(2), EEG.srate/2);
-% baseLow = max(baseFreq(1), 1);
+baseHigh = min(baseFreq(2), EEG.srate/2);
+baseLow = max(baseFreq(1), 1);
 %EEGBase = pop_eegfiltnew(EEG, highFreq, 2*highFreq - lowFreq);
-%EEGBase = pop_eegfiltnew(EEG, baseLow, baseHigh);
-%baseRatio = (baseHigh - baseLow)/(highFreq - lowFreq);
+EEGBase = pop_eegfiltnew(EEG, baseLow, baseHigh);
+baseRatio = (baseHigh - baseLow)/(highFreq - lowFreq);
 %% Reconstruct the signal using MP with a Gabor dictionary
 theAtoms = round(atomsPerSecond*totalTime);
 maxAtoms = max(theAtoms);
@@ -128,7 +128,7 @@ for k = 1:numAtoms
             sPower = sPower + sum(sData.*sData, 2);
         end
         if sPower > 0
-            spindles(p).eFraction = yPower./sPower;
+            spindles(p).eFraction = baseRatio*(yPower./sPower);
         end
         spindles(p).events = events;
         [spindles(p).numberSpindles, spindles(p).spindleTime, ...

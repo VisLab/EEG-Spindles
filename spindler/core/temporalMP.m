@@ -91,9 +91,9 @@ function [r, atomParams, scaledB, r2Values] = ...
         deadzone = 0;
     end
     atomParams = zeros(maxiter, 3);
-    maxr2 = .9999;   
+    %maxr2 = .9999;   
     feedbackFrequency = 250;
-    r2CheckFrequency  = 250;
+    %r2CheckFrequency  = 250;
     r2Values = zeros(1, maxiter);
     %Scale the basis to have sum(B.^2)
     scales = 1./sqrt(sum(B.^2));
@@ -206,7 +206,7 @@ function [r, atomParams, scaledB, r2Values] = ...
             Cmax(rg2) = Cmax(rg2).*(~Cmask(rg2));
         end
         
-        if rg2(end) > length(y) - size(B,2) - 1 || rg2(1) < size(B,2) + 1
+        if rg2(end) > length(y) - size(B, 2) - 1 || rg2(1) < size(B, 2) + 1
             C(:, Cmask) = 0;
             Cmax(Cmask) = 0;
         end
@@ -233,13 +233,13 @@ function [r, atomParams, scaledB, r2Values] = ...
         
         %Check if R^2 > maxr2
         r2Values(ii) = 1 - sum((y - r).^2)/sy2;
-        if maxr2 < 1 && mod(ii, r2CheckFrequency) == 0
-            if r2Values(ii) > maxr2
-                fprintf('Max R^2 reached at iteration %d\n', ii);
-                break;
-            end
-        end
-        
+%         if maxr2 < 1 && mod(ii, r2CheckFrequency) == 0
+%             if r2Values(ii) > maxr2
+%                 fprintf('Max R^2 reached at iteration %d\n', ii);
+%                 break;
+%             end
+%         end
+%         
         ii = ii + 1;
     end
     

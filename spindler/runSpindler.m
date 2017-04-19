@@ -1,21 +1,21 @@
 %% This script shows how to call getSpindles to get spindles for a range
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
-% %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerT2';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerT2';
-channelLabels = {'PO7'};
-paramsInit = struct();
+%% Setup the directories for input and output for driving data
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerNewMin';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerNewMin';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
-% dataDir = 'E:\CTADATA\BCIT\level_0';
-% eventDir = '';
-% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerAll';
-% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerAll';
-% channelLabels = {'PO3', 'H27'};
-% paramsInit = struct();
+dataDir = 'E:\CTADATA\BCIT\level_0';
+eventDir = '';
+resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerAllTemp';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerAllTemp';
+channelLabels = {'PO3', 'H27'};
+paramsInit = struct();
 
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
 % eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
@@ -26,8 +26,8 @@ paramsInit = struct();
 
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerNew';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerNew';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 % paramsInit = struct();
 % paramsInit.spindlerGaborFrequencies = 10:16;
@@ -62,11 +62,11 @@ if ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
 end;
 
-%paramsInit.figureClose = false;
-%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+paramsInit.figureClose = false;
+paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = [123, 144, 147, 180, 183, 297, 374, 469, 660, 668] %123%1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -87,7 +87,7 @@ for k = 1:length(dataFiles)
     [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
     spindlerCurves = getSpindlerCurves(spindles, imageDir, params);
-     if ~isempty(eventDir)
+    if ~isempty(eventDir) && ~isempty(spindlerCurves)
         [metrics, expertEvents, params] = ...
                  getSpindlerPerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)

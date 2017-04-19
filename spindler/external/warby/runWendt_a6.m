@@ -14,7 +14,7 @@ imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesA6';
 centralLabels = {'C3-A1', 'CZ-A1'};
 occipitalLabels = {'O1-A1'};
 paramsInit = struct();
-paramsInit.AsdVisualize = true;
+%paramsInit.AsdVisualize = true;
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -52,7 +52,7 @@ for k = 1%:length(dataFiles)
    end
    centralData = EEG.data(centralNumber, :);
    occipitalData = EEG.data(occipitalNumber, :);
-   detection = wendt_spindle_detection(centralData, occipitalData, EEG.srate);
+   detection = a6_spindle_detection(centralData, occipitalData, EEG.srate);
 %    [~, theName, ~] = fileparts(dataFiles{k});
 %    paramsInit.AsdImagePathPrefix = ...
 %                      [imageDir filesep theName '_Ch_' num2str(channelLabel)];

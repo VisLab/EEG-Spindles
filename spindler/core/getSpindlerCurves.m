@@ -1,4 +1,4 @@
-function [spindleCurves, badFlag] = getSpindlerCurves(spindles, outDir, params)
+function [spindleCurves, warningMsgs] = getSpindlerCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -9,11 +9,13 @@ function [spindleCurves, badFlag] = getSpindlerCurves(spindles, outDir, params)
 %                  plot of the parameter selection results in outDir
 %     spindleCurves (output) Structure containing results of parameter
 %                  selection
+%     warningMsgs (output) Structure containing results of parameter
+%                  selection
 %
 %  Written by:  Kay Robbins and John La Rocco, UTSA 2017
 
 %% Get the atoms per second and thresholds
-badFlag = false;
+warningMsgs = {};
 spindleCurves = struct('Name', NaN, ...
              'atomsPerSecond', NaN, 'bestAtomsPerSecond', NaN, ....
              'baseThresholds', NaN, ...
@@ -59,19 +61,18 @@ if isempty(upperAtomInd)
 end
 lowerAtomInd = find(spindleSTD > stdLimits(1), 1, 'first');
 if isempty(lowerAtomInd) || isempty(upperAtomInd) || lowerAtomInd >= upperAtomInd
-    warning('getSpinderCurves:BadSpindleSTD', ...
-        ['Spindles/sec has non standard behavior for low ' ...
-         'atoms/sec --- algorithm failed, likely because of large artifacts']);
-    badFlag = true;
+    warningMsgs{end + 1} = ...
+         ['Spindles/sec has non standard behavior for low ' ...
+         'atoms/sec --- algorithm failed, likely because of large artifacts'];
+    warning('getSpinderCurves:BadSpindleSTD', warningMsgs{end});
     return;
 end
 
 %% If the STD is not an increasing function of atoms/sec, decomposition bad
 if sum(diffSTD(upperAtomInd:end) < 0) > 0
-    warning('getSpindlerCurves:SpindleSTDNotMonotonic', ...
-        ['STD spindles/sec not montonic function of atoms/sec ' ...
-         '--- algorithm failed, likely because of large artifacts']); 
-    badFlag = true;
+    warningMsgs{end + 1} =   ['STD spindles/sec not montonic function of atoms/sec ' ...
+         '--- algorithm failed, likely because of large artifacts'];
+    warning('getSpindlerCurves:SpindleSTDNotMonotonic',  warningMsgs{end});
     return;
 end
 lowerAtomInd = max(1, lowerAtomInd - 1);
@@ -105,11 +106,10 @@ eFraction = reshape(eFraction, numAtoms, numThresholds);
 eFractionBest = eFraction(:, bestThresholdInd);
 eFractionMax = max(eFractionBest(:));
 eFractionBest = eFractionBest./eFractionMax;
-if eFractionBest(1)*0.5 > eFractionBest(end)
-    warning('getSpindlerCurves:BadEnergy', ...
-        ['Energy curve indicates large artifacts are present ' ...
-         'and the results are not reliable']);
-     badFlag = true;
+if params.spindlerLowEnergyWarning > eFractionBest(end)
+    warningMsgs{end + 1} =  ...
+        'Energy curve indicates large artifacts may be present';
+    warning('getSpindlerCurves:BadEnergy', warningMsgs{end});
 end
 %% Find the atoms/second with highest energy fraction in candidate range
 [~, eFractMaxInd] = max(eFractionBest(atomRangeInd(1):atomRangeInd(2)));

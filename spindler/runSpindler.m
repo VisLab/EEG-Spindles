@@ -4,8 +4,8 @@
 %% Setup the directories for input and output for driving data
 dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
 eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerResultsNew1';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerImagesNew1';
+resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerResultsNewAgain';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerImagesNewAgain';
 channelLabels = {'PO7'};
 paramsInit = struct();
 
@@ -26,8 +26,8 @@ paramsInit = struct();
 
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerNew';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerNew';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerNew1';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerNew1';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 % paramsInit = struct();
 % paramsInit.spindlerGaborFrequencies = 10:16;
@@ -66,18 +66,11 @@ paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 badMask = false(length(dataFiles), 1);
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 2%1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
-    %% Load the event file
-    if isempty(eventFiles) || isempty(eventFiles{k})
-        expertEvents = [];
-        metrics = [];
-    else
-        expertEvents = readEvents(eventFiles{k});
-    end
-    
+ 
     %% Calculate the spindle representations for a range of parameters
     [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
     if isempty(channelNumber)
@@ -86,8 +79,14 @@ for k = 1:length(dataFiles)
     end
     [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
-    [spindlerCurves, badMask(k)] = getSpindlerCurves(spindles, imageDir, params);
-    if ~isempty(eventDir) && ~isempty(spindlerCurves) && ~badMask(k)
+    [spindlerCurves, warningMsgs] = getSpindlerCurves(spindles, imageDir, params);
+    
+    %% Deal with ground truth if available
+    if isempty(eventFiles) || isempty(eventFiles{k}) || isempty(spindlerCurves)
+        expertEvents = [];
+        metrics = [];
+    else
+        expertEvents = readEvents(eventFiles{k});
         [metrics, expertEvents, params] = ...
                  getSpindlerPerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
@@ -98,15 +97,6 @@ for k = 1:length(dataFiles)
      
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
-    save([resultsDir filesep fileName, '_spindlerResults.mat'], ...
-        'spindles', 'metrics', 'params', 'spindlerCurves', '-v7.3');
-end
-
-%% Now print out a message indicating bad files
-badFiles = dataFiles(badMask);
-if ~isempty(badFiles)
-    fprintf('The following files could not be processed due to artifacts:\n');
-    for k = 1:length(badFiles)
-        fprintf('--- %s\n', badFiles{k});
-    end
+    save([resultsDir filesep fileName, '_spindlerResults.mat'], 'spindles', ...
+        'metrics', 'params', 'spindlerCurves', 'warningMsgs', '-v7.3');
 end

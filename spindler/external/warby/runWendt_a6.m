@@ -1,20 +1,20 @@
 %% Set up the directory
 % dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
 % resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsWendt';
 % imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesWendt';
-% channelLabels = {'PO7'};
+% centralLabels = {'CZ'};
+% occipitalLabels = {'O1'};
 % paramsInit = struct();
-% paramsInit.AsdVisualize = true;
 
 %% Set up the directory
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsA6';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesA6';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsWendt';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesWendt';
 centralLabels = {'C3-A1', 'CZ-A1'};
 occipitalLabels = {'O1-A1'};
 paramsInit = struct();
-%paramsInit.AsdVisualize = true;
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -42,23 +42,41 @@ if ~exist(resultsDir, 'dir')
 end;
 
 %% Run the algorithm
-for k = 1%:length(dataFiles) 
-   EEG = pop_loadset(dataFiles{k});
-   [centralNumber, centralLabel] = getChannelNumber(EEG, centralLabels);
-   [occipitalNumber, occipitalLabel] = getChannelNumber(EEG, occipitalLabels);
-   if isempty(centralNumber) || isempty(occipitalNumber)
-       warning('Dataset %d: %s does not have needed channels', k, dataFiles{k});
-       continue;
-   end
-   centralData = EEG.data(centralNumber, :);
-   occipitalData = EEG.data(occipitalNumber, :);
-   detection = a6_spindle_detection(centralData, occipitalData, EEG.srate);
-%    [~, theName, ~] = fileparts(dataFiles{k});
-%    paramsInit.AsdImagePathPrefix = ...
-%                      [imageDir filesep theName '_Ch_' num2str(channelLabel)];
-%    [events, params, additionalInfo] = ...
-%                       asdExtractEvents(EEG, channelNumber, paramsInit);
-%    params.fileName = theName;
-%    save([resultsDir filesep theName '_Ch_' channelLabel '_asd.mat'], ...
-%        'events', 'params', 'additionalInfo', '-v7.3');
+for k = 1%:length(dataFiles)
+    params = processParameters('Wendt_a6', 0, 0, paramsInit, getGeneralDefaults());
+    EEG = pop_loadset(dataFiles{k});
+    [centralNumber, centralLabel] = getChannelNumber(EEG, centralLabels);
+    [occipitalNumber, occipitalLabel] = getChannelNumber(EEG, occipitalLabels);
+    if isempty(centralNumber) || isempty(occipitalNumber)
+        warning('Dataset %d: %s does not have needed channels', k, dataFiles{k});
+        continue;
+    end
+    
+    %% Load the file
+    centralData = EEG.data(centralNumber, :)';
+    occipitalData = EEG.data(occipitalNumber, :)';
+    detection = a6_spindle_detection(centralData, occipitalData, EEG.srate);
+    events = getMaskEvents(detection, EEG.srate);
+    events = combineEvents(events, params.minSpindleLength, params.minSpindleSeparation);
+    params.srate = EEG.srate;
+    params.frames = size(EEG.data, 2);
+    
+    %% Deal with ground
+    if isempty(eventFiles) || isempty(eventFiles{k})
+        expertEvents = [];
+        metrics = [];
+    else
+        metrics = struct('hitMetrics', NaN, 'intersectMetrics', NaN, ...
+            'onsetMetrics', NaN, 'timeMetrics', NaN);
+        expertEvents = readEvents(eventFiles{k});
+        [metrics.hitMetrics, metrics.intersectMetrics, ...
+            metrics.onsetMetrics, metrics.timeMetrics] = ...
+            getPerformanceMetrics(expertEvents, events, params.frames, ...
+                                  params.srate, params);
+    end
+    [~, theName, ~] = fileparts(dataFiles{k});
+    
+    params.fileName = theName;
+    save([resultsDir filesep theName '_Ch_' centralLabel '_' occipitalLabel '_warby.mat'], ...
+        'events', 'metrics', 'params', '-v7.3');
 end

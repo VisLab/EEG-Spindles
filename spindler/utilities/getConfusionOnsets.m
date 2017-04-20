@@ -17,8 +17,18 @@ function confusion = getConfusionOnsets(trueEvents, labeledEvents, ...
 
 %% Set up the parameters and initialize the variables
 confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
-trueStarts = trueEvents(:, 1);
-labeledStarts = labeledEvents(:, 1);
+if isempty(trueEvents)
+    trueStarts = [];
+else
+    trueStarts = trueEvents(:, 1);
+end
+if isempty(labeledEvents)
+    labeledStarts = [];
+else
+    labeledStarts = labeledEvents(:, 1);
+end
+
+
 tp = 0;
 fp = 0;
 fn = 0;

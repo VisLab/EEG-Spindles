@@ -1,4 +1,4 @@
-function detection = wendt_spindle_detection(C3,O1,fs)
+function detection = wendt_spindle_detection_modded(C3,O1,fs)
 % WENDT_SS_DETECT Detect sleep spindles using the Wendt algorithm.
 % S. Wendt et al. "Validation of a Novel Automatic Sleep Spindle Detector
 % with High Performance During Sleep in Middle Age Subjects", Conf Proc 
@@ -37,7 +37,7 @@ result_03(sum_res_03 >= 1) = 1;
 [detection,~,~] = maximum_duration(result_03,begins,ends,3,fs);
 
 %% Functions
-    function out = bandpass_11_16(in,Fs)
+    function out = bandpass_11_16(inx,Fs)
         % BANDPASS_11_16 - Bandpass filter used in Wendt spindle
         % detection.
         % This function creates a 253rd order (if the sampling frequency is 100 Hz)
@@ -60,7 +60,8 @@ result_03(sum_res_03 >= 1) = 1;
             [Dstop1 Dpass Dstop2]);
         % Calculate the coefficients using the FIRPM function.
         b  = firpm(N, Fo, Ao, W, {dens});
-        out = filtfilt(b,1,in);   % b coeffs, a coeffs, inputsignal
+        
+        out = filtfilt(b,1,double(inx));   % b coeffs, a coeffs, inputsignal
     end
 
     function result = detect_spindles(C3raw,C3band,Oband,C3abs,lowpassF,offset,fs)
@@ -74,6 +75,7 @@ result_03(sum_res_03 >= 1) = 1;
         
         % Calculate the envelope
         C3low = lowpass(C3abs,lowpassF,fs);
+        
         % Calculate zerocrossings of the first and second derivative of the
         % envelope
         Z = zero_crossings(C3low);
@@ -87,7 +89,7 @@ result_03(sum_res_03 >= 1) = 1;
         [result,~,~] = check_amplitude(C3raw,DD,beginns,ennds);
     end
 
-    function out = lowpass(in,Fpass,Fs)
+    function out = lowpass(inx,Fpass,Fs)
         % LOWPASS - equripple lowpass filter a signal with passband Fpass and stopband
         % Fpass+1 Hz.
         % Input is an EEG signal. Output is the filtered EEG signal.
@@ -101,7 +103,10 @@ result_03(sum_res_03 >= 1) = 1;
         [N, Fo, Ao, W] = firpmord([Fpass, Fstop]/(Fs/2), [1 0], [Dpass, Dstop]);
         % Calculate the coefficients using the FIRPM function.
         b  = firpm(N, Fo, Ao, W, {dens});
-        out = filtfilt(b,1,in);   % b coeffs, a coeffs, inputsignal
+        out = filtfilt(b,1,inx);   % b coeffs, a coeffs, inputsignal
+        
+        
+        
     end
 
     function [Z,zdf,zddf] = zero_crossings(C3low)
@@ -148,7 +153,12 @@ result_03(sum_res_03 >= 1) = 1;
         % Output is a vector with indexes of zero crossings without points of
         % inflection.
         
-        P = find(Zin==1); P = [1; P; length(Zin)]; % zero crossing of 1. derivative
+        P = find(Zin==1); 
+        if isempty(P);
+           P=0; 
+        end
+
+        P = [1 P length(Zin)']; % zero crossing of 1. derivative
         Q = find(Zin==2);                          % zero crossing of 2. derivative
         z = 0;
         for i = 1:length(P)-1
@@ -266,11 +276,11 @@ result_03(sum_res_03 >= 1) = 1;
         
         C3rawabs = abs(signal);
         for k = 1:length(start)
-            if sum(C3rawabs(start(k):slut(k))>85) ~= 0
-                DD(start(k):slut(k)) = 0;
-                start(k) = 0;
-                slut(k) = 0;
-            end
+%               if sum(C3rawabs((start(k)):(slut(k)))>85) ~= 0;
+%                   DD(start(k):slut(k)) = 0;
+%                   start(k) = 0;
+%                   slut(k) = 0;
+%               end
         end
         start = start(start~=0);
         slut = slut(slut~=0);

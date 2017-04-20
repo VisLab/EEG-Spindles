@@ -24,27 +24,33 @@ function [events, params, additionalInfo] = ...
 events = [];
 additionalInfo = struct('eventFrequencies', NaN, 'eventAmplitudes', NaN, ...
            'eventOscillationIndices', NaN);
-params = processAsdParameters('asd', nargin, 2, params);
+defaults = concatenateStructs(getGeneralDefaults(), getAsdDefaults());
+params = processParameters('asd', nargin, 2, params, defaults);
 
-params.channelNumber = channelNumber;
-params.channelLabels = EEG.chanlocs(channelNumber);
-if isempty(channelNumber)
-    error('extractSpindles:NoChannels', 'Must have non-empty');
+%% Extract the channels and filter the EEG signal before MP
+if channelNumber > size(EEG.data, 1)
+    error('asdExtractEvents:BadChannel', 'The EEG does not have channel needed');
 end
+params.srateOriginal = EEG.srate;
 EEG.data = EEG.data(channelNumber, :);
+EEG.chanlocs = EEG.chanlocs(channelNumber);
 EEG.nbchan = 1;
+EEG = resampleToTarget(EEG, params.srateTarget);
+srate = EEG.srate;
+numFrames = size(EEG.data, 2);
+totalTime = (numFrames - 1)/srate;
+params.srate = srate;
+params.frames = numFrames;
+params.channelNumber = channelNumber;
+params.channelLabel = num2str(EEG.chanlocs.labels);
+
 if ~isempty(params.AsdBandpassHz)
     bandHz = params.AsdBandpassHz;
     EEG = pop_eegfiltnew(EEG, bandHz(1), bandHz(2));
 end
-if ~isempty(params.AsdDownsampleHz) && params.AsdDownsampleHz < EEG.srate
-    EEG = pop_resample(EEG, params.AsdDownsampleHz);
-end
+
 data = EEG.data;
 data = data(:);
-srate = EEG.srate;
-params.srate = srate;
-params.frames = size(EEG.data, 2);
 
 %% Set up the image directory if visualize is on
 imagePath = [];

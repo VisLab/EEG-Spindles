@@ -1,4 +1,4 @@
-function detection = wendt_spindle_detection(C3,O1,fs)
+function detection = a6_spindle_detection(C3,O1,fs)
 % WENDT_SS_DETECT Detect sleep spindles using the Wendt algorithm.
 % S. Wendt et al. "Validation of a Novel Automatic Sleep Spindle Detector
 % with High Performance During Sleep in Middle Age Subjects", Conf Proc 

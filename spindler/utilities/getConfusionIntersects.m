@@ -128,10 +128,20 @@ confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
 
     function matches = getEventIntersect()
         %% Compute matrix of intersect ratios between true and labeled events
-        trueStarts = trueEvents(:, 1);
-        trueEnds = trueEvents(:, 2);
-        labeledStarts = labeledEvents(:, 1);
-        labeledEnds = labeledEvents(:, 2);
+        if isempty(trueEvents)
+            trueStarts = [];
+            trueEnds = [];
+        else
+            trueStarts = trueEvents(:, 1);
+            trueEnds = trueEvents(:, 2);
+        end
+        if isempty(labeledEvents)
+            labeledStarts = [];
+            labeledEnds = [];
+        else
+            labeledStarts = labeledEvents(:, 1);
+            labeledEnds = labeledEvents(:, 2);
+        end
         matches = zeros(numberTrue, numberLabeled);
         for k = 1:numberTrue
             for n = 1:numberLabeled

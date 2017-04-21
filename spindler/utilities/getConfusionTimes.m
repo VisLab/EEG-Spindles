@@ -58,6 +58,7 @@ function confusion = getConfusionTimes(trueEvents, labeledEvents, ...
         for m = 1:size(eventSet, 1)
             frameMask(eventFrames(m, 1):eventFrames(m, 2)) = true;
         end
+        frameMask = frameMask(1:totalFrames);  %Might be one off
     end
     
     function newMask = extendBefore(testMask, position, maxFrames)

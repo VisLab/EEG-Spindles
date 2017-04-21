@@ -68,7 +68,7 @@ paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -82,24 +82,24 @@ for k = 1:length(dataFiles)
     [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
     [spindlerCurves, warningMsgs] = getSpindlerCurves(spindles, imageDir, params);
-    
+     if spindlerCurves.bestLinearInd > 0
+         events = spindles(spindlerCurves.bestLinearInd).events;
+     end
     %% Deal with ground truth if available
     if isempty(eventFiles) || isempty(eventFiles{k}) || isempty(spindlerCurves)
         expertEvents = [];
         allMetrics = [];
         metrics = [];
-        events = [];
     else
         expertEvents = readEvents(eventFiles{k});
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        [allMetrics, params] = getSpindlerPerformance(spindles, expertEvents, params);
+        [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
             showSpindlerMetric(spindlerCurves, allMetrics, metricNames{n}, ...
                        imageDir, params);
         end
         if spindlerCurves.bestLinearInd > 0
             metrics = allMetrics(spindlerCurves.bestLinearInd);
-            events = spindles(spindlerCurves.bestLinearInd).events;
         end
     end
    

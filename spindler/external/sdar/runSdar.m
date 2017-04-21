@@ -65,10 +65,10 @@ if ~exist(resultsDir, 'dir')
 end;
 
 paramsInit.figureClose = false;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
-badMask = false(length(dataFiles), 1);
+%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -79,12 +79,12 @@ for k = 1:length(dataFiles)
         warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
         continue;
     end
-    [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
+    [spindles, params] = extractSpindlesSdar(EEG, channelNumber, paramsInit);
     params.name = theName;
-    [spindlerCurves, warningMsgs] = getSpindlerCurves(spindles, imageDir, params);
+    %[spindlerCurves, warningMsgs] = getSpindlerCurves(spindles, imageDir, params);
     
     %% Deal with ground truth if available
-    if isempty(eventFiles) || isempty(eventFiles{k}) || isempty(spindlerCurves)
+    if isempty(eventFiles) || isempty(eventFiles{k}) 
         expertEvents = [];
         allMetrics = [];
         metrics = [];
@@ -92,21 +92,18 @@ for k = 1:length(dataFiles)
     else
         expertEvents = readEvents(eventFiles{k});
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        [allMetrics, params] = getSpindlerPerformance(spindles, expertEvents, params);
+        [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
-            showSpindlerMetric(spindlerCurves, allMetrics, metricNames{n}, ...
-                       imageDir, params);
+            showSdarMetric(spindles, allMetrics, metricNames{n}, imageDir, params);
         end
-        if spindlerCurves.bestLinearInd > 0
-            metrics = allMetrics(spindlerCurves.bestLinearInd);
-            events = spindles(spindlerCurves.bestLinearInd).events;
-        end
+%         if spindlerCurves.bestLinearInd > 0
+%             metrics = allMetrics(spindlerCurves.bestLinearInd);
+%             events = spindles(spindlerCurves.bestLinearInd).events;
+%         end
     end
    
     additionalInfo.spindles = spindles;
-    additionalInfo.spindlerCurves = spindlerCurves;
     additionalInfo.allMetrics = allMetrics;
-    additionalInfo.warningMsgs = warningMsgs;
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
     save([resultsDir filesep fileName, '_spindlerResults.mat'], 'events', ...

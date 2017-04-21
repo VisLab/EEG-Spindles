@@ -86,7 +86,7 @@ for k = 1:length(dataFiles)
     end
     [~, theName, ~] = fileparts(dataFiles{k});
     
-    params.fileName = theName;
+    params.name = theName;
     additionalInfo = struct();
     save([resultsDir filesep theName '_Ch_' centralLabel '_' occipitalLabel '_warby.mat'], ...
         'events', 'expertEvents', 'metrics', 'params', '-v7.3');

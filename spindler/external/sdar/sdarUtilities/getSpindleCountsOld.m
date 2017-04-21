@@ -1,4 +1,4 @@
-function [spindleCounts, spindleTime] = getSpindleCounts(events)
+function [spindleCounts, spindleTime] = getSpindleCountsOld(events)
 
 spindleCounts = length(events);
 if spindleCounts == 0

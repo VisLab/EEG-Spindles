@@ -6,7 +6,6 @@ dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
 eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
 resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindler';
 imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Spindler_Summary.mat';
 channelLabels = {'PO7'};
 paramsInit = struct();
 
@@ -37,7 +36,6 @@ paramsInit = struct();
 
 %% Metrics to calculate
 metricNames = {'f1', 'f2', 'G'};
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -66,7 +64,7 @@ end;
 
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
-
+badMask = false(length(dataFiles), 1);
 %% Process the data
 for k = 1:length(dataFiles)
     %% Load data file
@@ -113,6 +111,4 @@ for k = 1:length(dataFiles)
         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
 end
 
-%% Now consolidate the events for the collection and create a summary
-[results, dataNames] = consolidateResults(resultsDir, methodNames, metricNames);
-save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', '-v7.3');
+%% Now consolidate the events for the collection an

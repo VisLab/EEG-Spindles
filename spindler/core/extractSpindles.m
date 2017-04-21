@@ -19,7 +19,7 @@ function [spindles, params, atomParams, scaledGabors] = ...
 
 %% Process the input parameters and set up the calculation
 defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());
-params = processParameters('extractEvents', nargin, 2, params, defaults);
+params = processParameters('extractSpindles', nargin, 2, params, defaults);
 
 params.channelNumber = channelNumber;
 params.channelLabels = EEG.chanlocs(channelNumber).labels;

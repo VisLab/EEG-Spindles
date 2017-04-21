@@ -4,9 +4,9 @@
 %% Setup the directories for input and output for driving data
 dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
 eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Spindler_Summary.mat';
+resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
 channelLabels = {'PO7'};
 paramsInit = struct();
 
@@ -66,7 +66,7 @@ end;
 
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
-
+badMask = false(length(dataFiles), 1);
 %% Process the data
 for k = 1:length(dataFiles)
     %% Load data file

@@ -37,11 +37,11 @@ if thresholdMask(end)
     endIndices = [endIndices, length(thresholdMask)];
 end
 if isempty(startIndices) || isempty(endIndices)
-    warning('detectEvents:NoEvents', 'No signal above threshold');
+    warning('detectSpindlerEvents:NoEvents', 'No signal above threshold');
     return;
 elseif length(startIndices) ~= length(endIndices) || ...
         sum(endIndices < startIndices) > 0
-    error('detectEvents:BadEvents', 'Start and end of events do not match');
+    error('detectSpindlerEvents:BadEvents', 'Start and end of events do not match');
 end
 
 %% Convert event frames to times in seconds

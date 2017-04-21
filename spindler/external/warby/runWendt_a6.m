@@ -12,9 +12,18 @@ dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsWendt';
 imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesWendt';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Warby_Summary.mat';
 centralLabels = {'C3-A1', 'CZ-A1'};
 occipitalLabels = {'O1-A1'};
 paramsInit = struct();
+
+%% Set up for dumping the summary
+metricNames = {'f1', 'f2', 'G'};
+methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+resultSummaryDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
+
+%% Get the data and event file names and check that we have the same number
+resultFiles = getFiles('FILES', resultsDir, '.mat');
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -42,7 +51,7 @@ if ~exist(resultsDir, 'dir')
 end;
 
 %% Run the algorithm
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     params = processParameters('Wendt_a6', 0, 0, paramsInit, getGeneralDefaults());
     EEG = pop_loadset(dataFiles{k});
     [centralNumber, centralLabel] = getChannelNumber(EEG, centralLabels);
@@ -69,6 +78,7 @@ for k = 1%:length(dataFiles)
         metrics = struct('hitMetrics', NaN, 'intersectMetrics', NaN, ...
             'onsetMetrics', NaN, 'timeMetrics', NaN);
         expertEvents = readEvents(eventFiles{k});
+        expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
         [metrics.hitMetrics, metrics.intersectMetrics, ...
             metrics.onsetMetrics, metrics.timeMetrics] = ...
             getPerformanceMetrics(expertEvents, events, params.frames, ...
@@ -77,6 +87,13 @@ for k = 1%:length(dataFiles)
     [~, theName, ~] = fileparts(dataFiles{k});
     
     params.fileName = theName;
+    additionalInfo = struct();
     save([resultsDir filesep theName '_Ch_' centralLabel '_' occipitalLabel '_warby.mat'], ...
-        'events', 'metrics', 'params', '-v7.3');
+        'events', 'expertEvents', 'metrics', 'params', '-v7.3');
+end
+
+%% Now create a summary of the performance results
+if ~isempty(summaryFile)
+   [results, dataNames] = consolidateResults(resultsDir, methodNames, metricNames);
+    save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', '-v7.3');
 end

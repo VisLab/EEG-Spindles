@@ -69,14 +69,15 @@ params.mu = mu;
 params.sigma = sigma;
 
 %% Smooth the model
-smoothed = moving_average(loss, 5);
-baseThresholds = linspace(min(smoothed), max(smoothed), params.sdarNumberThresholds);
+smoothed = moving_average(loss, params.sdarSmoothWindow);
+baseThresholds = linspace(min(smoothed), max(smoothed), params.sdarNumberThresholds + 1);
+baseThresholds = baseThresholds(2:end);
 
 %% Combine adjacent spindles and eliminate items that are too short.
 numThresholds = size(baseThresholds(:), 1);
 spindles(numThresholds) = ...
-    struct('baseThresholds', 0', 'numberSpindles', 0, 'spindleTime', 0, ...
-          'spindleTimeRatio', 0, 'events', NaN, 'meanEventTime', 0);
+    struct('baseThresholds', NaN', 'numberSpindles', NaN, 'spindleTime', NaN, ...
+          'spindleTimeRatio', NaN, 'events', NaN, 'meanEventTime', NaN);
                
 for k = 1:numThresholds
    spindles(k) = spindles(end);
@@ -87,7 +88,7 @@ for k = 1:numThresholds
    events = [startEvents(:), endEvents(:)];
    events = combineEvents(events, minLength, minSeparation);
    spindles(k).events = events;
-    [spindles(k).numberSpindles, spindles(k).spindleTime, ...
+   [spindles(k).numberSpindles, spindles(k).spindleTime, ...
         spindles(k).meanEventTime] = getSpindleCounts(events);
     spindles(k).spindleTimeRatio = spindles(k).spindleTime/totalTime;
 end

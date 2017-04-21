@@ -2,13 +2,13 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
-channelLabels = {'PO7'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -25,15 +25,16 @@ paramsInit = struct();
 % channelLabels = {'P3'};
 % paramsInit = struct();
 
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerNew1';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerNew1';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% paramsInit = struct();
-% paramsInit.spindlerGaborFrequencies = 10:16;
-% paramsInit.spindlerOnsetTolerance = 0.3;
-% paramsInit.spindlerTimingTolerance = 0.1;
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Sdar_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
+paramsInit = struct();
+paramsInit.spindlerGaborFrequencies = 10:16;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate
 metricNames = {'f1', 'f2', 'G'};
@@ -60,15 +61,17 @@ else
 end
 
 %% Create the output directory if it doesn't exist
-if ~exist(resultsDir, 'dir')
+if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
 end;
-
+if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    mkdir(imageDir);
+end
 paramsInit.figureClose = false;
-%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -81,8 +84,9 @@ for k = 1%:length(dataFiles)
     end
     [spindles, params] = extractSpindlesSdar(EEG, channelNumber, paramsInit);
     params.name = theName;
-    %[spindlerCurves, warningMsgs] = getSpindlerCurves(spindles, imageDir, params);
-    
+    showSdarCurves(spindles, imageDir, params);
+    metrics = [];
+    events = [];
     %% Deal with ground truth if available
     if isempty(eventFiles) || isempty(eventFiles{k}) 
         expertEvents = [];
@@ -94,22 +98,19 @@ for k = 1%:length(dataFiles)
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
         [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
-            showSdarMetric(spindles, allMetrics, metricNames{n}, imageDir, params);
+            showSdarMetric(allMetrics, metricNames{n}, imageDir, params);
         end
-%         if spindlerCurves.bestLinearInd > 0
-%             metrics = allMetrics(spindlerCurves.bestLinearInd);
-%             events = spindles(spindlerCurves.bestLinearInd).events;
-%         end
     end
    
     additionalInfo.spindles = spindles;
     additionalInfo.allMetrics = allMetrics;
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
-    save([resultsDir filesep fileName, '_spindlerResults.mat'], 'events', ...
+    save([resultsDir filesep fileName, '_sdarResults.mat'], 'events', ...
         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
 end
 
 %% Now consolidate the events for the collection and create a summary
-[results, dataNames] = consolidateResults(resultsDir, methodNames, metricNames);
-save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', '-v7.3');
+[results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames);
+save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', ...
+                  'upperBounds', '-v7.3');

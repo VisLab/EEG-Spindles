@@ -60,15 +60,17 @@ else
 end
 
 %% Create the output directory if it doesn't exist
-if ~exist(resultsDir, 'dir')
+if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
 end;
-
+if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    mkdir(imageDir);
+end
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -114,5 +116,6 @@ for k = 1%:length(dataFiles)
 end
 
 %% Now consolidate the events for the collection and create a summary
-[results, dataNames] = consolidateResults(resultsDir, methodNames, metricNames);
-save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', '-v7.3');
+[results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames);
+save(summaryFile, 'results', 'dataNames', 'methodNames', ...
+    'metricNames', 'upperBounds', '-v7.3');

@@ -22,8 +22,6 @@ metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 resultSummaryDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
 
-%% Get the data and event file names and check that we have the same number
-resultFiles = getFiles('FILES', resultsDir, '.mat');
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -46,9 +44,12 @@ else
 end
 
 %% Create the output directory if it doesn't exist
-if ~exist(resultsDir, 'dir')
+if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
 end;
+if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    mkdir(imageDir);
+end
 
 %% Run the algorithm
 for k = 1:length(dataFiles)

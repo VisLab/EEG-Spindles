@@ -2,13 +2,13 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Spindler_Summary.mat';
-channelLabels = {'PO7'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Spindler_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -18,17 +18,21 @@ paramsInit = struct();
 % channelLabels = {'PO3', 'H27'};
 % paramsInit = struct();
 
-% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
-% channelLabels = {'P3'};
-% paramsInit = struct();
+%% NCTU
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Spindler_Summary.mat';
+channelLabels = {'P3'};
+paramsInit = struct();
 
+%% Dreams
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerNew1';
 % imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerNew1';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Spindler_Summary.mat';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 % paramsInit = struct();
 % paramsInit.spindlerGaborFrequencies = 10:16;

@@ -2,13 +2,13 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
-% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
-% channelLabels = {'PO7'};
-% paramsInit = struct();
+dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
+channelLabels = {'PO7'};
+paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -25,16 +25,16 @@
 % channelLabels = {'P3'};
 % paramsInit = struct();
 
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Sdar_Summary.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
-paramsInit = struct();
-paramsInit.spindlerGaborFrequencies = 10:16;
-paramsInit.spindlerOnsetTolerance = 0.3;
-paramsInit.spindlerTimingTolerance = 0.1;
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Sdar_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate
 metricNames = {'f1', 'f2', 'G'};

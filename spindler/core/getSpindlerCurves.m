@@ -64,17 +64,16 @@ lowerAtomInd = find(spindleSTD > stdLimits(1), 1, 'first');
 if isempty(lowerAtomInd) || isempty(upperAtomInd) || lowerAtomInd >= upperAtomInd
     warningMsgs{end + 1} = ...
          ['Spindles/sec has non standard behavior for low ' ...
-         'atoms/sec --- algorithm failed, likely because of large artifacts'];
+         'atoms/sec --- algorithm have have failed, likely because of large artifacts'];
     warning('getSpinderCurves:BadSpindleSTD', warningMsgs{end});
-    return;
 end
 
 %% If the STD is not an increasing function of atoms/sec, decomposition bad
 if sum(diffSTD(upperAtomInd:end) < 0) > 0
     warningMsgs{end + 1} =   ['STD spindles/sec not montonic function of atoms/sec ' ...
-         '--- algorithm failed, likely because of large artifacts'];
+         '--- algorithm may have failed, likely because of large artifacts'];
     warning('getSpindlerCurves:SpindleSTDNotMonotonic',  warningMsgs{end});
-    return;
+  
 end
 lowerAtomInd = max(1, lowerAtomInd - 1);
 atomRangeInd = [lowerAtomInd, upperAtomInd];

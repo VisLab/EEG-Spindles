@@ -70,6 +70,8 @@ params.sigma = sigma;
 
 %% Smooth the model
 smoothed = moving_average(loss, params.sdarSmoothWindow);
+% smoothedScale = prctile(abs(smoothed(:)), 99);
+% fprintf('max smoothed = %g, scale = %g\n', max(smoothed), smoothedScale);
 baseThresholds = linspace(min(smoothed), max(smoothed), params.sdarNumberThresholds + 1);
 baseThresholds = baseThresholds(2:end);
 
@@ -92,5 +94,3 @@ for k = 1:numThresholds
         spindles(k).meanEventTime] = getSpindleCounts(events);
     spindles(k).spindleTimeRatio = spindles(k).spindleTime/totalTime;
 end
-
-

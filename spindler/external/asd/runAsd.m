@@ -8,14 +8,26 @@
 % paramsInit = struct();
 %paramsInit.AsdVisualize = true;
 
-%% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsAsd';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesAsd';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Asd_Summary.mat';
-channelLabels = {'P3'};
+%% NCTU setup
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsAsd';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesAsd';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Asd_Summary.mat';
+% channelLabels = {'P3'};
+% paramsInit = struct();
+
+%% Dreams setup
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsAsd';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesAsd';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Asd_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
 paramsInit = struct();
+paramsInit.AsdPeakFrequencyRange = 10:16;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};

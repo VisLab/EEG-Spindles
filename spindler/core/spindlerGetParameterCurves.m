@@ -25,7 +25,7 @@ spindleCurves = struct('name', NaN, ...
              'bestAtomInd', NaN, ...
              'spindleSTD', NaN, 'spindleSTDScale', NaN, ...
              'diffSTD', NaN, 'diffSTDScale', NaN);
-defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());         
+defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());         
 params = processParameters('getSpindlerCurves', nargin, 2, params, defaults);
 atomsPerSecond = unique(cellfun(@double, {spindles.atomsPerSecond}))';
 baseThresholds = unique(cellfun(@double, {spindles.baseThreshold}));
@@ -72,7 +72,7 @@ end
 if sum(diffSTD(upperAtomInd:end) < 0) > 0
     warningMsgs{end + 1} =   ['STD spindles/sec not montonic function of atoms/sec ' ...
          '--- algorithm may have failed, likely because of large artifacts'];
-    warning('getSpindlerCurves:SpindleSTDNotMonotonic',  warningMsgs{end});
+    warning('spindlerGetParameterCurves:SpindleSTDNotMonotonic',  warningMsgs{end});
   
 end
 lowerAtomInd = max(1, lowerAtomInd - 1);
@@ -109,7 +109,7 @@ eFractionBest = eFractionBest./eFractionMax;
 if params.spindlerLowEnergyWarning > eFractionBest(end)
     warningMsgs{end + 1} =  ...
         'Energy curve indicates large artifacts may be present';
-    warning('getSpindlerCurves:BadEnergy', warningMsgs{end});
+    warning('spindlerGetParameterCurves:SpindleSTDNotMonotonic',BadEnergy', warningMsgs{end});
 end
 %% Find the atoms/second with highest energy fraction in candidate range
 [~, eFractMaxInd] = max(eFractionBest(atomRangeInd(1):atomRangeInd(2)));

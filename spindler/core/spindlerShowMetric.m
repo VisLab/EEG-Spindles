@@ -1,4 +1,4 @@
-function figHan = showSpindlerMetric(spindleParameters, metrics, metricName, ...
+function figHan = spindlerShowMetric(spindleParameters, metrics, metricName, ...
                              imageDir, params)
 %% Plot the specified metric for the different evaluation methods
 %
@@ -8,7 +8,7 @@ function figHan = showSpindlerMetric(spindleParameters, metrics, metricName, ...
 %     metricName            name of the metric to plot
 
 %% Set up image directory if saving
-defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());     
+defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());     
 params = processParameters('showSpindlerMetric', nargin, 4, params, defaults);
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
@@ -34,7 +34,7 @@ if ~isfield(sHits{1}, metricName) || ...
    ~isfield(sIntersects{1}, metricName) || ...
    ~isfield(sOnsets{1}, metricName) || ...
    ~isfield(sTimes{1}, metricName) 
-    warning('showSpindlerMetric:MissingMetric', 'Performance metric not availale');
+    warning('spindlerShowMetric:MissingMetric', 'Performance metric not availale');
     return;
 end
 

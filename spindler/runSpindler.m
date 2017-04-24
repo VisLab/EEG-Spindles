@@ -21,8 +21,8 @@
 %% NCTU
 dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
 eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler1';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler1';
 summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Spindler_Summary.mat';
 channelLabels = {'P3'};
 paramsInit = struct();
@@ -74,7 +74,7 @@ paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -85,9 +85,9 @@ for k = 1:length(dataFiles)
         warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
         continue;
     end
-    [spindles, params] = extractSpindles(EEG, channelNumber, paramsInit);
+    [spindles, params] = spindlerExtractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
-    [spindlerCurves, warningMsgs] = getSpindlerCurves(spindles, imageDir, params);
+    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
      if spindlerCurves.bestLinearInd > 0
          events = spindles(spindlerCurves.bestLinearInd).events;
      end
@@ -101,7 +101,7 @@ for k = 1:length(dataFiles)
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
         [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
-            showSpindlerMetric(spindlerCurves, allMetrics, metricNames{n}, ...
+            spindlerShowMetric(spindlerCurves, allMetrics, metricNames{n}, ...
                        imageDir, params);
         end
         if spindlerCurves.bestLinearInd > 0

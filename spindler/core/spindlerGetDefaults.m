@@ -1,4 +1,4 @@
-function defaults = getSpindlerDefaults()
+function defaults = spindlerGetDefaults()
 % Returns the defaults for spindle detection
 %
 % Parameters:

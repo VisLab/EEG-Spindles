@@ -44,10 +44,10 @@ params.frames = numFrames;
 params.channelNumber = channelNumber;
 params.channelLabel = num2str(EEG.chanlocs.labels);
 %% Initialize the other parameters
-baseRange = params.AsdBaseRange;
-peakRange = params.AsdPeakRange;
-lowBase = max(1, baseRange(1));
-highBase = min(baseRange(2), srate/2);
+baseFrequencyRange = params.AsdBaseFrequencyRange;
+peakFrequencyRange = params.AsdPeakFrequencyRange;
+lowBase = max(1, baseFrequencyRange(1));
+highBase = min(baseFrequencyRange(2), floor(srate/2) - 1);
 EEG = pop_eegfiltnew(EEG, lowBase, highBase);
 
 data = EEG.data;
@@ -128,7 +128,7 @@ for k = 1:numSlides
     peakPosition(k) = maxIndex + lowBase - 1;
     peakFrequency(k) = f(peakPosition(k)); % finds the associated frequency
     peakAmplitude(k) = signalLevel(peakPosition(k));
-    if peakFrequency(k) < peakRange(1) || peakRange(2) < peakFrequency(k)
+    if peakFrequency(k) < peakFrequencyRange(1) || peakFrequencyRange(2) < peakFrequency(k)
         continue;
     end
     halfPeak = peakAmplitude(k)/2; % take half of the max

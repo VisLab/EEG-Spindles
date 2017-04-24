@@ -1,5 +1,5 @@
 function [spindles, params, atomParams, scaledGabors] = ...
-                               extractSpindles(EEG, channelNumber, params)
+                      spindlerExtractSpindles(EEG, channelNumber, params)
 %% Calculate spindle events from different Gabor reconstructions 
 %  
 %  Parameters:
@@ -18,7 +18,7 @@ function [spindles, params, atomParams, scaledGabors] = ...
 %
 
 %% Process the input parameters and set up the calculation
-defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());
+defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
 params = processParameters('extractSpindles', nargin, 2, params, defaults);
 
 params.channelNumber = channelNumber;
@@ -43,7 +43,7 @@ params.spindlerBaseThresholds = baseThresholds;
 
 %% Extract the channels and filter the EEG signal before MP
 if channelNumber > size(EEG.data, 1)
-    error('extractSpindles:BadChannel', 'The EEG does not have channel needed');
+    error('spindlerExtractSpindles:BadChannel', 'The EEG does not have channel needed');
 end
 params.srateOriginal = EEG.srate;
 EEG.data = EEG.data(channelNumber, :);
@@ -69,11 +69,7 @@ if max(baseFreq) >= EEG.srate/2
 else
     EEGBase = pop_eegfiltnew(EEG, baseFreq(1), baseFreq(2));
 end
-% baseHigh = min(baseFreq(2), EEG.srate/2);
-% baseLow = max(baseFreq(1), 1);
-%EEGBase = pop_eegfiltnew(EEG, highFreq, 2*highFreq - lowFreq);
-%EEGBase = pop_eegfiltnew(EEG, baseLow, baseHigh);
-%baseRatio = (baseHigh - baseLow)/(highFreq - lowFreq);
+
 %% Reconstruct the signal using MP with a Gabor dictionary
 theAtoms = round(atomsPerSecond*totalTime);
 maxAtoms = max(theAtoms);
@@ -112,7 +108,7 @@ for k = 1:numAtoms
         spindles(p).atomsPerSecond = atomsPerSecond(k);
         spindles(p).numberAtoms = theAtoms(k);
         spindles(p).baseThreshold = baseThresholds(j);
-        events = detectSpindlerEvents(y, srate, baseThresholds(j), params.spindlerSignalTrimFactor);
+        events = spindlerDetectEvents(y, srate, baseThresholds(j), params.signalTrimFactor);
         events = combineEvents(events, minLength, minSeparation);
         yPower = 0;
         sPower = 0;
@@ -120,9 +116,7 @@ for k = 1:numAtoms
         for m = 1:numLabelledEvents
             startFrame = round(events(m, 1)*srate + 1);
             endFrame = round(events(m, 2)*srate + 1);
-%             yData = y(:, startFrame:endFrame);
             yData = EEGFilt.data(startFrame:endFrame);
-            %sData = EEG.data(startFrame:endFrame);
             sData = EEGBase.data(startFrame:endFrame);
             yPower = yPower + sum(yData.*yData, 2);
             sPower = sPower + sum(sData.*sData, 2);
@@ -136,4 +130,3 @@ for k = 1:numAtoms
         spindles(p).spindleTimeRatio = spindles(p).spindleTime/totalTime;
     end
 end
-

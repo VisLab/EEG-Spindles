@@ -1,4 +1,4 @@
-function events = detectSpindlerEvents(data, srate, threshold, trimFactor)
+function events = spindlerDetectEvents(data, srate, threshold, trimFactor)
 %% Detect events where scaled MP signal above a threshold
 %
 % Parameters:
@@ -37,11 +37,11 @@ if thresholdMask(end)
     endIndices = [endIndices, length(thresholdMask)];
 end
 if isempty(startIndices) || isempty(endIndices)
-    warning('detectSpindlerEvents:NoEvents', 'No signal above threshold');
+    warning('spindlerDetectEvents:NoEvents', 'No signal above threshold');
     return;
 elseif length(startIndices) ~= length(endIndices) || ...
         sum(endIndices < startIndices) > 0
-    error('detectSpindlerEvents:BadEvents', 'Start and end of events do not match');
+    error('spindlerDetectEvents:BadEvents', 'Start and end of events do not match');
 end
 
 %% Convert event frames to times in seconds

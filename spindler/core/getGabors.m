@@ -17,7 +17,7 @@ function [gabors, sigmaFreq] = getGabors(srate, params)
 %
 
 %% Set up the parameters
-params = processParameters('getGabors', nargin, 1, params, getSpindlerDefaults());
+params = processParameters('getGabors', nargin, 1, params, spindlerGetDefaults());
 atomSupportFactor = params.spindlerGaborSupportFactor; 
 atomScales = params.spindlerGaborScales;
 atomFrequencies = params.spindlerGaborFrequencies;

@@ -11,14 +11,24 @@
 % paramsInit = struct();
 
 %% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
-channelLabels = {'P3'};
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar2';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar2';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
+% channelLabels = {'P3'};
+% paramsInit = struct();
+
+%% 
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sdar_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
 paramsInit = struct();
-paramsInit.sdarNumberThresholds = 1000;
+paramsInit.onsetTolerance = 0.3;
+paramsInit.timingTolerance = 0.1;
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';

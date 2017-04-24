@@ -6,21 +6,43 @@
 % centralLabels = {'CZ'};
 % occipitalLabels = {'O1'};
 % paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Spindler_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
-%% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-centralLabels = {'C3-A1', 'CZ-A1'};
+%% Set up the parameters for BCIT
+dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+channelLabels = {'PO7'};
 defaults = concatenateStructs(getGeneralDefaults(), tsanasGetDefaults());
-paramsInit = processParameters('runTsanas', 0, 0, struct(), defaults);
-summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-    'Dreams_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
-resultsDir = ['D:\TestData\Alpha\spindleData\dreams\resultsTsanas_' ...
-               paramsInit.tsanasAlgorithm];
-paramsInit.onsetTolerance = 0.3;
-paramsInit.timingTolerance = 0.1;     
+paramsInit = processParameters('runTsanas', 0, 0, struct(), defaults);     
 paramsInit.srateTarget = 100;
+paramsInit.tsanasAlgorithm = 'a7';
+summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
+    'Bcit_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
+resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsTsanas_' ...
+               paramsInit.tsanasAlgorithm];
 
+%% Set up the directory for dreams
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% defaults = concatenateStructs(getGeneralDefaults(), tsanasGetDefaults());
+% paramsInit = processParameters('runTsanas', 0, 0, struct(), defaults);
+% 
+% paramsInit.onsetTolerance = 0.3;
+% paramsInit.timingTolerance = 0.1;     
+% paramsInit.srateTarget = 100;
+% paramsInit.tsanasAlgorithm = 'a8';
+% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
+%     'Dreams_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
+% resultsDir = ['D:\TestData\Alpha\spindleData\dreams\resultsTsanas_' ...
+%                paramsInit.tsanasAlgorithm];
+           
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
@@ -55,7 +77,7 @@ for k = 1:length(dataFiles)
     params = paramsInit;
     EEG = pop_loadset(dataFiles{k});
     params.srateOriginal = EEG.srate;
-    [channelNumber, channelLabel] = getChannelNumber(EEG, centralLabels);
+    [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
     if isempty(channelNumber)
         warning('Dataset %d: %s does not have needed channels', k, dataFiles{k});
         continue;

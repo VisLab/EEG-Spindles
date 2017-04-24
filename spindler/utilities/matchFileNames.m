@@ -29,7 +29,8 @@ end
 
 %% Match those with a base that has only one match
 matchCount = 0;
-while(matchCount < length(matchedFiles))
+unmatched = 0;
+while(matchCount + unmatched < length(matchedFiles))
     possibleRow = sum(~isinf(matchList), 2);
     posRow = find(possibleRow == 1, 1, 'first');
     if ~isempty(posRow)
@@ -52,6 +53,7 @@ while(matchCount < length(matchedFiles))
         matchCount = matchCount + 1;
         continue;
     end
+    unmatched = unmatched + 1;
 end
 
 % for k = 1:length(baseFiles) 

@@ -43,7 +43,7 @@ set(ax(2), 'XLim', [0, 1], 'XLimMode', 'manual');
 
 ylabel(ax(1), 'Average spindle length (sec)');
 ylabel(ax(2), 'Spindles/sec');
-xlabel(ax(1), 'Threshold fractions');
+xlabel(ax(1), 'Threshold fraction');
 xlabel(ax(2), '');
 box(ax(1), 'on')
 box(ax(2), 'on')

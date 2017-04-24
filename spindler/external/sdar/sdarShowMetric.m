@@ -1,4 +1,4 @@
-function figHan = sdarShowMetric(metrics, metricName, imageDir, params)
+function figHan = sdarShowMetric(spindleParameters, metrics, metricName, imageDir, params)
 %% Plot the specified metric for the different evaluation methods
 %
 %  Parameters:
@@ -38,7 +38,7 @@ end
 
 %% Figure out the thresholds to plot and calculate the mean
 datasetName = params.name;
-baseThresholds = params.sdarBaseThresholds;
+baseThresholds = cellfun(@double, {spindleParameters.baseThresholds});
 
 %% Extract the values to plot
 hitMetric = zeros(length(sHits), 1);

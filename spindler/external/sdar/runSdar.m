@@ -108,7 +108,7 @@ for k = 1%:length(dataFiles)
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
         [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
-            sdarShowMetric(allMetrics, metricNames{n}, imageDir, params);
+            sdarShowMetric(spindles, allMetrics, metricNames{n}, imageDir, params);
         end
     end
    

@@ -39,7 +39,7 @@ paramsInit = struct();
 % paramsInit.spindlerOnsetTolerance = 0.3;
 % paramsInit.spindlerTimingTolerance = 0.1;
 
-%% Metrics to calculate
+%% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 

@@ -1,6 +1,6 @@
 function [metrics, params] = ...
                  getSpindlerPerformance(spindles, expertEvents, params)
-%% Calculate performance for representations in spdinles
+%% Calculate performance for representations in spindles
 %  
 %  Parameters:
 %    spindles         Structure with MP and performance information

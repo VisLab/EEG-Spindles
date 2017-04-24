@@ -1,4 +1,4 @@
-function [] = showSdarCurves(spindles, outDir, params)
+function h1Fig = sdarShowCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -15,9 +15,9 @@ function [] = showSdarCurves(spindles, outDir, params)
 %  Written by:  Kay Robbins and John La Rocco, UTSA 2017
 
 %% Get the atoms per second and thresholds
-defaults = concatenateStructs(getGeneralDefaults(), getSpindlerDefaults());         
-params = processParameters('getSdarCurves', nargin, 2, params, defaults);
-baseThresholds = params.sdarBaseThresholds;
+defaults = concatenateStructs(getGeneralDefaults(), sdarGetDefaults());         
+params = processParameters('sdarShowCurves', nargin, 2, params, defaults);
+baseThresholds = cellfun(@double, {spindles.baseThresholds});
 totalSeconds = params.frames./params.srate;
 theName = params.name;
 

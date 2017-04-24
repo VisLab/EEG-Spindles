@@ -2,13 +2,23 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
-channelLabels = {'PO7'};
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
+
+%% Set up the directory
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
+channelLabels = {'P3'};
 paramsInit = struct();
+paramsInit.sdarNumberThresholds = 1000;
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -36,7 +46,7 @@ paramsInit = struct();
 % paramsInit.spindlerOnsetTolerance = 0.3;
 % paramsInit.spindlerTimingTolerance = 0.1;
 
-%% Metrics to calculate
+%% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 
@@ -71,7 +81,7 @@ paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -82,9 +92,9 @@ for k = 1:length(dataFiles)
         warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
         continue;
     end
-    [spindles, params] = extractSpindlesSdar(EEG, channelNumber, paramsInit);
+    [spindles, params] = sdarExtractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
-    showSdarCurves(spindles, imageDir, params);
+    sdarShowCurves(spindles, imageDir, params);
     metrics = [];
     events = [];
     %% Deal with ground truth if available
@@ -98,7 +108,7 @@ for k = 1:length(dataFiles)
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
         [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
         for n = 1:length(metricNames)
-            showSdarMetric(allMetrics, metricNames{n}, imageDir, params);
+            sdarShowMetric(allMetrics, metricNames{n}, imageDir, params);
         end
     end
    

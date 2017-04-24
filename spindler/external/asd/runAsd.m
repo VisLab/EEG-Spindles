@@ -1,25 +1,25 @@
 %% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsASDNew';
-imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesASDNew';
-channelLabels = {'PO7'};
-paramsInit = struct();
-paramsInit.AsdVisualize = true;
+% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsAsd';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesAsd';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Asd_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
+%paramsInit.AsdVisualize = true;
 
 %% Set up the directory
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsASD';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesASD';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% paramsInit = struct();
-% paramsInit.AsdVisualize = true;
-% paramsInit.
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsAsd';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesAsd';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Asd_Summary.mat';
+channelLabels = {'P3'};
+paramsInit = struct();
 
-
-
-%% Metrics to calculate
+%% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
+methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -52,7 +52,7 @@ badMask = false(length(dataFiles), 1);
 
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -70,26 +70,36 @@ for k = 1%:length(dataFiles)
         warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
         continue;
     end
-      paramsInit.AsdImagePathPrefix = ...
-                     [imageDir filesep theName '_Ch_' num2str(channelLabel)];
-   [events, params, additionalInfo] = ...
-                      asdExtractEvents(EEG, channelNumber, paramsInit);
-   params.fileName = theName;
-   frames = params.frames;
-   [hitMetrics, intersectMetrics, onsetMetrics, timeMetrics] = ...
-        getPerformanceMetrics(expertEvents, events, params.frames, params.srate, params);
-
+    paramsInit.AsdImagePathPrefix = ...
+        [imageDir filesep theName '_Ch_' num2str(channelLabel)];
+    [events, params, additionalInfo] = ...
+                      asdExtractSpindles(EEG, channelNumber, paramsInit);
+    params.name = theName;
+    frames = params.frames;
+    %% Deal with ground truth if available
+    if isempty(eventFiles) || isempty(eventFiles{k})
+        expertEvents = [];
+        metrics = [];
+    else
+        metrics = struct('hitMetrics', NaN, 'intersectMetrics', NaN, ...
+            'onsetMetrics', NaN, 'timeMetrics', NaN);
+        expertEvents = readEvents(eventFiles{k});
+        expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
+        [metrics.hitMetrics, metrics.intersectMetrics, ...
+            metrics.onsetMetrics, metrics.timeMetrics] = ...
+            getPerformanceMetrics(expertEvents, events, params.frames, ...
+            params.srate, params);
+    end
+    [~, theName, ~] = fileparts(dataFiles{k});
+    
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
-    save([resultsDir filesep fileName, '_AsdResults.mat'], ...
-        'events', 'metrics', 'params',  '-v7.3');
+    save([resultsDir filesep fileName, '_asdResults.mat'], 'events', ...
+        'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
+    
 end
 
-%% Now print out a message indicating bad files
-badFiles = dataFiles(badMask);
-if ~isempty(badFiles)
-    fprintf('The following files could not be processed due to artifacts:\n');
-    for k = 1:length(badFiles)
-        fprintf('--- %s\n', badFiles{k});
-    end
-end
+%% Now consolidate the events for the collection and create a summary
+[results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames);
+save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', ...
+    'upperBounds', '-v7.3');

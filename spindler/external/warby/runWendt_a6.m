@@ -17,11 +17,9 @@ centralLabels = {'C3-A1', 'CZ-A1'};
 occipitalLabels = {'O1-A1'};
 paramsInit = struct();
 
-%% Set up for dumping the summary
+%% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
-resultSummaryDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
-
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -71,7 +69,7 @@ for k = 1:length(dataFiles)
     params.srate = EEG.srate;
     params.frames = size(EEG.data, 2);
     
-    %% Deal with ground
+    %% Deal with ground truth if available
     if isempty(eventFiles) || isempty(eventFiles{k})
         expertEvents = [];
         metrics = [];

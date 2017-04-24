@@ -1,4 +1,4 @@
-function figHan = showSdarMetric(metrics, metricName, imageDir, params)
+function figHan = sdarShowMetric(metrics, metricName, imageDir, params)
 %% Plot the specified metric for the different evaluation methods
 %
 %  Parameters:
@@ -7,7 +7,7 @@ function figHan = showSdarMetric(metrics, metricName, imageDir, params)
 %     metricName            name of the metric to plot
 
 %% Set up image directory if saving
-defaults = concatenateStructs(getGeneralDefaults(), getSdarDefaults());     
+defaults = concatenateStructs(getGeneralDefaults(), sdarGetDefaults());     
 params = processParameters('showSdarMetric', nargin, 4, params, defaults);
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
@@ -18,7 +18,7 @@ if ~isfield(metrics, 'timeMetrics') || ...
    ~isfield(metrics, 'hitMetrics') || ...
    ~isfield(metrics, 'intersectMetrics') || ...
    ~isfield(metrics, 'onsetMetrics') 
-    warning('showSdarMetric:MissingMethod', 'Performance method not available');
+    warning('sdarShowMetric:MissingMethod', 'Performance method not available');
     return;
 end
 
@@ -32,7 +32,7 @@ if ~isfield(sHits{1}, metricName) || ...
    ~isfield(sIntersects{1}, metricName) || ...
    ~isfield(sOnsets{1}, metricName) || ...
    ~isfield(sTimes{1}, metricName) 
-    warning('showSdarMetric:MissingMetric', 'Performance metric not availale');
+    warning('sdarShowMetric:MissingMetric', 'Performance metric not availale');
     return;
 end
 

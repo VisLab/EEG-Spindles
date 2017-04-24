@@ -1,4 +1,4 @@
-function [spindles, params] = extractSpindlesSdar(EEG, channelNumber, params)
+function [spindles, params] = sdarExtractSpindles(EEG, channelNumber, params)
 %% Calculate spindle events from different Gabor reconstructions 
 %  
 %  Parameters:
@@ -17,7 +17,7 @@ function [spindles, params] = extractSpindlesSdar(EEG, channelNumber, params)
 %
 
 %% Process the input parameters and set up the calculation
-defaults = concatenateStructs(getGeneralDefaults(), getSdarDefaults());
+defaults = concatenateStructs(getGeneralDefaults(), sdarGetDefaults());
 params = processParameters('extractSpindlesSdar', nargin, 2, params, defaults);
 
 params.channelNumber = channelNumber;
@@ -30,7 +30,7 @@ minLength = params.minSpindleLength;
 minSeparation = params.minSpindleSeparation;
 
 %% Handle the baseThresholds (making sure thresholds 0 and 1 are included)
-baseThresholds = params.sdarBaseThresholds;
+% baseThresholds = params.sdarBaseThresholds;
 % baseThresholds = sort(baseThresholds);
 % if baseThresholds(1) ~= 0
 %     baseThresholds = [0, baseThresholds];
@@ -42,7 +42,7 @@ baseThresholds = params.sdarBaseThresholds;
 
 %% Extract the channels and filter the EEG signal 
 if channelNumber > size(EEG.data, 1)
-    error('extractSpindlesSdar:BadChannel', 'The EEG does not have channel needed');
+    error('sdarExtractSpindles:BadChannel', 'The EEG does not have channel needed');
 end
 params.srateOriginal = EEG.srate;
 EEG.data = EEG.data(channelNumber, :);

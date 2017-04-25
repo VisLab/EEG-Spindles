@@ -58,11 +58,14 @@ function metrics = getConfusionMetrics(tp, tn, fp, fn)
     end
     metrics.precision = metrics.ppv;
     metrics.recall = metrics.sensitivity;
-    metrics.f1 = 2*metrics.precision*metrics.recall/(metrics.precision + metrics.recall);
-    beta2 = 2;
-    metrics.f2 = (1 + beta2^2).*metrics.precision*metrics.recall ...
-        ./(beta2^2.*metrics.precision + metrics.recall);
-
+    if metrics.precision + metrics.recall == 0
+        metrics.f1 = 0;
+        metrics.f2 = 0;
+    else
+       metrics.f1 = 2*metrics.precision*metrics.recall/(metrics.precision + metrics.recall);
+       metrics.f2 = 5.*metrics.precision*metrics.recall ...
+        ./(4.*metrics.precision + metrics.recall);
+    end
     metrics.G = sqrt(metrics.precision*metrics.recall);
     Po = metrics.accuracy;
     Pe = ((tp + tn)*(tp + fp) + (fp + tn)*(fn + tn))/checkSum;

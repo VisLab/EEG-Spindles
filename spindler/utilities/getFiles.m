@@ -16,6 +16,7 @@ if strcmpi(type, 'FILES')
         fileList{k} = [pathName filesep fileList{k}];
     end
     fileList = fileList(goodFiles);
+    fileList = fileList(:);
 elseif strcmpi(type, 'FILES2')
     inList = dir(pathName);
     dirNames = {inList(:).name};

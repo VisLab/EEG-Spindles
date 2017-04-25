@@ -21,7 +21,8 @@ channelLabels = {'PO7'};
 defaults = concatenateStructs(getGeneralDefaults(), tsanasGetDefaults());
 paramsInit = processParameters('runTsanas', 0, 0, struct(), defaults);     
 paramsInit.srateTarget = 100;
-paramsInit.tsanasAlgorithm = 'a7';
+paramsInit.tsanasAlgorithm = 'a8';
+paramsInit.tsanasSpindleFrequencies = 7:13;
 summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
     'Bcit_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
 resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsTsanas_' ...
@@ -88,6 +89,7 @@ for k = 1:length(dataFiles)
     EEG.data = EEG.data(channelNumber, :);
     EEG.chanlocs = EEG.chanlocs(channelNumber);
     EEG.nbchan = 1;
+    EEG.event = [];
     EEG = pop_resample(EEG, params.srateTarget);
     params.srate = EEG.srate;
     params.frames = size(EEG.data, 2);

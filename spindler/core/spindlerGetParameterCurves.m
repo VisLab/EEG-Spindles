@@ -1,4 +1,4 @@
-function [spindleCurves, warningMsgs] = getSpindlerCurves(spindles, outDir, params)
+function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:

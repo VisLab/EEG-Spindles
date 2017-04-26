@@ -2,33 +2,34 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSdar';
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSdar';
 % imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Sdar_Summary.mat';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Sdar_Summary.mat';
 % channelLabels = {'PO7'};
 % paramsInit = struct();
 
 %% Set up the directory
-% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar2';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar2';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
-% channelLabels = {'P3'};
-% paramsInit = struct();
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
+channelLabels = {'P3'};
+paramsInit = struct();
 
 %% 
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sdar_Summary.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
-paramsInit = struct();
-paramsInit.onsetTolerance = 0.3;
-paramsInit.timingTolerance = 0.1;
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sdar_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';

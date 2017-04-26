@@ -8,11 +8,11 @@
 % paramsInit = struct();
 
 %% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsWendt';
 imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesWendt';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Warby_Summary.mat';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Wendt_Summary.mat';
 centralLabels = {'C3-A1', 'CZ-A1'};
 occipitalLabels = {'O1-A1'};
 paramsInit = struct();

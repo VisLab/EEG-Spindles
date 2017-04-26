@@ -1,35 +1,35 @@
-%% Set up the directory
-% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsWendt';
-% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesWendt';
-% centralLabels = {'CZ'};
-% occipitalLabels = {'O1'};
-% paramsInit = struct();
-% dataDir = 'D:\TestData\Alpha\spindleData\BCIT\level0';
-% eventDir = 'D:\TestData\Alpha\spindleData\BCIT\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\BCIT_Spindler_Summary.mat';
-% channelLabels = {'PO7'};
-% paramsInit = struct();
+
 
 %% Set up the parameters for BCIT
-dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-channelLabels = {'PO7'};
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% channelLabels = {'PO7'};
+% defaults = concatenateStructs(getGeneralDefaults(), tsanasGetDefaults());
+% paramsInit = processParameters('runTsanas', 0, 0, struct(), defaults);     
+% paramsInit.srateTarget = 100;
+% paramsInit.tsanasAlgorithm = 'a7';
+% paramsInit.tsanasSpindleFrequencies = 6:14;
+% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
+%     'bcit_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
+% resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsTsanas_' ...
+%                paramsInit.tsanasAlgorithm];
+
+%% Set up for nctu
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+channelLabels = {'P3'};
 defaults = concatenateStructs(getGeneralDefaults(), tsanasGetDefaults());
 paramsInit = processParameters('runTsanas', 0, 0, struct(), defaults);     
 paramsInit.srateTarget = 100;
 paramsInit.tsanasAlgorithm = 'a8';
-paramsInit.tsanasSpindleFrequencies = 7:13;
+paramsInit.tsanasSpindleFrequencies = 6:14;
 summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-    'Bcit_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
-resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsTsanas_' ...
+    'nctu_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
+resultsDir = ['D:\TestData\Alpha\spindleData\nctu\resultsTsanas_' ...
                paramsInit.tsanasAlgorithm];
 
 %% Set up the directory for dreams
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 % defaults = concatenateStructs(getGeneralDefaults(), tsanasGetDefaults());
@@ -38,7 +38,7 @@ resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsTsanas_' ...
 % paramsInit.onsetTolerance = 0.3;
 % paramsInit.timingTolerance = 0.1;     
 % paramsInit.srateTarget = 100;
-% paramsInit.tsanasAlgorithm = 'a8';
+% paramsInit.tsanasAlgorithm = 'a7';
 % summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
 %     'Dreams_Tsanas_Algorithm_' paramsInit.tsanasAlgorithm '_Summary.mat'];
 % resultsDir = ['D:\TestData\Alpha\spindleData\dreams\resultsTsanas_' ...

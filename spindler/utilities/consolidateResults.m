@@ -1,4 +1,4 @@
-function [results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames)
+function [results, dataNames, upperBounds] = consolidateResults(supervisedResultsDir, methodNames, metricNames)
 %% Consolidate the results for metrics corresponding to methods
 %
 %  Parameters:

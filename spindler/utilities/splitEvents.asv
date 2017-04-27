@@ -1,0 +1,90 @@
+function [events1, events2, frameSplitFirst, frameSplitLast] = splitEvents(events, totalFrames, srate, params)
+%% Split the events in two pieces
+     
+params = processParameters('showSpindlerMetric', nargin, 1, params, getGeneralDefaults());
+events1 = [];
+events2 = [];
+splitFraction = params.supervisedSplitFraction;
+% gapFrames = round(params.supervisedEventGap/srate);
+% removeMethod = params.supervisedEventRemovalMethod;
+numEvents = size(events, 1);
+frameMask = getFrameMask();
+[frameSplitFirst, frameSplitLast, eFirst, eLast] = getSplit();
+if isempty(eFirst) || isempty(eLast)
+    warning('splitEvent:NoSplit', 'Could not find a valid of events');
+    return;
+end
+
+events1 = events(1:eFirst, :);
+events2 = events(eLast:end, :);
+% if splitTime <= 0
+%     error('splitEvents:NoFrames', 'Could not split total frames by indicated fraction');
+% end
+
+
+
+% if  ~strcmpi(removeMethod, 'remove')
+%     events1 = [];
+%     events2 = [];
+%     frameSplitPoint = [];
+%     return;
+% end
+
+
+
+
+    function mask = getFrameMask()
+    %% Create a frame mask with the event number in the position.
+       mask = zeros(totalFrames, 1);
+       frames = round(events*srate) + 1;
+       
+       for k = 1:numEvents
+           for j = frames(k, 1):frames(k, 2)
+               mask(j) = k;
+           end
+       end
+    end
+
+    function [frameSplitFirst, frameSplitLast, eFirst, eLast] = getSplit()
+        frameSplitFirst = [];
+        frameSplitLast = [];
+        eFirst = [];
+        eLast = [];
+        firstEvent =
+        splitFrame = floor(splitFraction*totalFrames);
+        if frameMask(splitFrame) == 0
+            frameSplitFirst = splitFrame;
+            frameSplitLast = splitFrame + 1;
+            first = find(frameMask(1:splitFrame) > 0, 1, 'last');
+            last = find(frameMask(splitFrame + 1:end) > 0, 1, 'first') + splitFrame;
+            if ~isempty(first) &&  ~isempty(last)
+                eFirst = frameMask(first);
+                eLast = frameMask(last);
+            end 
+            return;
+        end
+        eventNumber = frameMask(splitFrame);
+        if eventNumber == 1 || eventNumber == numEvents
+            return;
+        end
+        if eventNumber >= floor(numEvents/2)
+             nextStart = events(eventNumber, 1);
+             lastEnd = events(eventNumber - 1, 2);
+             gapTime = min(params.supervisedEventGap, (nextStart - lastEnd)/2);
+             frameSplitFirst = floor((nextStart - gapTime)*srate) + 1;
+             frameSplitLast = frameSplitFirst + 1;
+             eFirst = eventNumber - 1;
+             eLast = eventNumber;
+        else
+             lastEnd = events(eventNumber, 2);
+             nextStart = events(eventNumber + 1, 1);
+             gapTime = min(params.supervisedEventGap, (nextStart - lastEnd)/2);
+             frameSplitFirst = floor((lastEnd + gapTime)*srate) + 1;
+             frameSplitLast = frameSplitFirst + 1;
+             eFirst = eventNumber;
+             eLast = eventNumber + 1;
+        end
+    end
+end
+
+ 

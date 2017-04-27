@@ -72,9 +72,9 @@ params.sigma = sigma;
 smoothed = moving_average(loss, params.sdarSmoothWindow);
 % smoothedScale = prctile(abs(smoothed(:)), 99);
 % fprintf('max smoothed = %g, scale = %g\n', max(smoothed), smoothedScale);
-baseThresholds = linspace(min(smoothed), max(smoothed), params.sdarNumberThresholds + 1);
-baseThresholds = baseThresholds(2:end);
-
+% baseThresholds = linspace(min(smoothed), max(smoothed), params.sdarNumberThresholds + 1);
+% baseThresholds = baseThresholds(2:end);
+baseThresholds = min(smoothed) + params.sdarThresholds*(max(smoothed) - min(smoothed));
 %% Combine adjacent spindles and eliminate items that are too short.
 numThresholds = size(baseThresholds(:), 1);
 spindles(numThresholds) = ...

@@ -1,4 +1,4 @@
-function figHan = compareMetric(results, metricName, algorithmNames, theColors, theTitle, temp)
+function figHan = compareMetric(results, metricName, algorithmNames, theColors, theTitle)
 
 theTitle = [theTitle ': ' metricName];
 matchNames = {'H', 'I', 'O', 'T'};

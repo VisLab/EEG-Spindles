@@ -8,14 +8,14 @@
 % summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Supervised_Sdar_Summary.mat';
 % channelLabels = {'PO7'};
 
-%% Set up the directory
+%% Set up the directory for NCTU driving
 % splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
 % supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSdar';
 % imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSdar';
 % summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Sdar_Summary.mat';
 % channelLabels = {'P3'};
 
-%% 
+%% Set up the directory for the dreams dataset
 splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
 supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSdar';
 imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSdar';
@@ -39,7 +39,7 @@ if ~isempty(imageDir) && ~exist(imageDir, 'dir')
 end
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Load data split files and process the parameters
     splitData = load(dataFiles{k});
     params = processParameters('runSdarSupervised', 0, 0, splitData.params, sdarGetDefaults());     
@@ -91,12 +91,12 @@ for k = 1%:length(dataFiles)
     %% Save the additional information for future analysis
     additionalInfo.spindles1 = spindles1;
     additionalInfo.allMetrics1 = allMetrics1;
-    additionalInfo.spindles1 = spindles2;
-    additionalInfo.allMetrics1 = allMetrics2;
+    additionalInfo.spindles2 = spindles2;
+    additionalInfo.allMetrics2 = allMetrics2;
  
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
-    save([supervisedResultsDir  filesep fileName, '_spindlerSupervisedResults.mat'],  ...
+    save([supervisedResultsDir  filesep fileName, '_sdar_SupervisedResults.mat'],  ...
         'expertEvents1', 'expertEvents2',  'supervisedMetrics1', ...
         'supervisedMetrics2', 'optimalMetrics1', 'optimalMetrics2', ...
         'methodNames', 'metricNames', 'params1', 'params2', 'additionalInfo', '-v7.3');

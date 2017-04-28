@@ -10,18 +10,18 @@
 
 
 %% NCTU
-splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Spindler_Summary.mat';
-channelLabels = {'P3'};
+% splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Spindler_Summary.mat';
+% channelLabels = {'P3'};
 
 %% Dreams
-% splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Spindler_Summary.mat';
-% channelLabels = {'C3-A1', 'CZ-A1'};
+splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSpindler';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Spindler_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
@@ -45,9 +45,9 @@ for k = 1:length(dataFiles)
     splitData = load(dataFiles{k});
     params = processParameters('runSpindlerSupervised', 0, 0, splitData.params, spindlerGetDefaults());     
     params.figureClose = false;
-%     params.spindlerGaborFrequencies = 10:16;
-%     params.spindlerOnsetTolerance = 0.3;
-%     params.spindlerTimingTolerance = 0.1;
+    params.spindlerGaborFrequencies = 10:16;
+    params.spindlerOnsetTolerance = 0.3;
+    params.spindlerTimingTolerance = 0.1;
     
     %% Read in the EEG and find the correct channel number
     EEG1 = splitData.EEG1;
@@ -95,9 +95,9 @@ for k = 1:length(dataFiles)
     additionalInfo.spindles1 = spindles1;
     additionalInfo.spindlerCurves1 = spindlerCurves1;
     additionalInfo.allMetrics1 = allMetrics1;
-    additionalInfo.spindles1 = spindles2;
-    additionalInfo.spindlerCurves1 = spindlerCurves2;
-    additionalInfo.allMetrics1 = allMetrics2;
+    additionalInfo.spindles2 = spindles2;
+    additionalInfo.spindlerCurves2 = spindlerCurves2;
+    additionalInfo.allMetrics2 = allMetrics2;
     additionalInfo.warningMsgs1 = warningMsgs1;
     additionalInfo.warningMsgs2 = warningMsgs2;
     

@@ -48,7 +48,7 @@ end
 
 %% Plot the dreams summary
 dreams = squeeze(dreams(:, methodIndices, :, :));
-dreamsOptimal = squeeze(dreamsOptimal(:, methodIndices, :, :));
+dreamsOptimal = squeeze(dreams(:, methodIndices, :, :));
 theTitle = 'Dreams performance';
 for n = 1:numberMetrics
     metricName = metricNames{n};
@@ -103,13 +103,65 @@ drivingOptimal = [driving1Optimal; driving2Optimal];
 
 %% Plot the summary performance
 theTitle = 'Driving performance';
-driving = squeeze(driving(:, methodIndices, :, :));
-drivingOptimal = squeeze(drivingOptimal(:, methodIndices, :, :));
+driving
 for n = 1:numberMetrics
     metricName = metricNames{n};
     theseResults = squeeze(driving(:, :, :, n));
     theseResultsOptimal = squeeze(drivingOptimal(:, :, :, n));
     figHan = compareMetricSupervised(theseResults, theseResultsOptimal, ...
            metricName, drivingAlgs, algColors, algColorsOptimal, ...
-           methodLegends(methodIndices), methodMarkers(methodIndices), theTitle);
+           methodLegends, methodMarkers, theTitle);
 end
+% 
+% 
+% figure
+% hold on
+% title('Dreams')
+% plot(spindlerDreams.results(:),warbyDreams.results(:), 'sk', 'LineWidth', 2, 'MarkerSize', 10);
+% plot(spindlerDreams.upperBounds(:), warbyDreams.results(:), 'or', 'LineWidth', 2, 'MarkerSize', 10);
+% line([0, 1], [0, 1], 'Color', [0.7, 0.7, 0.7]);
+% hold off
+% legend('Normal', 'Upper', 'Location', 'NorthWest')
+% box on
+% xlabel('Performance Spindler')
+% ylabel('Warby')
+% 
+% 
+% figure
+% hold on
+% title('Dreams')
+% plot(warbyDreams.results(:), spindlerDreams.results(:), 'sk', 'LineWidth', 2, 'MarkerSize', 10);
+% plot(warbyDreams.results(:), spindlerDreams.upperBounds(:), 'or', 'LineWidth', 2, 'MarkerSize', 10);
+% line([0, 1], [0, 1], 'Color', [0.7, 0.7, 0.7]);
+% hold off
+% legend('Normal', 'Upper', 'Location', 'NorthWest')
+% box on
+% ylabel('Performance Spindler')
+% xlabel('Warby')
+% 
+% 
+% %%
+% figure
+% hold on
+% title('BCIT')
+% plot(spindlerBCIT.results(:),sdarBCIT.upperBounds(:), 'sk', 'LineWidth', 2, 'MarkerSize', 10);
+% plot(spindlerBCIT.upperBounds(:), sdarBCIT.upperBounds(:), 'or', 'LineWidth', 2, 'MarkerSize', 10);
+% line([0, 1], [0, 1], 'Color', [0.7, 0.7, 0.7]);
+% hold off
+% legend('Normal', 'Upper', 'Location', 'NorthWest')
+% box on
+% xlabel('Performance Spindler')
+% ylabel('SDAR')
+% 
+% %%
+% figure
+% hold on
+% title('Dreams')
+% %plot(spindlerDreams.results(:), sdarDreams.results(:), 'sk', 'LineWidth', 2, 'MarkerSize', 10);
+% plot(spindlerDreams.upperBounds(:), sdarDreams.upperBounds(:), 'or', 'LineWidth', 2, 'MarkerSize', 10);
+% line([0, 1], [0, 1], 'Color', [0.7, 0.7, 0.7]);
+% hold off
+% legend('Upper', 'Location', 'NorthWest')
+% box on
+% xlabel('Performance Spindler')
+%ylabel('SDar')

@@ -9,19 +9,55 @@
 % channelLabels = {'PO7'};
 
 %% Set up the directory
-% splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSdar';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSdar';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Sdar_Summary.mat';
-% channelLabels = {'P3'};
+splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Sdar_Summary.mat';
+channelLabels = {'P3'};
 
 %% 
 splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
 supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSdar';
 imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSdar';
 summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Sdar_Summary.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
+channelLabels = {'P3'};
 
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sdar_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
+
+%% Setup the directories for input and output for driving data
+% dataDir = 'E:\CTADATA\BCIT\level_0';
+% eventDir = '';
+% resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerNewAgain';
+% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSpindlerNewAgain';
+% channelLabels = {'PO3', 'H27'};
+% paramsInit = struct();
+
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
+% channelLabels = {'P3'};
+% paramsInit = struct();
+
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\level0';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\Dreams_Sdar_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
@@ -39,14 +75,11 @@ if ~isempty(imageDir) && ~exist(imageDir, 'dir')
 end
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Load data split files and process the parameters
     splitData = load(dataFiles{k});
     params = processParameters('runSdarSupervised', 0, 0, splitData.params, sdarGetDefaults());     
     params.figureClose = false;
-    params.spindlerGaborFrequencies = 10:16;
-    params.spindlerOnsetTolerance = 0.3;
-    params.spindlerTimingTolerance = 0.1;
     %params.figureFormats = {'png', 'fig', 'pdf', 'eps'};
     %% Read in the EEG and find the correct channel number
     EEG1 = splitData.EEG1;
@@ -83,9 +116,9 @@ for k = 1%:length(dataFiles)
                   getOptimalMetrics(allMetrics1, metricNames, methodNames);
     [optimalMetrics2, optimalIndices2] = ...
                   getOptimalMetrics(allMetrics2, metricNames, methodNames);
-    supervisedMetrics2 = getMetricsFromIndices(allMetrics2, ...
+    supervisedMetrics2 = getMetricsFromIndices(allMetrics1, ...
                  optimalIndices1, metricNames, methodNames);
-    supervisedMetrics1 = getMetricsFromIndices(allMetrics1, ...
+    supervisedMetrics1 = getMetricsFromIndices(allMetrics2, ...
                  optimalIndices2, metricNames, methodNames);
    
     %% Save the additional information for future analysis

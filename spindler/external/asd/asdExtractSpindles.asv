@@ -196,34 +196,43 @@ end
 
 %% Now merge events
 spindleMask = oscillationIndex >= params.AsdFWHMCutoff & peakWidthMask;
-slidesOnTail = round(windowLength/slideWidth) - 1;
+slidesOnTail = round(windowLength/slideWidth);
 changeMask = diff(spindleMask);
 spindleIndices = (1:size(ampX, 2))';
 downPoints = spindleIndices(changeMask == -1);
-endPoints = downPoints + slidesOnTail;
-endPoints(endPoints > length(spindleMask)) = length(spindleMask);
-for k = 1:length(downPoints)
-    spindleMask(downPoints(k):endPoints(k)) = true;
+for k = downPoints
+    downMask = downPoints:downPoints
+spindleIndices = spindleIndices(spindleMask);
+spindleFrequency = peakFrequency(spindleMask);
+spindleAmplitude = peakAmplitude(spindleMask);
+
+spindleCounts = zeros(size(spindleIndices));
+if isempty(spindleCounts)
+    return;
 end
-diffMask = diff(spindleMask);
-startFrames = spindleIndices(diffMask == 1) + 1;
-downFrames =  spindleIndices(diffMask == -1);
-% 
-% 
-% numEvents = spindleCounts(end);
-% events = zeros(numEvents, 2);
-% eventFrequencies = zeros(numEvents, 1);
-% eventAmplitudes = zeros(numEvents, 1);
-% eventOscillationIndices = zeros(numEvents, 1);
-% for k = 1:numEvents
-%     spindleMask = spindleCounts == k;
-%     theseIndices = spindleIndices(spindleMask);
-%     eventFrequencies(k) = mean(spindleFrequency(spindleMask));
-%     eventAmplitudes(k) = mean(spindleAmplitude(spindleMask));
-%     eventOscillationIndices(k) = mean(oscillationIndex(spindleMask));
-%     events(k, 1) = (theseIndices(1) - 1)*slideWidth;
-%     events(k, 2) = events(k, 1) + length(theseIndices)*windowLength - 1;
-% end
+spindleCounts(1) = 1;
+for k = 2:length(spindleCounts)
+    if spindleIndices(k - 1) + 1 == spindleIndices(k) && ...
+            abs(spindleFrequency(k - 1) - spindleFrequency(k)) <= 1
+        spindleCounts(k) = spindleCounts(k - 1);
+    else
+        spindleCounts(k) = spindleCounts(k - 1) + 1;
+    end
+end
+numEvents = spindleCounts(end);
+events = zeros(numEvents, 2);
+eventFrequencies = zeros(numEvents, 1);
+eventAmplitudes = zeros(numEvents, 1);
+eventOscillationIndices = zeros(numEvents, 1);
+for k = 1:numEvents
+    spindleMask = spindleCounts == k;
+    theseIndices = spindleIndices(spindleMask);
+    eventFrequencies(k) = mean(spindleFrequency(spindleMask));
+    eventAmplitudes(k) = mean(spindleAmplitude(spindleMask));
+    eventOscillationIndices(k) = mean(oscillationIndex(spindleMask));
+    events(k, 1) = (theseIndices(1) - 1)*slideWidth;
+    events(k, 2) = events(k, 1) + length(theseIndices)*windowLength - 1;
+end
 events = events/srate;
 additionalInfo.eventFrequencies = eventFrequencies;
 additionalInfo.eventAmplitudes = eventAmplitudes;

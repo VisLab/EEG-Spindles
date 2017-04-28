@@ -9,18 +9,18 @@
 % channelLabels = {'PO7'};
 
 %% Set up the directory for NCTU driving
-% splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSdar';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSdar';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Sdar_Summary.mat';
-% channelLabels = {'P3'};
+splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Sdar_Summary.mat';
+channelLabels = {'P3'};
 
 %% Set up the directory for the dreams dataset
-splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Sdar_Summary.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
+% splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Sdar_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
 
 
 %% Metrics to calculate and methods to use
@@ -44,9 +44,9 @@ for k = 1:length(dataFiles)
     splitData = load(dataFiles{k});
     params = processParameters('runSdarSupervised', 0, 0, splitData.params, sdarGetDefaults());     
     params.figureClose = false;
-    params.spindlerGaborFrequencies = 10:16;
-    params.spindlerOnsetTolerance = 0.3;
-    params.spindlerTimingTolerance = 0.1;
+%     params.spindlerGaborFrequencies = 10:16;
+%     params.spindlerOnsetTolerance = 0.3;
+%     params.spindlerTimingTolerance = 0.1;
     %params.figureFormats = {'png', 'fig', 'pdf', 'eps'};
     %% Read in the EEG and find the correct channel number
     EEG1 = splitData.EEG1;

@@ -1,21 +1,21 @@
 %% Set up the directory
-% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsAsd';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesAsd';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Asd_Summary.mat';
-% channelLabels = {'PO7'};
-% paramsInit = struct();
-%paramsInit.AsdVisualize = true;
+dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsAsd';
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesAsd';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Asd_Summary.mat';
+channelLabels = {'PO7'};
+paramsInit = struct();
+paramsInit.AsdVisualize = false;
 
 %% NCTU setup
-dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsAsd';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesAsd';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Asd_Summary.mat';
-channelLabels = {'P3'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsAsd';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesAsd';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Asd_Summary.mat';
+% channelLabels = {'P3'};
+% paramsInit = struct();
 
 %% Dreams setup
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
@@ -64,7 +64,7 @@ badMask = false(length(dataFiles), 1);
 
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

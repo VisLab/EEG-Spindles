@@ -41,7 +41,8 @@ theTitle = 'Dreams performance';
 for n = 1:numberMetrics
     metricName = metricNames{n};
     theseResults = squeeze(dreams(:, :, :, n));
-    figHan = compareMetric(theseResults, metricName, dreamsAlgs, algColors, theTitle, dreamsResults);
+    figHan = compareMetric(theseResults, metricName, dreamsAlgs, ...
+                           algColors, theTitle);
 end
 
 %% Construct driving results
@@ -83,5 +84,6 @@ theTitle = 'Driving performance';
 for n = 1:numberMetrics
     metricName = metricNames{n};
     theseResults = squeeze(driving(:, :, :, n));
-    figHan = compareMetric(theseResults, metricName, drivingAlgs, algColors, theTitle, drivingResults);
+    figHan = compareMetric(theseResults, metricName, drivingAlgs, ...
+                           algColors, theTitle);
 end

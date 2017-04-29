@@ -1,28 +1,23 @@
 dreamsAlgs = {'Spindler', 'Asd', 'Tsanas_a7', 'Tsanas_a8', 'Wendt'};
 drivingAlgs = {'Spindler', 'Asd', 'Tsanas_a7', 'Tsanas_a8'};
-drivingAlgsSupervised = {'Spindler', 'Sdar'};
 drivingDirBase = {'D:\TestData\Alpha\spindleData\bcit\results'; ...
                   'D:\TestData\Alpha\spindleData\nctu\results'};
 dreamsDirBase = {'D:\TestData\Alpha\spindleData\dreams\results'};
+
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 
-[drivingStatsSupervised, drivingNamesSupervised] = ...
-        getSummaryStatisticsSupervised(drivingDirBase, drivingAlgs);
-% [drivingStats, statNames1] = getSummaryStatistics(drivingDirBase, drivingAlgs);
-% [dreamsStats, statNames2] = getSummaryStatistics(dreamsDirBase, dreamsAlgs);
-% 
-% 
-% %% Plot the Driving statistics
-% statsBase = squeeze(drivingStats(1, :, :));
-% statsOthers = squeeze(drivingStats(2, :, :));
-% baseAlgorithm = drivingAlgs{1};
-% otherAlgorithms = drivingAlgs(2);
-% for k = 1:length(statNames1)
-%     theTitle = 'Driving';
-%     figHan = compareStatistic(squeeze(statsBase(:, k)), ...
-%          squeeze(statsOthers(:, k)), statNames1{k}, ...
-%          baseAlgorithm, otherAlgorithms, algColors, theTitle);
-% end
+[drivingStats, statNames1] = getSummaryStatistics(drivingDirBase, drivingAlgs);
+[dreamsStats, statNames2] = getSummaryStatistics(dreamsDirBase, dreamsAlgs);
+
+statsBase = squeeze(drivingStats(1, :, :));
+statsOthers = squeeze(drivingStats(2, :, :));
+baseAlgorithm = drivingAlgs{1};
+otherAlgorithms = drivingAlgs{2};
+for k = 1:length(statNames1)
+    theTitle = 'Driving';
+    figHan = compareStatistic(squeeze(statsBase(:, j, statsOthers, statNames1{k}, ...
+         baseAlgorithm, otherAlgorithms, algColors, theTitle);
+end
 % 
 % 
 % %% Create the array of performance values

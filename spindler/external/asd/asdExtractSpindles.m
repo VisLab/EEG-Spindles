@@ -95,7 +95,13 @@ meanAmpX = mean(ampX, 2);
 fh = @(x,p) exp(-x./p(1));
 errfh = @(p,x,y) sum((y(:)-fh(x(:),p)).^2);
 p0 = (max(f) - min(f))/2;
-P = fminsearch(errfh, p0, [], f, meanAmpX);
+
+[P, ~, exitflag] = fminsearch(errfh, p0, [], f, meanAmpX);
+if exitflag == 0
+    warning('asdExtractSpindles:fminsearch', ...
+        'having trouble fitting noise spectrum, trying more function evals');
+    return;
+end
 noiseFit = fh(f, P);
 if params.AsdVisualize
     theTitle = [imageBase ' [Average spectrum and noise fit]'];
@@ -195,39 +201,51 @@ for k = 1:numSlides
 end
 
 %% Now merge events
-spindleMask = oscillationIndex >= params.AsdFWHMCutoff & peakWidthMask;
 slidesOnTail = round(windowLength/slideWidth) - 1;
-changeMask = diff(spindleMask);
-spindleIndices = (1:size(ampX, 2))';
-downPoints = spindleIndices(changeMask == -1);
-endPoints = downPoints + slidesOnTail;
-endPoints(endPoints > length(spindleMask)) = length(spindleMask);
-for k = 1:length(downPoints)
-    spindleMask(downPoints(k):endPoints(k)) = true;
+spindleMask = oscillationIndex >= params.AsdFWHMCutoff & peakWidthMask;
+dataIndices = (1:size(ampX, 2))';
+spindleIndices = dataIndices(spindleMask);
+spindleMaskCount = zeros(size(spindleMask));
+numWindows = length(spindleMask);
+for k = 1:length(spindleIndices)
+    firstPos = spindleIndices(k);
+    lastPos = min(spindleIndices(k) + slidesOnTail, numWindows);
+    spindleMaskCount(firstPos:lastPos) = spindleMaskCount(firstPos:lastPos) + 1;
 end
-diffMask = diff(spindleMask);
-startFrames = spindleIndices(diffMask == 1) + 1;
-downFrames =  spindleIndices(diffMask == -1);
-% 
-% 
-% numEvents = spindleCounts(end);
-% events = zeros(numEvents, 2);
-% eventFrequencies = zeros(numEvents, 1);
-% eventAmplitudes = zeros(numEvents, 1);
-% eventOscillationIndices = zeros(numEvents, 1);
-% for k = 1:numEvents
-%     spindleMask = spindleCounts == k;
-%     theseIndices = spindleIndices(spindleMask);
-%     eventFrequencies(k) = mean(spindleFrequency(spindleMask));
-%     eventAmplitudes(k) = mean(spindleAmplitude(spindleMask));
-%     eventOscillationIndices(k) = mean(oscillationIndex(spindleMask));
-%     events(k, 1) = (theseIndices(1) - 1)*slideWidth;
-%     events(k, 2) = events(k, 1) + length(theseIndices)*windowLength - 1;
-% end
-events = events/srate;
-additionalInfo.eventFrequencies = eventFrequencies;
-additionalInfo.eventAmplitudes = eventAmplitudes;
-additionalInfo.eventOscillationIndices = eventOscillationIndices;
+spindleOverlapMask = spindleMaskCount >= params.AsdWindowOverlapCount;
+changeMask = diff(spindleOverlapMask);
+startWins = find(changeMask == 1) + 1;
+endWins =  find(changeMask == -1);
+if spindleOverlapMask(1)
+    startWins = [1; startWins];
+end
+if spindleOverlapMask(end)
+    endWins = [endWins; length(spindleOverlapMask)];
+end
+if length(startWins) ~= length(endWins)
+    error('asdExtractSpindles:Unmatched', 'Event start and ends do not match');
+end
+
+%% Compute event statistics for the windows
+startFrames = (startWins - 1)*slideWidth + 1;
+endFrames = endWins*slideWidth;
+events = [startFrames, endFrames]/srate;
+numEvents = length(startWins);
+
+eventFrequencies = zeros(numEvents, 1);
+eventAmplitudes = zeros(numEvents, 1);
+eventOscillationIndices = zeros(numEvents, 1);
+for k = 1:numEvents
+    eventWins = startWins(k):endWins(k);
+    eventFrequencies(k) = mean(peakFrequency(eventWins));
+    eventAmplitudes(k) = mean(peakAmplitude(eventWins));
+    eventOscillationIndices(k) = mean(oscillationIndex(eventWins));
+end
+combinedCutoffMask = eventOscillationIndices > params.AsdFWHMCutoffCombined;
+events = events(combinedCutoffMask, :);
+additionalInfo.eventFrequencies = eventFrequencies(combinedCutoffMask);
+additionalInfo.eventAmplitudes = eventAmplitudes(combinedCutoffMask);
+additionalInfo.eventOscillationIndices = eventOscillationIndices(combinedCutoffMask);
 end
 
 function fInt = getInterpolatedFrequency(f1, f2, s1, s2, sInt)

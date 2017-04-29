@@ -1,12 +1,12 @@
 %% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsAsd';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesAsd';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Asd_Summary.mat';
-channelLabels = {'PO7'};
-paramsInit = struct();
-paramsInit.AsdVisualize = false;
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsAsd';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesAsd';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Asd_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
+% paramsInit.AsdVisualize = false;
 
 %% NCTU setup
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
@@ -18,16 +18,16 @@ paramsInit.AsdVisualize = false;
 % paramsInit = struct();
 
 %% Dreams setup
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsAsd';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesAsd';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Asd_Summary.mat';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% paramsInit = struct();
-% paramsInit.AsdPeakFrequencyRange = 10:16;
-% paramsInit.spindlerOnsetTolerance = 0.3;
-% paramsInit.spindlerTimingTolerance = 0.1;
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsAsd';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesAsd';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Asd_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
+paramsInit = struct();
+paramsInit.AsdPeakFrequencyRange = 10:16;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
@@ -64,7 +64,7 @@ badMask = false(length(dataFiles), 1);
 
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Load data file
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

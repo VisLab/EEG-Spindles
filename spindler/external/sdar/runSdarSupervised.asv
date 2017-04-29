@@ -3,24 +3,24 @@
 
 %% Setup the directories for input and output for driving data
 % splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSdarSupervised';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSdarSupervised';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Sdar_Summary_Supervised.mat';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSupervisedSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSupervisedSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Supervised_Sdar_Summary.mat';
 % channelLabels = {'PO7'};
 
 %% Set up the directory for NCTU driving
-% splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdarSupervised';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdarSupervised';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Sdar_Summary_Supervised.mat';
-% channelLabels = {'P3'};
+splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdarSupervised';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdarSupervised';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Sdar_Summary_Supervised.mat';
+channelLabels = {'P3'};
 
 %% Set up the directory for the dreams dataset
-splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdarSupervised';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdarSupervised';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Sdar_Summary_Supervised.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
+% splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Sdar_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
 
 
 %% Metrics to calculate and methods to use
@@ -45,9 +45,9 @@ for k = 1:length(dataFiles)
     splitData = load(dataFiles{k});
     params = processParameters('runSdarSupervised', 0, 0, splitData.params, sdarGetDefaults());     
     params.figureClose = false;
-    params.spindlerGaborFrequencies = 10:16;
-    params.spindlerOnsetTolerance = 0.3;
-    params.spindlerTimingTolerance = 0.1;
+%     params.spindlerGaborFrequencies = 10:16;
+%     params.spindlerOnsetTolerance = 0.3;
+%     params.spindlerTimingTolerance = 0.1;
     %params.figureFormats = {'png', 'fig', 'pdf', 'eps'};
     %% Read in the EEG and find the correct channel number
     EEG1 = splitData.EEG1;

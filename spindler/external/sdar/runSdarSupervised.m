@@ -2,11 +2,11 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-% splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSdarSupervised';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSdarSupervised';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Sdar_Summary_Supervised.mat';
-% channelLabels = {'PO7'};
+splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSdarSupervised';
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSdarSupervised';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Sdar_Summary_Supervised.mat';
+channelLabels = {'PO7'};
 
 %% Set up the directory for NCTU driving
 % splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
@@ -16,11 +16,11 @@
 % channelLabels = {'P3'};
 
 %% Set up the directory for the dreams dataset
-splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdarSupervised';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdarSupervised';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Sdar_Summary_Supervised.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
+% splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdarSupervised';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdarSupervised';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Sdar_Summary_Supervised.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
 
 
 %% Metrics to calculate and methods to use
@@ -45,9 +45,9 @@ for k = 1:length(dataFiles)
     splitData = load(dataFiles{k});
     params = processParameters('runSdarSupervised', 0, 0, splitData.params, sdarGetDefaults());     
     params.figureClose = false;
-    params.spindlerGaborFrequencies = 10:16;
-    params.spindlerOnsetTolerance = 0.3;
-    params.spindlerTimingTolerance = 0.1;
+%     params.spindlerGaborFrequencies = 10:16;
+%     params.spindlerOnsetTolerance = 0.3;
+%     params.spindlerTimingTolerance = 0.1;
     %params.figureFormats = {'png', 'fig', 'pdf', 'eps'};
     %% Read in the EEG and find the correct channel number
     EEG1 = splitData.EEG1;
@@ -91,8 +91,8 @@ for k = 1:length(dataFiles)
     optimalEvents2 = cell(numMethods, numMetrics);
     for m = 1:numMethods
         for n = 1:numMetrics
-            optimalEvents1 = spindles1(optimalIndices2(m, n)).events;
-            optimalEvents2 = spindles1(optimalIndices1(m, n)).events;
+            optimalEvents1{m, n} = spindles1(optimalIndices2(m, n)).events;
+            optimalEvents2{m, n}  = spindles1(optimalIndices1(m, n)).events;
         end
     end
     %% Save the additional information for future analysis

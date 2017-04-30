@@ -2,30 +2,31 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-% splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSupervisedSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSupervisedSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Supervised_Spindler_Summary.mat';
-% channelLabels = {'PO7'};
-
+splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerSupervised';
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerSupervised';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Spindler_Summary_Supervised.mat';
+channelLabels = {'PO7'};
 
 %% NCTU
-splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSupervisedSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSupervisedSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Supervised_Spindler_Summary.mat';
-channelLabels = {'P3'};
+% splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindlerSupervised';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerSupervised';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\nctu_Spindler_Summary_Supervised.mat';
+% channelLabels = {'P3'};
 
 %% Dreams
 % splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSupervisedSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSupervisedSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Supervised_Spindler_Summary.mat';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerSupervised';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerSupervised';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Spindler_Summary_Supervised.mat';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+numMetrics = length(metricNames);
+numMethods = length(methodNames);
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', splitFileDir, '.mat');
@@ -90,7 +91,14 @@ for k = 1:length(dataFiles)
                  optimalIndices1, metricNames, methodNames);
     supervisedMetrics1 = getMetricsFromIndices(allMetrics1, ...
                  optimalIndices2, metricNames, methodNames);
-   
+    optimalEvents1 = cell(numMethods, numMetrics);
+    optimalEvents2 = cell(numMethods, numMetrics);
+    for m = 1:numMethods
+        for n = 1:numMetrics
+            optimalEvents1{m, n} = spindles1(optimalIndices2(m, n)).events;
+            optimalEvents2{m, n} = spindles1(optimalIndices1(m, n)).events;
+        end
+    end
     %% Save the additional information for future analysis
     additionalInfo.spindles1 = spindles1;
     additionalInfo.spindlerCurves1 = spindlerCurves1;
@@ -98,6 +106,8 @@ for k = 1:length(dataFiles)
     additionalInfo.spindles2 = spindles2;
     additionalInfo.spindlerCurves2 = spindlerCurves2;
     additionalInfo.allMetrics2 = allMetrics2;
+    additionalInfo.optimalEvents1 = optimalEvents1;
+    additionalInfo.optimalEvents2 = optimalEvents2;
     additionalInfo.warningMsgs1 = warningMsgs1;
     additionalInfo.warningMsgs2 = warningMsgs2;
     

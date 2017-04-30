@@ -16,12 +16,11 @@
 % channelLabels = {'P3'};
 
 %% Set up the directory for the dreams dataset
-splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdarSupervised';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdarSupervised';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Sdar_Summary_Supervised.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
-
+% splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSdarSupervised';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSdarSupervised';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Sdar_Summary_Supervised.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
@@ -93,10 +92,10 @@ for k = 1:length(dataFiles)
     optimalEvents2 = cell(numMethods, numMetrics);
     for m = 1:numMethods
         for n = 1:numMetrics
-            supervisedEvents1{m, n} = spindles1(optimalIndices1(m, n)).events;
-            supervisedEvents2{m, n}  = spindles1(optimalIndices2(m, n)).events;
+            supervisedEvents1{m, n} = spindles1(optimalIndices2(m, n)).events;
+            supervisedEvents2{m, n}  = spindles2(optimalIndices1(m, n)).events;
             optimalEvents1{m, n} = spindles1(optimalIndices1(m, n)).events;
-            optimalEvents2{m, n}  = spindles1(optimalIndices2(m, n)).events;
+            optimalEvents2{m, n}  = spindles2(optimalIndices2(m, n)).events;
         end
     end
     %% Save the additional information for future analysis
@@ -104,13 +103,12 @@ for k = 1:length(dataFiles)
     additionalInfo.allMetrics1 = allMetrics1;
     additionalInfo.optimalIndices1 = optimalIndices1;
     additionalInfo.optimalIndices2 = optimalIndices2;
-    additionalInfo.optimalEvents1 = optimalEvents1;
-    additionalInfo.optimalEvents2 = optimalEvents2;
-    additionalInfo.optimalEvents1 = supervisedEvents1;
-    additionalInfo.optimalEvents2 = supervisedEvents2;
     additionalInfo.spindles2 = spindles2;
     additionalInfo.allMetrics2 = allMetrics2;
- 
+    additionalInfo.optimalEvents1 = optimalEvents1;
+    additionalInfo.optimalEvents2 = optimalEvents2;
+    additionalInfo.supervisedEvents1 = supervisedEvents1;
+    additionalInfo.supervisedEvents2 = supervisedEvents2;
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
     save([supervisedResultsDir  filesep fileName, '_sdar_SupervisedResults.mat'],  ...

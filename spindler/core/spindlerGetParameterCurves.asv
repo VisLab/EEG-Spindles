@@ -22,7 +22,7 @@ spindleCurves = struct('name', NaN, ...
              'bestThreshold', NaN, 'bestThresholdInd', NaN, ...
               'atomRange', NaN, 'atomRangeInd', NaN,...
              'eFractionBest', NaN, 'eFractMaxInd', NaN, ...
-             'bestAtomInd', NaN, 'spindleRateSTD', NaN);
+             'bestAtomInd', NaN, 'spindleSTD', NaN);
 defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());         
 params = processParameters('getSpindlerCurves', nargin, 2, params, defaults);
 atomsPerSecond = unique(cellfun(@double, {spindles.atomsPerSecond}))';
@@ -45,13 +45,16 @@ spindleRate = 60*spindleHits/totalSeconds;
 
 %% Get the standard deviations and slopes
 spindleRateSTD = std(spindleRate, 0, 2);
-stdRateMax = max(spindleRateSTD(:));
-diffSTD = diff(spindleRateSTD);
-upperAtomInd = find(spindleRateSTD > stdRateMax*stdLimits(2), 1, 'first');
+stdMax = max(spindleSTDUnscaled(:));
+spindleSTD = spindleSTDUnscaled./stdMax;
+spindleSTD(isnan(spindleSTD)) = 0;
+diffSTD = diff(spindleSTD);
+diffSTD(isnan(diffSTD)) = 0;
+upperAtomInd = find(spindleSTD > stdLimits(2), 1, 'first');
 if isempty(upperAtomInd)
     upperAtomInd = numAtoms;
 end
-lowerAtomInd = find(spindleRateSTD > stdRateMax*stdLimits(1), 1, 'first');
+lowerAtomInd = find(spindleSTD > stdLimits(1), 1, 'first');
 if isempty(lowerAtomInd) || isempty(upperAtomInd) || lowerAtomInd >= upperAtomInd
     warningMsgs{end + 1} = ...
          ['Spindles/sec has non standard behavior for low ' ...
@@ -81,6 +84,7 @@ xTHRatioScaled = bsxfun(@times, xTHRatio, xTHRatioDiv);
 
 %% Find the threshold whose scaled ratio is closed to the central ratio
 averL1THDist = mean(abs(xTHRatioScaled(atomRangeInd(1):atomRangeInd(2), :) - 1));
+%averL1THDist = mean(abs(xTHRatio(atomRangeInd(1):atomRangeInd(2), :) - 1));
 [~, bestThresholdInd] = min(averL1THDist);
 bestThreshold = baseThresholds(bestThresholdInd);
 [~, mInd] = findFirstMin(xTHRatio(atomRangeInd(1):atomRangeInd(2), bestThresholdInd));
@@ -104,9 +108,10 @@ end
 %% Find the atoms/second with highest energy fraction in candidate range
 [~, eFractMaxInd] = max(eFractionBest(atomRangeInd(1):atomRangeInd(2)));
 eFractMaxInd = eFractMaxInd + lowerAtomInd - 1;
+%bestAtomsPerSecond = atomsPerSecond(eFractMaxInd);
 
 %%
-sRateMean = (spindleRate(:,  minThresholdInd) + spindleRate(:, maxThresholdInd))/2;
+sHitsMean = (spindleHits(:,  minThresholdInd) + spindleHits(:, maxThresholdInd))/2;
 
 %% Now save the calculated spindle parameters
 spindleCurves.name = theName;
@@ -120,8 +125,8 @@ spindleCurves.atomRange = [lowerAtomRange, upperAtomRange];
 spindleCurves.eFractionBest = eFractionBest;
 spindleCurves.eFractMaxInd = eFractMaxInd;
 spindleCurves.bestAtomInd = bestAtomInd;
-spindleCurves.spindleRateSTD = spindleRateSTD;
-spindleCurves.spindleRateSTDScale = stdRateMax;
+spindleCurves.spindleSTD = spindleSTD;
+spindleCurves.spindleSTDScale = stdMax;
 spindleCurves.bestLinearInd = length(atomsPerSecond)*(bestThresholdInd - 1) + ...
                                      bestAtomInd;
 %% Determine whether to display the results
@@ -145,7 +150,7 @@ theTitle = {baseTitle; ...
        ' Closest threshold: ' num2str(baseThresholds(bestThresholdInd))]};
 h1Fig = figure('Name', baseTitle);
 hold on
-[ax, h1, h2] = plotyy(atomsPerSecond, xTHRatio(:, bestThresholdInd), atomsPerSecond, spindleRateSTD);
+[ax, h1, h2] = plotyy(atomsPerSecond, xTHRatio(:, bestThresholdInd), atomsPerSecond, spindleSTDUnscaled);
 theColor = get(h1, 'Color');
 set(h1, 'Color', [0, 0, 0]);
 plot(ax(1), atomsPerSecond, xTHRatioMean, ...
@@ -166,6 +171,7 @@ set(ax(1), 'YLimMode', 'auto', 'YTickMode', 'auto')
 yLimits = get(ax(1), 'YLim');
 
 ePos = atomsPerSecond(bestAtomInd);
+% ePos = atomsPerSecond(eFractMaxInd);
 line(ax(1), [ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
 
 line(ax(1), [lowerAtomRange, upperAtomRange], [-0.1, -0.1], ...
@@ -175,7 +181,7 @@ yLimits = get(ax(2), 'YLim');
 line(ax(2), [lowerAtomRange, upperAtomRange], [0.1, 0.1]*yLimits(2), ...
     'LineWidth', 4, 'Color', [0.8, 0.8, 0.8]);
 ylabel(ax(1), 'Average spindle length (sec)');
-ylabel(ax(2), 'STD spindles/min');
+ylabel(ax(2), 'STD spindles/sec');
 xlabel(ax(1), 'Atoms/sec');
 xlabel(ax(2), '');
 box(ax(1), 'on')
@@ -197,25 +203,26 @@ theTitle = {baseTitle; ...
            ['STD range: [' num2str(lowerAtomRange) ',' num2str(upperAtomRange) '] ' ]};           
 h2Fig = figure('Name', baseTitle);
 hold on
-[ax, h1, h2] = plotyy(atomsPerSecond, spindleRate(:, bestThresholdInd), ...
-                     atomsPerSecond, spindleRateSTD);
+[ax, h1, h2] = plotyy(atomsPerSecond, 60*spindleHits(:, bestThresholdInd), ...
+                     atomsPerSecond, 60*spindleSTDUnscaled);
 theColor = get(h1, 'Color');
 set(h1, 'Color', [0, 0, 0]);
-plot(ax(1), atomsPerSecond, sRateMean, ...
+plot(ax(1), atomsPerSecond, sHitsMean, ...
          'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
-plot(ax(1), atomsPerSecond, spindleRate(:, minThresholdInd), ...
+plot(ax(1), atomsPerSecond, spindleHits(:, minThresholdInd), ...
          'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
-plot(ax(1), atomsPerSecond, spindleRate(:, maxThresholdInd), ...
+plot(ax(1), atomsPerSecond, spindleHits(:, maxThresholdInd), ...
          'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
 hleg = legend(ax(1), ['T_b=' num2str(bestThreshold)], 'T_b centered', ...
                      'T_b=0', 'T_b=1', 'Location', 'NorthWest');
 title(hleg, 'Threshold')
 set(h1, 'LineWidth', 3);
 set(h2, 'LineWidth', 3);
-ylabel(ax(1), 'Spindles/min');
-ylabel(ax(2), 'STD spindles/min wrt threshold');
+ylabel(ax(1), 'Spindles/sec');
+ylabel(ax(2), 'STD spindles/sec wrt threshold');
 set(ax(1), 'YLimMode', 'auto', 'YTickMode', 'auto');
 yLimits = get(ax(1), 'YLim');
+%ePos = atomsPerSecond(eFractMaxInd);
 line(ax(1), [ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
 
 yLimits = get(ax(2), 'YLim');

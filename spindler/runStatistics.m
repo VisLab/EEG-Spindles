@@ -5,9 +5,11 @@ drivingDirBase = {'D:\TestData\Alpha\spindleData\bcit\results'; ...
                   'D:\TestData\Alpha\spindleData\nctu\results'};
 dreamsDirBase = {'D:\TestData\Alpha\spindleData\dreams\results'};
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
-
+methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+metricNames = {'f1', 'f2', 'g'};
 [drivingStatsSupervised, drivingNamesSupervised] = ...
-        getSummaryStatisticsSupervised(drivingDirBase, drivingAlgs);
+        getSummaryStatisticsSupervised(drivingDirBase, drivingAlgs, ...
+                                     methodNames, metricNames);
 % [drivingStats, statNames1] = getSummaryStatistics(drivingDirBase, drivingAlgs);
 % [dreamsStats, statNames2] = getSummaryStatistics(dreamsDirBase, dreamsAlgs);
 % 

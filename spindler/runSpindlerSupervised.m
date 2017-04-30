@@ -2,11 +2,11 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
-supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerSupervised';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerSupervised';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Spindler_Summary_Supervised.mat';
-channelLabels = {'PO7'};
+% splitFileDir = 'D:\TestData\Alpha\spindleData\bcit\splitData';
+% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerSupervised';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerSupervised';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\bcit_Spindler_Summary_Supervised.mat';
+% channelLabels = {'PO7'};
 
 %% NCTU
 % splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
@@ -16,11 +16,11 @@ channelLabels = {'PO7'};
 % channelLabels = {'P3'};
 
 %% Dreams
-% splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
-% supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerSupervised';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerSupervised';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Spindler_Summary_Supervised.mat';
-% channelLabels = {'C3-A1', 'CZ-A1'};
+splitFileDir = 'D:\TestData\Alpha\spindleData\dreams\splitData';
+supervisedResultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerSupervised';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerSupervised';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummarySupervised\dreams_Spindler_Summary_Supervised.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
@@ -46,9 +46,9 @@ for k = 1:length(dataFiles)
     splitData = load(dataFiles{k});
     params = processParameters('runSpindlerSupervised', 0, 0, splitData.params, spindlerGetDefaults());     
     params.figureClose = false;
-%     params.spindlerGaborFrequencies = 10:16;
-%     params.spindlerOnsetTolerance = 0.3;
-%     params.spindlerTimingTolerance = 0.1;
+    params.spindlerGaborFrequencies = 10:16;
+    params.spindlerOnsetTolerance = 0.3;
+    params.spindlerTimingTolerance = 0.1;
     
     %% Read in the EEG and find the correct channel number
     EEG1 = splitData.EEG1;
@@ -91,12 +91,16 @@ for k = 1:length(dataFiles)
                  optimalIndices1, metricNames, methodNames);
     supervisedMetrics1 = getMetricsFromIndices(allMetrics1, ...
                  optimalIndices2, metricNames, methodNames);
+    supervisedEvents1 = cell(numMethods, numMetrics);
+    supervisedEvents2 = cell(numMethods, numMetrics);    
     optimalEvents1 = cell(numMethods, numMetrics);
     optimalEvents2 = cell(numMethods, numMetrics);
     for m = 1:numMethods
         for n = 1:numMetrics
-            optimalEvents1{m, n} = spindles1(optimalIndices2(m, n)).events;
-            optimalEvents2{m, n} = spindles1(optimalIndices1(m, n)).events;
+            supervisedEvents1{m, n} = spindles1(optimalIndices1(m, n)).events;
+            supervisedEvents2{m, n}  = spindles1(optimalIndices2(m, n)).events;
+            optimalEvents1{m, n} = spindles1(optimalIndices1(m, n)).events;
+            optimalEvents2{m, n}  = spindles1(optimalIndices2(m, n)).events;
         end
     end
     %% Save the additional information for future analysis
@@ -106,8 +110,12 @@ for k = 1:length(dataFiles)
     additionalInfo.spindles2 = spindles2;
     additionalInfo.spindlerCurves2 = spindlerCurves2;
     additionalInfo.allMetrics2 = allMetrics2;
+    additionalInfo.optimalIndices1 = optimalIndices1;
+    additionalInfo.optimalIndices2 = optimalIndices2;
     additionalInfo.optimalEvents1 = optimalEvents1;
     additionalInfo.optimalEvents2 = optimalEvents2;
+    additionalInfo.optimalEvents1 = supervisedEvents1;
+    additionalInfo.optimalEvents2 = supervisedEvents2;
     additionalInfo.warningMsgs1 = warningMsgs1;
     additionalInfo.warningMsgs2 = warningMsgs2;
     
@@ -118,7 +126,6 @@ for k = 1:length(dataFiles)
         'supervisedMetrics2', 'optimalMetrics1', 'optimalMetrics2', ...
         'methodNames', 'metricNames', 'params1', 'params2', 'additionalInfo', '-v7.3');
 end
-
 
 %% Now consolidate the events for the collection and create a summary
 [results, dataNames, upperBounds] = consolidateSupervisedResults(supervisedResultsDir, methodNames, metricNames);

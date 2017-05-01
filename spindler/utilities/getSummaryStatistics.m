@@ -1,7 +1,7 @@
 function [summaryStatistics, statNames] = getSummaryStatistics(baseDirs, algNames)
 %% Consolidate summary statistics from results files named by convention
    
-statNames = {'Spindles/sec', 'Average spindle length', 'Fraction of time spindling'};
+statNames = {'Spindles/min', 'Average spindle length', 'Fraction of time spindling'};
 numAlgs = length(algNames);
 numTypes = length(baseDirs);
 eventLists = cell(numAlgs, numTypes);
@@ -24,7 +24,7 @@ for k = 1:numAlgs
             datasetTime = (frames - 1)/srate;
             timeInEvents = sum(events(:, 2) - events(:, 1));
             numberEvents = size(events, 1);
-            eventStatistics(n, 1) = numberEvents/datasetTime;
+            eventStatistics(n, 1) = 60*numberEvents/datasetTime;
             eventStatistics(n, 2) = timeInEvents/numberEvents;
             eventStatistics(n, 3) = timeInEvents/datasetTime;
         end

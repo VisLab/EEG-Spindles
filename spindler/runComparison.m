@@ -1,6 +1,12 @@
+%% Script to consolidate and compare performance results across algorithms
+%
+%  Written by: Kay Robbins, UTSA, 2017
+%
+%% Set up the parameters
 resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
 dreamsAlgs = {'Spindler', 'Asd', 'Tsanas_a7', 'Tsanas_a8', 'Wendt'};
 drivingAlgs = {'Spindler', 'Asd', 'Tsanas_a7', 'Tsanas_a8'};
+
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 metricNames = {'F1', 'F2', 'G'};
 
@@ -45,6 +51,13 @@ for n = 1:numberMetrics
                            algColors, theTitle);
 end
 
+%% Perform a paired ttest for statistical significance
+hitIndices = 2:4;
+baseIndex = 1;
+dataSummary = dreams(:, hitIndices, :, :);
+fprintf('\nStatistical significance testing for dreams\n');
+dreamsStats = getPairedStatistics(dataSummary, baseIndex, dreamsAlgs); 
+
 %% Construct driving results
 numberMethods = length(drivingResults{1}.methodNames);
 numberFiles = length(drivingResults{1}.dataNames);
@@ -87,3 +100,10 @@ for n = 1:numberMetrics
     figHan = compareMetric(theseResults, metricName, drivingAlgs, ...
                            algColors, theTitle);
 end
+
+%% Perform a paired ttest for statistical significance
+hitIndices = 2:4;
+baseIndex = 1;
+dataSummary = driving(:, hitIndices, :, :);
+fprintf('\nStatistical significance testing for driving\n');
+drivingStats = getPairedStatistics(dataSummary, baseIndex, drivingAlgs); 

@@ -1,5 +1,8 @@
-%% Script to compare the supervised versions of the algorithms
-
+%% Script to consolidate and compare performance results across algorithms
+%
+%  Written by: Kay Robbins, UTSA, 2017
+%
+%% Set up the parameters
 resultsDir = 'D:\TestData\Alpha\spindleData\resultSummarySupervised';
 dreamsAlgs = {'Spindler', 'Sdar'};
 drivingAlgs = {'Spindler', 'Sdar'};
@@ -59,6 +62,12 @@ for n = 1:numberMetrics
            methodLegends(methodIndices), methodMarkers(methodIndices), theTitle);
 end
 
+%% Perform a paired ttest for statistical significance
+baseIndex = 1;
+dataSummary = dreams;
+fprintf('\nStatistical significance testing for dreams\n');
+dreamsStats = getPairedStatistics(dataSummary, baseIndex, dreamsAlgs); 
+
 %% Construct driving results
 numberMethods = length(drivingResults{1}.methodNames);
 numberFiles = length(drivingResults{1}.dataNames);
@@ -113,3 +122,9 @@ for n = 1:numberMetrics
            metricName, drivingAlgs, algColors, algColorsOptimal, ...
            methodLegends(methodIndices), methodMarkers(methodIndices), theTitle);
 end
+
+%% Now compute statistical comparison for driving
+baseIndex = 1;
+dataSummary = driving;
+fprintf('\nStatistical significance testing for driving\n');
+drivingStats = getPairedStatistics(dataSummary, baseIndex, drivingAlgs); 

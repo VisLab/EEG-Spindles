@@ -1,0 +1,38 @@
+function stats = getPairedStatistics(dataSummary, baseIndex, algorithms) 
+%% Performs paired statistics
+
+[numDatasets, numMethods, numAlgs, numMetrics] = size(dreams);
+baseData = dreams(:, hitIndices, baseIndex, :);
+baseData = baseData(:);
+otherData = dreams;
+algorithms = dreamsAlgs;
+[numDatasets, numMethods, numAlgs, numMetrics] = size(dreams);
+stats(numAlgs - 1) = struct('baseAlg', NaN, 'alg', NaN, ...
+               'h', NaN, 'p', NaN, 'ci', NaN, 'tstats', NaN, 'status', NaN);
+fprintf('Base algorithm %s is ...\n', algorithms{baseIndex});
+for k = 1:numAlgs
+    stats(k) = stats(end);
+    thisData = squeeze(otherData(:, hitIndices, k, :));
+    stats(k).baseAlg = algorithms{baseIndex};
+    stats(k).alg = algorithms{k};
+    [h, p, ci, tstats] = ttest(baseData, thisData(:), 'Tail', 'Both');
+    if ci(1) > 0
+        status = 'significantly better than';
+    elseif ci(2) < 0
+        status = 'significantly worse than';
+    else
+        status = 'Not significantly different than';
+    end
+    status = sprintf('%s %s %s: p=%g  ci=[%g, %g] tstat = %g', ...
+         algorithms{baseIndex}, algorithms{k}, p, ci(1), ci(2), tstats.tstat);
+    stats(k).h = h;
+    stats(k).p = p;
+    stats(k).ci = ci;
+    stats(k).tstats = tstats;
+  
+     
+    fprintf('%s %s: p=%g  ci=[%g, %g]\n', status, algorithms{k}, p, ci(1), ci(2));
+end
+
+end
+

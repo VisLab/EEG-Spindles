@@ -14,15 +14,15 @@ methodIndices = 2:4;
 %% Read in all of the summary data
 dreamsResults = cell(length(dreamsAlgs), 1);
 for k = 1:length(dreamsResults)
-    dreamsResults{k} = load([resultsDir filesep 'dreams_Supervised_' dreamsAlgs{k} '_Summary.mat']);
+    dreamsResults{k} = load([resultsDir filesep 'dreams_' dreamsAlgs{k} '_Summary_Supervised.mat']);
     dreamsResults{k}.algorithm = dreamsAlgs{k};
 end
 drivingResults = cell(length(drivingAlgs), 1);
 for k = 1:length(drivingAlgs)
-    drivingResults{k} = load([resultsDir filesep 'bcit_Supervised_' drivingAlgs{k} '_Summary.mat']);
+    drivingResults{k} = load([resultsDir filesep 'bcit_' drivingAlgs{k} '_Summary_Supervised.mat']);
     drivingResults{k}.algorithm = [drivingAlgs{k} '_bcit_Supervised'];
     
-    drivingResults{length(drivingAlgs) + k} = load([resultsDir filesep 'nctu_Supervised_' drivingAlgs{k} '_Summary.mat']);
+    drivingResults{length(drivingAlgs) + k} = load([resultsDir filesep 'nctu_' drivingAlgs{k} '_Summary_Supervised.mat']);
     drivingResults{length(drivingAlgs) + k}.algorithm = [drivingAlgs{k} '_nctu_Supervised_'];
 end
 

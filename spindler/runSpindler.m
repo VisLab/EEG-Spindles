@@ -30,15 +30,15 @@
 %% Dreams
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerA';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerA';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_SpindlerA_Summary.mat';
 channelLabels = {'C3-A1', 'CZ-A1'};
 paramsInit = struct();
 paramsInit.spindlerGaborFrequencies = 10:16;
 paramsInit.spindlerOnsetTolerance = 0.3;
 paramsInit.spindlerTimingTolerance = 0.1;
-
+params.Init.spindlerGaborScales = [0.125, 0.25, 0.5]/2;
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};

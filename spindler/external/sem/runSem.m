@@ -7,12 +7,12 @@
 % occipitalLabels = {'O1'};
 % paramsInit = struct();
 
-%% Set up the directory
+%% Set up the directory for dreams
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsWendt';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesWendt';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Wendt_Summary.mat';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSem';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSem';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sem_Summary.mat';
 centralLabels = {'C3-A1', 'CZ-A1'};
 occipitalLabels = {'O1-A1'};
 paramsInit = struct();
@@ -87,7 +87,7 @@ for k = 1:length(dataFiles)
     
     params.name = theName;
     additionalInfo = struct();
-    save([resultsDir filesep theName '_Ch_' centralLabel '_' occipitalLabel '_warby.mat'], ...
+    save([resultsDir filesep theName '_Ch_' centralLabel '_' occipitalLabel '_Sem.mat'], ...
         'events', 'expertEvents', 'metrics', 'params', '-v7.3');
 end
 

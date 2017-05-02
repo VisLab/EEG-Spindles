@@ -21,10 +21,10 @@ channelLabels = {'P3'};
 defaults = concatenateStructs(getGeneralDefaults(), cwtGetDefaults());
 paramsInit = processParameters('runCwt', 0, 0, struct(), defaults);     
 paramsInit.srateTarget = 100;
-paramsInit.cwtAlgorithm = 'a7';
+paramsInit.cwtAlgorithm = 'a8';
 paramsInit.cwtSpindleFrequencies = 6:14;
 summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-    'nctu_cwt_' paramsInit.cwtAlgorithm '_Summary.mat'];
+    'nctu_Cwt_' paramsInit.cwtAlgorithm '_Summary.mat'];
 resultsDir = ['D:\TestData\Alpha\spindleData\nctu\resultsCwt_' ...
                paramsInit.cwtAlgorithm];
 

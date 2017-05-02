@@ -4,8 +4,8 @@
 %
 %% Set up the parameters
 resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
-dreamsAlgs = {'Spindler', 'Asd', 'Tsanas_a7', 'Tsanas_a8', 'Wendt'};
-drivingAlgs = {'Spindler', 'Asd', 'Tsanas_a7', 'Tsanas_a8'};
+dreamsAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8', 'Sem'};
+drivingAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8'};
 
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 metricNames = {'F1', 'F2', 'G'};

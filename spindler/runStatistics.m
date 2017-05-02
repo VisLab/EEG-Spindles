@@ -1,5 +1,5 @@
-dreamsAlgs = {'Spindler', 'Asd', 'CWT-a7', 'CWT-a8', 'SEM-a6'};
-drivingAlgs = {'Spindler', 'Asd', 'CWT-a7', 'CWT-a8'};
+dreamsAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8', 'Sem'};
+drivingAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8'};
 drivingAlgsSupervised = {'Spindler', 'Sdar'};
 drivingDirBase = {'D:\TestData\Alpha\spindleData\bcit\results'; ...
                   'D:\TestData\Alpha\spindleData\nctu\results'};
@@ -46,7 +46,7 @@ theMeans = [drivingMean(drivingInd, :); dreamsMean(dreamsInd, :)];
 theStds = [drivingStd(drivingInd, :); dreamsStd(dreamsInd, :)];
 algColors = [0, 0, 0; 0.8, 0.8, 0.2; 0, 0, 0; ...
              0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
-markers = {'o', 's', 'o', 's', 's', 's', 's'};
+markers = {'o', 'o', 's', 's', 's', 's', 's'};
 statNames = drivingStatNames;
 legendStrings = {'Spindler(A)', 'ASD(A)', 'Spindler(S)', 'CWT-a7(S)', 'CWT-a8(S)', 'SEM-a6(S)'};
 figure

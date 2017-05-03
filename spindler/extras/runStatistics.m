@@ -66,3 +66,39 @@ for k = 1:3
     box on
     legend(legendStrings, 'Location', 'EastOutside');
 end
+
+%%
+dreamsInd = [1, 3, 4, 5]; 
+drivingInd = 1:2;
+slabels = {'Spin-A', 'ASD-A', 'Spin-S', 'CWTa7-S', 'CWTa8-S', 'SEM-S'};
+driveNums = repmat([1;2], 1, size(drivingStats, 2));
+dreamsNums = repmat([3; 4; 5; 6], 1, size(dreamsStats, 2));
+
+drive = drivingStats(drivingInd, :, :);
+dreams = dreamsStats(dreamsInd, :, :);
+statNames = drivingStatNames;
+%legendStrings = {'Spindler(A)', 'ASD(A)', 'Spindler(S)', 'CWT-a7(S)', 'CWT-a8(S)', 'SEM-a6(S)'};
+theColors = [0, 0, 0; 0, 0, 0; 0, 0.7, 0.9; 0, 0.7, 0.9; 0, 0.7, 0.9; 0, 0.7, 0.9];
+figure
+allnums = [driveNums(:); dreamsNums(:)];
+for k = 1:3
+    figure('Name', statNames{k})
+    driveData = squeeze(drive(:, :, k));
+    dreamsData = squeeze(dreams(:, :, k));
+    data = [driveData(:); dreamsData(:)];
+    h = boxplot(data, allnums, 'labels', slabels, 'Colors', theColors);
+    for m = 1:7
+        for j = 1:length(slabels)
+           set(h(m, j), 'LineWidth', 1.2)
+        end
+    end
+    for j = 1:length(slabels)
+        set(h(5,j), 'MarkerFaceColor', [0.8, 0.8, 0.8]);
+    end
+    for j = 1:length(slabels)
+        set(h(6, j), 'Color', 'r');
+    end
+    ylabel(statNames{k})
+    xlabel('Algorithm-Data')
+    box on
+end

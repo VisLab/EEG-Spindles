@@ -85,9 +85,9 @@ for k = 3%1:length(dataFiles)
     end
     
     %% Calculate the spindle representations for a range of parameters
-    [spindles, params] = spindlerExtractSpindles(EEG, channelNumber, paramsInit);
+    [spindles, params] = spindlerExtractSpindles2(EEG, channelNumber, paramsInit);
     params.name = theName;
-    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
+    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, imageDir, params);
      if spindlerCurves.bestLinearInd > 0
          events = spindles(spindlerCurves.bestLinearInd).events;
      end

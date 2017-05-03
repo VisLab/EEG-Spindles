@@ -2,13 +2,13 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler2';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler2';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary2\bcit_Spindler_Summary.mat';
-channelLabels = {'PO7'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler2';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler2';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary2\bcit_Spindler_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -21,24 +21,24 @@ paramsInit = struct();
 %% NCTU
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
 % eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Spindler_Summary.mat';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler2';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler2';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary2\nctu_Spindler_Summary.mat';
 % channelLabels = {'P3'};
 % paramsInit = struct();
 
 %% Dreams
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerA';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerA';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_SpindlerA_Summary.mat';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% paramsInit = struct();
-% paramsInit.spindlerGaborFrequencies = 10:16;
-% paramsInit.spindlerOnsetTolerance = 0.3;
-% paramsInit.spindlerTimingTolerance = 0.1;
-% params.Init.spindlerGaborScales = [0.125, 0.25, 0.5]/2;
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler2';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler2';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler2_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
+paramsInit = struct();
+paramsInit.spindlerGaborFrequencies = 10:16;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
+
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
@@ -78,10 +78,10 @@ if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
     mkdir(summaryDir);
 end
 paramsInit.figureClose = false;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = [1, 3] %1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

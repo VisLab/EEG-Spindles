@@ -4,9 +4,9 @@
 %% Setup the directories for input and output for driving data
 dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
 eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
+resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler2';
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler2';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary2\bcit_Spindler_Summary.mat';
 channelLabels = {'PO7'};
 paramsInit = struct();
 
@@ -65,16 +65,23 @@ end
 
 %% Create the output directory if it doesn't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
+    fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
 end;
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);
+end
+[summaryDir, ~, ~] = fileparts(summaryFile);
+if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
+    fprintf('Creating summary directory %s \n', summaryDir);
+    mkdir(summaryDir);
 end
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 3%1:length(dataFiles)
+for k = [1, 3] %1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

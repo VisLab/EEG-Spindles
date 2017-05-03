@@ -81,12 +81,17 @@ else
     end
 end
 
-%% Create the output directory if it doesn't exist
+%% Create the output, image, and summary directories if they don't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
 end;
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
+end
+[summaryDir, ~, ~] = fileparts(summaryFile);
+if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
+    fprintf('Creating summary directory %s \n', summaryDir);
+    mkdir(summaryDir);
 end
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};

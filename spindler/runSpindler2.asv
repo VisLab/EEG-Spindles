@@ -4,9 +4,9 @@
 %% Setup the directories for input and output for driving data
 dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
 eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
+resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler2';
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler2';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary2\bcit_Spindler_Summary.mat';
 channelLabels = {'PO7'};
 paramsInit = struct();
 
@@ -63,23 +63,19 @@ else
     end
 end
 
-%% Create the output, image, and summary directories if they don't exist
+%% Create the output directory if it doesn't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
+    fprintf('Creating
     mkdir(resultsDir);
 end;
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
-end
 paramsInit.figureClose = false;
 paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 3%1:length(dataFiles)
+for k = [1, 3] %1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -90,9 +86,9 @@ for k = 3%1:length(dataFiles)
     end
     
     %% Calculate the spindle representations for a range of parameters
-    [spindles, params] = spindlerExtractSpindles(EEG, channelNumber, paramsInit);
+    [spindles, params] = spindlerExtractSpindles2(EEG, channelNumber, paramsInit);
     params.name = theName;
-    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
+    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, imageDir, params);
      if spindlerCurves.bestLinearInd > 0
          events = spindles(spindlerCurves.bestLinearInd).events;
      end

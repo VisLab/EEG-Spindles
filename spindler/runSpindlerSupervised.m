@@ -31,12 +31,17 @@ numMethods = length(methodNames);
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', splitFileDir, '.mat');
 
-%% Create the output directory if it doesn't exist
+%% Create the output and summary directories if they don't exist
 if ~exist(supervisedResultsDir, 'dir')
     mkdir(supervisedResultsDir);
 end;
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
+end
+[summaryDir, ~, ~] = fileparts(summaryFile);
+if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
+    fprintf('Creating summary directory %s \n', summaryDir);
+    mkdir(summaryDir);
 end
 %paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 

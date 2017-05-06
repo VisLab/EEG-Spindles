@@ -461,15 +461,12 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
        %% Now plot the spindle ratio image
        xProduct = sRatio .* sHarmonic.*xMask;
     [~, maxProdInd] = max(xProduct(:));
-    atomInd = rem(maxProdInd, numAtoms);
-    threshInd = (maxProdInd - atomInd)/numAtoms + 1;
+    atomInd = remmaxProdInd
     baseTitle = [theName ': Spindle ratio * spindle harmonic mean'];
     theTitle = {baseTitle; ...
                 [' Best index: ' num2str(atomsPerSecond(bestAtomInd)) ...
                 ' Closest threshold: ' num2str(baseThresholds(bestThresholdInd)) ...
-                ' Closest median: ' num2str(best50Threshold)];
-                ['Max atoms: ' num2str(atomsPerSecond(atomInd)) ...
-                 ' Max thresh: ' num2str(baseThresholds(threshInd))]};
+                ' Closest median: ' num2str(best50Threshold)]};
     h7Fig = figure('Name', baseTitle);
     
     imagesc(xProduct);

@@ -19,25 +19,25 @@
 % paramsInit = struct();
 
 %% NCTU
-% dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler2';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler2';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary2\nctu_Spindler_Summary.mat';
-% channelLabels = {'P3'};
-% paramsInit = struct();
+dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
+eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler3';
+imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler3';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary3\nctu_Spindler_Summary.mat';
+channelLabels = {'P3'};
+paramsInit = struct();
 
 %% Dreams
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler2';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler2';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler2_Summary.mat';
-channelLabels = {'C3-A1', 'CZ-A1'};
-paramsInit = struct();
-paramsInit.spindlerGaborFrequencies = 10:16;
-paramsInit.spindlerOnsetTolerance = 0.3;
-paramsInit.spindlerTimingTolerance = 0.1;
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler3';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler3';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler3_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
@@ -81,7 +81,7 @@ paramsInit.figureClose = false;
 %paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

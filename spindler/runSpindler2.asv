@@ -2,13 +2,13 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler11';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler11';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary11\bcit_Spindler_Summary.mat';
-channelLabels = {'PO7'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler10';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler10';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary10\bcit_Spindler_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -30,9 +30,9 @@ paramsInit = struct();
 %% Dreams
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler10';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler10';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary10\dreams_Spindler_Summary.mat';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler3';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler3';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler3_Summary.mat';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 % paramsInit = struct();
 % paramsInit.spindlerGaborFrequencies = 10:16;

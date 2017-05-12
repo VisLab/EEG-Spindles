@@ -48,8 +48,8 @@ numThresholds = length(baseThresholds);
 [~, maxInd] = max(baseThresholds);
 spindleRateSTD = spindleParameters.spindleRateSTD;
 bestAtomInd = spindleParameters.bestAtomInd;
-bestThresholdInd = spindleParameters.bestThresholdInd;
-
+bestEligibleAtomInd = spindleParameters.bestEligibleAtomInd;
+bestEligibleThresholdInd = spindleParameters.bestEligibleThresholdInd;
 %% Extract the values to plot
 hitMetric = zeros(length(sHits), 1);
 intersectMetric = zeros(length(sHits), 1);
@@ -65,27 +65,27 @@ end
 hitMetric = reshape(hitMetric, numAtoms, numThresholds);
 hitMetricMean = mean([hitMetric(:, minInd), hitMetric(:, maxInd)], 2);
 hitMetric = [hitMetric(:, minInd), hitMetric(:, maxInd),  ...
-             hitMetricMean, hitMetric(:, bestThresholdInd)];
+             hitMetricMean, hitMetric(:, bestEligibleThresholdInd)];
 
 intersectMetric = reshape(intersectMetric, numAtoms, numThresholds);
 intersectMetricMean = mean([intersectMetric(:, minInd), ...
                             intersectMetric(:, maxInd)], 2);
 intersectMetric = [intersectMetric(:, minInd), intersectMetric(:, maxInd) ...
-         intersectMetricMean, intersectMetric(:, bestThresholdInd)];
+         intersectMetricMean, intersectMetric(:, bestEligibleThresholdInd)];
 
 onsetMetric = reshape(onsetMetric, numAtoms, numThresholds);
 onsetMetricMean = mean([onsetMetric(:, minInd), onsetMetric(:, maxInd)], 2);
 onsetMetric = [onsetMetric(:, minInd), onsetMetric(:, maxInd), ...
-               onsetMetricMean, onsetMetric(:, bestThresholdInd)];
+               onsetMetricMean, onsetMetric(:, bestEligibleThresholdInd)];
 
 timeMetric = reshape(timeMetric, numAtoms, numThresholds);
 timeMetricMean = mean([timeMetric(:, minInd), timeMetric(:, maxInd)], 2);
 timeMetric = [timeMetric(:, minInd), timeMetric(:, maxInd), ...
-              timeMetricMean, timeMetric(:, bestThresholdInd)];
+              timeMetricMean, timeMetric(:, bestEligibleThresholdInd)];
 
 %% Set up the legends
 legendStrings = {'T_b=0', 'T_b=1', 'T_b center', ...
-                 ['T_b=' num2str(spindleParameters.bestThreshold)]};
+                 ['T_b=' num2str(spindleParameters.bestEligibleThreshold)]};
 
 %% set up the graphics
 legendBoth = cell(1, 16);
@@ -98,7 +98,7 @@ end
 theTitle = [datasetName ': ' metricName ' vs atoms/second'];
 figHan = figure('Name', theTitle);
 hold on
-newColors = [0, 0, 0.8; 0.8, 0, 0; 0, 0.8, 0; 0, 0, 0];
+newColors = [0.4, 0.4, 0.8; 0.8, 0.4, 0.4; 0.4, 0.8, 0.8; 0.3, 0.3, 0.3];
 lineWidths = [2, 2, 2, 3];
 for j = 1:4
     plot(atomsPerSecond, hitMetric(:, j), 'LineWidth', lineWidths(j), ...
@@ -110,20 +110,23 @@ for j = 1:4
     plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', lineWidths(j), ...
         'LineStyle', '--', 'Color', newColors(j, :));
 end
-plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), 'LineWidth', 2, 'Color', [0.5, 0.5, 0.5]);
+plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), ...
+    'LineWidth', 2, 'Color', [0.7, 0.7, 0.7]);
 ePos = atomsPerSecond(bestAtomInd);
 yLimits = [0, 1];
 line([ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
-line(spindleParameters.atomRange, [0.1, 0.1], ...
+eligiblePos = atomsPerSecond(bestEligibleAtomInd);
+line([eligiblePos, eligiblePos], yLimits, 'Color', [0.8, 0.8, 0.3]);
+line(spindleParameters.atomRateRange, [0.1, 0.1], ...
     'LineWidth', 4, 'Color', [0.8, 0.8, 0.8]);
-plot(ePos, hitMetric(bestAtomInd, 4), 'x', ...
-    'LineWidth', 2.5, 'MarkerSize', 12, 'Color', [0, 0, 0]);
-plot(ePos, timeMetric(bestAtomInd, 4), 'x', ...
-    'LineWidth', 2.5, 'MarkerSize', 12, 'Color', [0, 0, 0]);
-plot(ePos, onsetMetric(bestAtomInd, 4), 'x', ...
-    'LineWidth', 2.5, 'MarkerSize', 12, 'Color', [0, 0, 0]);
-plot(ePos, intersectMetric(bestAtomInd, 4), 'x', ...
-    'LineWidth', 2.5, 'MarkerSize', 12, 'Color', [0, 0, 0]);
+plot(eligiblePos, hitMetric(bestEligibleAtomInd, 4), 'o', ...
+    'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
+plot(eligiblePos, timeMetric(bestEligibleAtomInd, 4), 'o', ...
+    'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
+plot(eligiblePos, onsetMetric(bestEligibleAtomInd, 4), 'o', ...
+    'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
+plot(eligiblePos, intersectMetric(bestEligibleAtomInd, 4), 'o', ...
+    'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
 hold off
 ylabel('Performance')
 xlabel('Atoms/second')

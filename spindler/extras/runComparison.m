@@ -3,7 +3,7 @@
 %  Written by: Kay Robbins, UTSA, 2017
 %
 %% Set up the parameters
-resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
+resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummaryNew';
 dreamsAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8', 'Sem'};
 drivingAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8'};
 

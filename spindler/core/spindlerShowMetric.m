@@ -47,7 +47,6 @@ numThresholds = length(baseThresholds);
 [~, minInd] = min(baseThresholds);
 [~, maxInd] = max(baseThresholds);
 spindleRateSTD = spindleParameters.spindleRateSTD;
-bestAtomInd = spindleParameters.bestAtomInd;
 bestEligibleAtomInd = spindleParameters.bestEligibleAtomInd;
 bestEligibleThresholdInd = spindleParameters.bestEligibleThresholdInd;
 %% Extract the values to plot
@@ -112,11 +111,12 @@ for j = 1:4
 end
 plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), ...
     'LineWidth', 2, 'Color', [0.7, 0.7, 0.7]);
-ePos = atomsPerSecond(bestAtomInd);
+%ePos = atomsPerSecond(bestAtomInd);
 yLimits = [0, 1];
-line([ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
+%line([ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
 eligiblePos = atomsPerSecond(bestEligibleAtomInd);
-line([eligiblePos, eligiblePos], yLimits, 'Color', [0.8, 0.8, 0.3]);
+line([eligiblePos, eligiblePos], yLimits, ...
+    'LineWidth', 2, 'Color', [0.8, 0.8, 0.3]);
 line(spindleParameters.atomRateRange, [0.1, 0.1], ...
     'LineWidth', 4, 'Color', [0.8, 0.8, 0.8]);
 plot(eligiblePos, hitMetric(bestEligibleAtomInd, 4), 'o', ...

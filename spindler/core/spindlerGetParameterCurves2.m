@@ -75,7 +75,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     %% Get the standard deviations and slopes
     spindleRateSTD = std(spindleRate, 0, 2);
     spindleRateSTD(isnan(spindleRateSTD)) = 0;
-    stdRateMax = max(spindleRateSTD(:));
+    %stdRateMax = max(spindleRateSTD(:));
     diffSTD = diff(spindleRateSTD);
     diffTopThreshold = diff(spindleRate(:, end));
     upperAtomRateInd = find(diffTopThreshold <= 0, 1, 'first');
@@ -145,8 +145,8 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     %% Find the one with average spindle length closest to central
     averL1THDist = mean(abs(meanSpindleLenScaled(stdRange, :) - 1));
     [~, bestThresholdInd] = min(averL1THDist);
-    bestAtomInd =allAtomInd(bestThresholdInd);
-    bestAtomsPerSecond = atomsPerSecond(bestAtomInd);
+%     bestAtomInd = allAtomInd(bestThresholdInd);
+%     bestAtomsPerSecond = atomsPerSecond(bestAtomInd);
     bestThreshold = baseThresholds(bestThresholdInd);
     %% Also find the eligible threshold closest to the mean
 
@@ -190,10 +190,10 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     bestEligibleAtomsPerSecond = atomsPerSecond(bestEligibleAtomInd);
     
     %% Find the threshold whose median is closest to the scaled ratio
-    spindle50Scaled = bsxfun(@times, spindle50, meanSpindleLenDiv);
-    averL1TH50Dist = mean(abs(spindle50Scaled(stdRange, :) - 1));
-    [~, best50ThresholdInd] = min(averL1TH50Dist);
-    best50Threshold = baseThresholds(best50ThresholdInd);
+%     spindle50Scaled = bsxfun(@times, spindle50, meanSpindleLenDiv);
+%     averL1TH50Dist = mean(abs(spindle50Scaled(stdRange, :) - 1));
+%     [~, best50ThresholdInd] = min(averL1TH50Dist);
+%     best50Threshold = baseThresholds(best50ThresholdInd);
 
     %% Find the distance between the median and the mean spindle length
     rangeSize = length(stdRange);
@@ -269,8 +269,10 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
              'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
   
     yLimitsTemp = [meanSpindleLen(:, maxThresholdInd), meanSpindleLen(:, minThresholdInd)];
-    hLine = line(ax(1), [eligiblePos, eligiblePos], yLimitsTemp, ...
-        'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
+%     hLine = line(ax(1), [eligiblePos, eligiblePos], yLimitsTemp, ... ###
+%         'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
+    hLine = line(ax(1), [eligiblePos, eligiblePos], [0, 3], ...
+        'Color', [0.8, 0.8, 0.2], 'LineWidth', 2); %####
     for k = 1:numThresholds
         plot(ax(1), atomsPerSecond, meanSpindleLen(:, k), 'Color', theColors(k, :));
     end
@@ -285,7 +287,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     set(h2, 'LineWidth', 3);
     set(ax(1), 'YLimMode', 'auto', 'YTickMode', 'auto')
     yLimits = get(ax(1), 'YLim');
-    set(hLine, 'YData', [0, yLimits(2)])
+    %set(hLine, 'YData', [0, yLimits(2)]) ####
     set(ax(1), 'YLim', [0, yLimits(2)], 'YLimMode', 'manual', 'YTickMode', 'auto');
     yLimits = get(ax(2), 'YLim');
     line(ax(2), [lowerAtomRateRange, upperAtomRateRange], [0.1, 0.1]*yLimits(2), ...
@@ -300,6 +302,8 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     xlabel(ax(2), '');
     box(ax(1), 'on')
     box(ax(2), 'on')
+    set(ax(1), 'YLim', [0, 3], 'YLimMode', 'manual', 'YTickMode', 'auto'); %####
+    set(ax(2), 'YLim', [0, 2], 'YLimMode', 'manual', 'YTickMode', 'auto'); %####
     hold off
     title(theTitle, 'Interpreter', 'None');
     for k = 1:length(params.figureFormats)
@@ -329,9 +333,12 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
              'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
     plot(ax(1), atomsPerSecond, spindleRate(:, maxThresholdInd), ...
              'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
+%     hLine = line(ax(1), [eligiblePos, eligiblePos], ... ####
+%            [0, spindleRate(3, minThresholdInd)], ...
+%            'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
     hLine = line(ax(1), [eligiblePos, eligiblePos], ...
-           [0, spindleRate(3, minThresholdInd)], ...
-           'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
+           [0, 15], ...
+           'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);    
     for k = 1:numThresholds
         plot(ax(1), atomsPerSecond, spindleRate(:, k), 'Color', theColors(k, :));
     end
@@ -349,7 +356,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     
     %line(ax(1), [ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
     yLimits = get(ax(1), 'YLim');
-    set(hLine, 'YData', [0, yLimits(2)])
+%     set(hLine, 'YData', [0, yLimits(2)])  ####
     set(ax(1), 'YLim', [0, yLimits(2)], 'YLimMode', 'manual', 'YTickMode', 'auto');
     yLimits = get(ax(2), 'YLim');
     line(ax(2), [lowerAtomRateRange, upperAtomRateRange], [0.05, 0.05]*yLimits(2), ...
@@ -363,6 +370,8 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     xlabel(ax(2), '');
     box(ax(1), 'on')
     box(ax(2), 'on')
+    set(ax(1), 'YLim', [0, 15], 'YLimMode', 'manual', 'YTickMode', 'auto'); %####
+    set(ax(2), 'YLim', [0, 2], 'YLimMode', 'manual', 'YTickMode', 'auto'); %####
     hold off
     title(theTitle, 'Interpreter', 'None');
     for k = 1:length(params.figureFormats)
@@ -406,20 +415,24 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
         plot(atomsPerSecond, spindleHarmonicMean(:, k), 'Color', [0.0, 0.7, 0.7], ...
             'LineStyle', '--', 'LineWidth', 2);
         plot(atomsPerSecond, selfMeanMedianAbsDist(:, k), ...
-             'Color', [0.3, 0.8, 0.8], 'LineWidth', 2);     
+             'Color', [0.1, 0.6, 0.2], 'LineWidth', 2);     
         set(gca, 'YLimMode', 'auto', 'YTickMode', 'auto');
-        yLimits = get(gca, 'YLim');
-        yLimits(1) = 0;
-        set(gca, 'YLim', yLimits, 'YLimMode', 'manual');
-        line(gca, [eligiblePos, eligiblePos], yLimits, 'Color', ...
+%         yLimits = get(gca, 'YLim');
+%         yLimits(1) = 0;
+%         set(gca, 'YLim', yLimits, 'YLimMode', 'manual', 'YTickMode', 'auto');
+%         line(gca, [eligiblePos, eligiblePos], yLimits, 'Color', ...
+%             [0.8, 0.8, 0.3], 'LineWidth', 2); #####
+        line(gca, [eligiblePos, eligiblePos], [0, 3], 'Color', ...
             [0.8, 0.8, 0.3], 'LineWidth', 2);
-        line(gca, [thisPos, thisPos], yLimits, ...
-            'Color', [0.6, 0, 0], 'LineStyle', ':', 'LineWidth', 2);
-
+%         line(gca, [thisPos, thisPos], yLimits, ...
+%             'Color', [0.6, 0, 0], 'LineStyle', '--', 'LineWidth', 2);
+        line(gca, [thisPos, thisPos], [0, 3], ...
+            'Color', [0.6, 0, 0], 'LineStyle', '--', 'LineWidth', 2);
+        set(gca, 'YLim', [0, 3], 'YLimMode', 'manual', 'YTickMode', 'auto')
         hold off
         hleg1 = legend('25 PCTL', '50 PCTL', '75 PCTL', 'Central', ...
             'Mean spindle length', 'STD rate range', 'Max/min ratio', ...
-            'Harmonic mean', 'Distance to median', 'N_s best', 'N_s this', 'Location', 'EastOutside');
+            'Harmonic mean', 'Distance to median', 'N_s best', 'N_s this', 'Location', 'NorthEast');
         title(hleg1, 'Spindle length stats')
         xlabel('Atoms per second')
         ylabel('Spindle length(s)');
@@ -445,9 +458,8 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     baseTitle = [theName ': Percentile ratios/dists (max mean harm '];
     theTitle = {baseTitle; ...
                 [num2str(baseThresholds(harmonicInd)) ')' ...
-                ' Best index: ' num2str(atomsPerSecond(bestAtomInd)) ...
-                ' Closest threshold: ' num2str(baseThresholds(bestThresholdInd)) ...
-               ' Closest median: ' num2str(best50Threshold)]};
+                ' Best index: ' num2str(atomsPerSecond(bestEligibleAtomInd)) ...
+                ' Best threshold: ' num2str(baseThresholds(bestEligibleThresholdInd))]};
     h4Fig = figure('Name', baseTitle);
     dists = [distMeanMedian(:), meanHarmonicMean(:)];
     [ax, h1, h2] = plotyy(baseThresholds(:), bestRatios(:), ...
@@ -481,9 +493,8 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
   %% Now plot the spindle ratio image
     baseTitle = [theName ': Making sure mean is below 75%'];
     theTitle = {baseTitle; ...
-                [' Best index: ' num2str(atomsPerSecond(bestAtomInd)) ...
-                ' Closest threshold: ' num2str(baseThresholds(bestThresholdInd)) ...
-                ' Closest median: ' num2str(best50Threshold)]};
+                [' Best atoms/sec: ' num2str(atomsPerSecond(bestEligibleAtomInd)) ...
+                ' Best threshold: ' num2str(baseThresholds(bestEligibleThresholdInd))]};
     h5Fig = figure('Name', baseTitle);
     imagesc(meanSpindleLenMask')
     axis xy
@@ -527,10 +538,8 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
     atomsNoSTDMask(stdRange) = false;
     baseTitle = [theName ': Spindle ratio'];
     theTitle = {baseTitle; ...
-                [' Best: ' num2str(atomsPerSecond(bestAtomInd)) ...
-                 ' Best eligible: ' num2str(atomsPerSecond(bestEligibleAtomInd)) ...
-                ' Closest mean: ' num2str(baseThresholds(bestThresholdInd)) ...
-                ' Closest median: ' num2str(best50Threshold)]};
+                [' Best atoms/sec: ' num2str(atomsPerSecond(bestEligibleAtomInd)) ...
+                 ' Best thresholds: ' num2str(atomsPerSecond(bestEligibleAtomInd))]};
     h5Fig = figure('Name', baseTitle);
     sRatio = spindleRatio;
     sRatio(sRatio < 0.05) = 0;
@@ -573,16 +582,10 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves2(spindles, ou
 
        %% Now plot the spindle ratio image
        xProduct = sRatio .* sHarmonic.*meanSpindleLenMask;
-    [~, maxProdInd] = max(xProduct(:));
-    atomInd = rem(maxProdInd, numAtoms);
-    threshInd = (maxProdInd - atomInd)/numAtoms + 1;
     baseTitle = [theName ': Spindle ratio * spindle harmonic mean'];
     theTitle = {baseTitle; ...
-                [' Best index: ' num2str(atomsPerSecond(bestAtomInd)) ...
-                ' Closest threshold: ' num2str(baseThresholds(bestThresholdInd)) ...
-                ' Closest median: ' num2str(best50Threshold)];
-                ['Max atoms: ' num2str(atomsPerSecond(atomInd)) ...
-                 ' Max thresh: ' num2str(baseThresholds(threshInd))]};
+                [' Best atoms/sec: ' num2str(atomsPerSecond(bestEligibleAtomInd)) ...
+                ' Bst threshold: ' num2str(baseThresholds(bestEligibleThresholdInd))]};
     h7Fig = figure('Name', baseTitle);
     
     imagesc(xProduct');

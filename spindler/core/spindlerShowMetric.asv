@@ -90,9 +90,9 @@ legendStrings = {'T_b=0', 'T_b=1', 'T_b center', ...
 legendBoth = cell(1, 16);
 for k = 1:4
     legendBoth{4*k - 3} = ['H:' legendStrings{k}];
-    legendBoth{4*k - 2} = ['I:' legendStrings{k}];
+    legendBoth{4*k - 2} = ['T:' legendStrings{k}];
     legendBoth{4*k - 1} = ['O:' legendStrings{k}];
-    legendBoth{4*k} = ['T:' legendStrings{k}];
+    legendBoth{4*k} = ['I:' legendStrings{k}];
 end
 theTitle = [datasetName ': ' metricName ' vs atoms/second'];
 figHan = figure('Name', theTitle);
@@ -102,12 +102,12 @@ lineWidths = [2, 2, 2, 3];
 for j = 1:4
     plot(atomsPerSecond, hitMetric(:, j), 'LineWidth', lineWidths(j), ...
          'Color', newColors(j, :));
-    plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', lineWidths(j), ...
-        'LineStyle', '--', 'Color', newColors(j, :));
-    plot(atomsPerSecond, onsetMetric(:, j), 'LineWidth', lineWidths(j), ...
-        'LineStyle', ':', 'Color', newColors(j, :));
     plot(atomsPerSecond, timeMetric(:, j), 'LineWidth', lineWidths(j), ...
          'LineStyle', '-.', 'Color', newColors(j, :));
+    plot(atomsPerSecond, onsetMetric(:, j), 'LineWidth', lineWidths(j), ...
+        'LineStyle', ':', 'Color', newColors(j, :));
+    plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', lineWidths(j), ...
+        'LineStyle', '--', 'Color', newColors(j, :));
 end
 plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), ...
     'LineWidth', 2, 'Color', [0.7, 0.7, 0.7]);
@@ -131,7 +131,7 @@ hold off
 ylabel('Performance')
 xlabel('Atoms/second')
 title(theTitle, 'Interpreter', 'None');
-legend([legendBoth, 'STD spin/min', 'N_s best', 'T_b best', 'TRange'], 'Location', 'eastoutside');
+legend([legendBoth, 'STD spin/min', 'N_s best', 'T_b best'], 'Location', 'eastoutside');
 set(gca, 'YLim', yLimits);
 box on;
 

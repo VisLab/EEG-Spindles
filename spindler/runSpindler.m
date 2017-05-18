@@ -2,13 +2,13 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
-channelLabels = {'PO7'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
 
 %% Setup the directories for input and output for driving data
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -28,17 +28,17 @@ paramsInit = struct();
 % paramsInit = struct();
 
 %% Dreams
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerA';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerA';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_SpindlerA_Summary.mat';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% paramsInit = struct();
-% paramsInit.spindlerGaborFrequencies = 10:16;
-% paramsInit.spindlerOnsetTolerance = 0.3;
-% paramsInit.spindlerTimingTolerance = 0.1;
-% params.Init.spindlerGaborScales = [0.125, 0.25, 0.5]/2;
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
+channelLabels = {'C3-A1', 'CZ-A1'};
+paramsInit = struct();
+paramsInit.spindlerGaborFrequencies = 10:16;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
+
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
@@ -63,11 +63,13 @@ else
     end
 end
 
-%% Create the output, image, and summary directories if they don't exist
+%% Create the output directory if it doesn't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
+    fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
 end;
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);
 end
 [summaryDir, ~, ~] = fileparts(summaryFile);
@@ -76,10 +78,10 @@ if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
     mkdir(summaryDir);
 end
 paramsInit.figureClose = false;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 3%1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -93,8 +95,8 @@ for k = 3%1:length(dataFiles)
     [spindles, params] = spindlerExtractSpindles(EEG, channelNumber, paramsInit);
     params.name = theName;
     [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
-     if spindlerCurves.bestLinearInd > 0
-         events = spindles(spindlerCurves.bestLinearInd).events;
+     if spindlerCurves.bestEligibleLinearInd > 0
+         events = spindles(spindlerCurves.bestEligibleLinearInd).events;
      end
     %% Deal with ground truth if available
     if isempty(eventFiles) || isempty(eventFiles{k}) || isempty(spindlerCurves)
@@ -109,8 +111,8 @@ for k = 3%1:length(dataFiles)
             spindlerShowMetric(spindlerCurves, allMetrics, metricNames{n}, ...
                        imageDir, params);
         end
-        if spindlerCurves.bestLinearInd > 0
-            metrics = allMetrics(spindlerCurves.bestLinearInd);
+        if spindlerCurves.bestEligibleLinearInd > 0
+            metrics = allMetrics(spindlerCurves.bestEligibleLinearInd);
         end
     end
    

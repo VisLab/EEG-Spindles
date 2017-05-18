@@ -8,12 +8,13 @@ dreamsDirBase = {'D:\TestData\Alpha\spindleData\dreams\results'};
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 metricNames = {'f1', 'f2', 'g'};
+dreamsSets = 1:6;
 % [drivingStatsSupervised, drivingNamesSupervised] = ...
 %         getSummaryStatisticsSupervised(drivingDirBase, drivingAlgs, ...
 %                                      methodNames, metricNames);
 [drivingStats, drivingStatNames] = getSummaryStatistics(drivingDirBase, drivingAlgs);
 [dreamsStats, dreamsStatNames] = getSummaryStatistics(dreamsDirBase, dreamsAlgs);
-
+dreamsStats = dreamsStats(:, dreamsSets, :);
 
 %% Plot the Driving statistics
 baseIndex = 1;

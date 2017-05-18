@@ -46,7 +46,7 @@ end
 %paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 3%:length(dataFiles)
     %% Load data split files and process the parameters
     splitData = load(dataFiles{k});
     params = processParameters('runSpindlerSupervised', 0, 0, splitData.params, spindlerGetDefaults());     

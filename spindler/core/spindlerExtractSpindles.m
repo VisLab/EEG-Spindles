@@ -88,7 +88,8 @@ spindles(numAtoms*numThresholds) = ...
                    'baseThreshold', 0', 'numberSpindles', 0, ...
                    'spindleTime', 0, 'spindleTimeRatio', 0, ...
                    'events', NaN, 'meanEventTime', 0, ...
-                   'r2', 0, 'eFraction', 0);
+                   'eventTime25Per', NaN, 'eventTime50Per', NaN, ...
+                   'eventTime75Per', NaN, 'r2', 0, 'eFraction', 0);
 
 atomsPerSecond = sort(atomsPerSecond);
 currentAtom = 1;
@@ -128,5 +129,11 @@ for k = 1:numAtoms
         [spindles(p).numberSpindles, spindles(p).spindleTime, ...
             spindles(p).meanEventTime] = getSpindleCounts(events);
         spindles(p).spindleTimeRatio = spindles(p).spindleTime/totalTime;
+        if ~isempty(events)
+            ptimes = prctile(events(:, 2) - events(:, 1), [25, 50, 75]);
+            spindles(p).eventTime25Per = ptimes(1);
+            spindles(p).eventTime50Per = ptimes(2);
+            spindles(p).eventTime75Per = ptimes(3);
+        end
     end
 end

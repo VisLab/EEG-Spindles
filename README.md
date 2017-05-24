@@ -4,30 +4,30 @@ Toolbox for detecting alpha and sleep spindles in EEG
 ### EEG-Annotate is freely available under the GNU General Public License. 
 Please cite the following publication if using: 
 > Spindler: Spatiotemporal adaptive matching pursuit 
-> for EEG-based spindle detection
-> John LaRocco, Piotr Franaszczuk, Scott Kerick, Kay Robbins
+> for EEG-based spindle detection  
+> John LaRocco, Piotr Franaszczuk, Scott Kerick, Kay Robbins  
 
 
 ### Installing and running spindler
 
 	- run EEGLAB to install it
-	- add the spindler directory and all its subdirectories to your MATLAB path.
-	- modify and uncomment a setup for your directories in ``runSpindler.m`.
-	- execute the script `runSpindler`.
+	- add the spindler directory and all its subdirectories to your MATLAB path
+	- modify and uncomment a setup for your directories in ``runSpindler.m`
+	- execute the script `runSpindler`
 
 #### Example setup
 Spindler is designed to be run in batch mode. Edit `runSpindler` to set:  
-    dataDir         path of directory containing EEG .set files to analyze
-    eventDir        directory of labeled event files
-    resultsDir      directory that Spindler uses to write its output
-    imageDir        directory that Spindler users to save images
-    summaryFile     full path name of the file containing the summary analysis
-    channelLabels   cell array containing possible channel labels 
+    - dataDir         path of directory containing EEG .set files to analyze
+    - eventDir        directory of labeled event files
+    - resultsDir      directory that Spindler uses to write its output
+    - imageDir        directory that Spindler users to save images
+    - summaryFile     full path name of the file containing the summary analysis
+    - channelLabels   cell array containing possible channel labels 
                        (Spindler uses the first label that matches one in EEG)
-    paramsInit      structure containing the parameter values
-                    (if an empty structure, Spindler uses defaults)
+    - paramsInit      structure containing the parameter values
+                      (if an empty structure, Spindler uses defaults)  
  
-Spindler uses the input to run a batch analysis. If eventDir is not empty, Spindler runs performance comparisons, provided it can match file names for files in eventDir with those in dataDir.  Ideally, the event file names should have the data file names as prefixes, although Spindler tries more complicated matching strategies as well.  Event files contain "ground truth" in text files with two columns containing the start and end times in seconds.
+Spindler uses the input to run a batch analysis. If eventDir is not empty, Spindler runs performance comparisons, provided it can match file names for files in eventDir with those in dataDir.  Ideally, the event file names should have the data file names as prefixes, although Spindler tries more complicated matching strategies as well.  Event files contain "ground truth" in text files that have two columns containing the start and end times in seconds.
 	
 ### Dependencies:
 * EEGLAB: https://sccn.ucsd.edu/eeglab/  

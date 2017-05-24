@@ -1,5 +1,4 @@
 %% This script shows how to run the Spindler analysis for a data collection
-%
 %  
 % You must set up the following information (see examples below)
 %   dataDir         path of directory containing EEG .set files to analyze
@@ -18,8 +17,6 @@
 % should have the data file names as prefixes, although Spindler tries more
 % complicated matching strategies as well.  Event files contain "ground truth"
 % in text files with two columns containing the start and end times in seconds.
-%
-% 
 %
 % 
 %% Example 1: Setup for driving data
@@ -60,8 +57,7 @@
 %paramsInit.spindlerOnsetTolerance = 0.3;
 %paramsInit.spindlerTimingTolerance = 0.1;
 
-
-%% Example 4: Set up for the Dreams sleep collection
+%% Example 5: Set up for the Dreams sleep collection
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
@@ -72,6 +68,7 @@ paramsInit = struct();
 paramsInit.spindlerGaborFrequencies = 10:16;
 paramsInit.spindlerOnsetTolerance = 0.3;
 paramsInit.spindlerTimingTolerance = 0.1;
+
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};

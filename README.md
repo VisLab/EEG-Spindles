@@ -1,7 +1,7 @@
 # EEG-Spindles
-Toolbox for detecting alpha and sleep spindles in EEG
+Spindler Toolbox for detecting alpha and sleep spindles in EEG
 
-### EEG-Annotate is freely available under the GNU General Public License. 
+### Spindler is freely available under the GNU General Public License. 
 Please cite the following publication if using: 
 > Spindler: Spatiotemporal adaptive matching pursuit 
 > for EEG-based spindle detection  
@@ -28,7 +28,7 @@ Spindler is designed to be run in batch mode. Edit `runSpindler` to set:
     - paramsInit      structure containing the parameter values
                       (if an empty structure, Spindler uses defaults)  
  
-Spindler uses the input to run a batch analysis. If eventDir is not empty, Spindler runs performance comparisons, provided it can match file names for files in eventDir with those in dataDir.  Ideally, the event file names should have the data file names as prefixes, although Spindler tries more complicated matching strategies as well.  Event files contain "ground truth" in text files that have two columns containing the start and end times in seconds.
+Spindler uses the input to run a batch analysis. If `eventDir` is not empty, Spindler runs performance comparisons, provided it can match file names for files in `eventDir` with those in `dataDir`.  Ideally, the event file names should have the data file names as prefixes, although Spindler tries more complicated matching strategies as well.  Event files contain "ground truth" in text files that have two columns containing the start and end times in seconds.
 	
 ### Dependencies:
 * EEGLAB: https://sccn.ucsd.edu/eeglab/  

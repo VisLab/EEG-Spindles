@@ -1,7 +1,28 @@
-%% This script shows how to call getSpindles to get spindles for a range
-% of algorithm parameters. The analyzeSpindles selects best parameters.
-
-%% Setup the directories for input and output for driving data
+%% This script shows how to run the Spindler analysis for a data collection
+%
+%  
+% You must set up the following information (see examples below)
+%   dataDir         path of directory containing EEG .set files to analyze
+%   eventDir        directory of labeled event files
+%   resultsDir      directory that Spindler uses to write its output
+%   imageDir        directory that Spindler users to save images
+%   summaryFile     full path name of the file containing the summary analysis
+%   channelLabels   cell array containing possible channel labels 
+%                      (Spindler uses the first label that matches one in EEG)
+%   paramsInit      structure containing the parameter values
+%                   (if an empty structure, Spindler uses defaults)
+%
+% Spindler uses the input to run a batch analysis. If eventDir is not empty, 
+% Spindler runs performance comparisons, provided it can match file names for 
+% files in eventDir with those in dataDir.  Ideally, the event file names 
+% should have the data file names as prefixes, although Spindler tries more
+% complicated matching strategies as well.  Event files contain "ground truth"
+% in text files with two columns containing the start and end times in seconds.
+%
+% 
+%
+% 
+%% Example 1: Setup for driving data
 % dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
 % eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
 % resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
@@ -10,7 +31,7 @@
 % channelLabels = {'PO7'};
 % paramsInit = struct();
 
-%% Setup the directories for input and output for driving data
+%% Example 2: Setup for the BCIT driving collection
 % dataDir = 'E:\CTADATA\BCIT\level_0';
 % eventDir = '';
 % resultsDir = 'D:\TestData\Alpha\spindleData\BCIT\resultsSpindlerNewAgain';
@@ -18,7 +39,7 @@
 % channelLabels = {'PO3', 'H27'};
 % paramsInit = struct();
 
-%% NCTU
+%% Example 3: Setup for the NCTU labeled driving collection
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
 % eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
 % resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
@@ -27,7 +48,20 @@
 % channelLabels = {'P3'};
 % paramsInit = struct();
 
-%% Dreams
+%% Example 4: Set up for the Dreams sleep collection
+%dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+%eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+%resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
+%imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
+%summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
+%channelLabels = {'C3-A1', 'CZ-A1'};
+%paramsInit = struct();
+%paramsInit.spindlerGaborFrequencies = 10:16;
+%paramsInit.spindlerOnsetTolerance = 0.3;
+%paramsInit.spindlerTimingTolerance = 0.1;
+
+
+%% Example 4: Set up for the Dreams sleep collection
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
@@ -38,7 +72,6 @@ paramsInit = struct();
 paramsInit.spindlerGaborFrequencies = 10:16;
 paramsInit.spindlerOnsetTolerance = 0.3;
 paramsInit.spindlerTimingTolerance = 0.1;
-
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};

@@ -17,6 +17,7 @@ Please cite the following publication if using:
 
 #### Example setup
 Spindler is designed to be run in batch mode. Edit `runSpindler` to set:  
+
     - dataDir         path of directory containing EEG .set files to analyze
     - eventDir        directory of labeled event files
     - resultsDir      directory that Spindler uses to write its output

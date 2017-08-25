@@ -22,7 +22,7 @@ defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
 params = processParameters('extractSpindles', nargin, 2, params, defaults);
 
 params.channelNumber = channelNumber;
-params.channelLabels = EEG.chanlocs(channelNumber).labels;
+params.channelLabel = EEG.chanlocs(channelNumber).labels;
 if isempty(channelNumber)
     error('extractSpindles:NoChannels', 'Must have non-empty');
 end  

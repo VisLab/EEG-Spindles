@@ -19,8 +19,7 @@ function changeLog = getChangeLog()
        'Improved documentation on various functions'};
    
     changeLog(2) = ...
-     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
-
+   struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
     changeLog(2).version = '1.0.2';
     changeLog(2).status = 'Released';
     changeLog(2).date = '08/25/2017';

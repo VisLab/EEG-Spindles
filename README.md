@@ -39,7 +39,10 @@ Version 1.0.3 Released 09/02/2017
 * Added warningCodes to spindlerExtractSpindles
 * Added a generic spindlerAllChannels with example run functions
 * Improved documentation on various functions  
-    
+
+Version 1.0.2 Released 08/25/2017
+* Renamed getChannelNumbers as getChannelNumbersFromLabels
+      
 Version 1.0.1 Released 08/25/2017
 * Changed params and spindlerExtractSpindles to just handle a single channel
 * Added 'basic' figureLevel value that only plots key curves

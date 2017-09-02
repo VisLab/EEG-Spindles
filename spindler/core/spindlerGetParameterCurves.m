@@ -1,22 +1,24 @@
-function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, outDir, params)
+function [spindleCurves, warningMsgs, warningCodes] = ...
+                   spindlerGetParameterCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
 %     spindles     Spindler structure with results of MP decomposition
 %     totalSeconds Total seconds in the dataset
 %     theName      String identifying the name of the dataset
-%     outDir       Optional argument (if present and non empty, saves a
-%                  plot of the parameter selection results in outDir
+%     outDir       Optional argument (If present and non empty, saves a
+%                  plot of the parameter selection results in outDir)
 %     spindleCurves (output) Structure containing results of parameter
 %                  selection
-%     warningMsgs (output) Structure containing results of parameter
-%                  selection
+%     warningMsgs (output) Cell array of warning messages
+%     warningCodes (output) Integer array of corresponding error codes
 %
 %  Written by:  Kay Robbins and John La Rocco, UTSA 2017
 
 %% Get the atoms per second and thresholds
     earlyMatlabVersion = verLessThan('matlab', '9.0');
     warningMsgs = {};
+    warningCodes = [];
     spindleCurves = struct('name', NaN,  'atomsPerSecond', NaN, ...
         'baseThresholds', NaN, ...
         'bestEligibleAtomsPerSecond', NaN', ...
@@ -37,7 +39,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, out
     [~, maxThresholdInd] = max(baseThresholds);
     totalSeconds = params.frames./params.srate;
     theName = params.name;
-    %stdLimits = params.spindlerSTDLimits;
+    
     spindleCurves.name = params.name;
 
     %% Get the spindle hits and spindle times
@@ -84,6 +86,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, out
     end
     lowerAtomRateInd = find(spindleRateSTD > 0, 1, 'first');
     if isempty(lowerAtomRateInd) || isempty(upperAtomRateInd) || lowerAtomRateInd >= upperAtomRateInd
+        warningCodes(end + 1) = 1;
         warningMsgs{end + 1} = ...
             ['Spindles/sec has non standard behavior for low ' ...
             'spindle length --- algorithm failed, likely because of large artifacts'];
@@ -93,6 +96,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, out
 
     %% If the STD is not an increasing function of atoms/sec, decomposition bad
     if sum(diffSTD(upperAtomRateInd:end) < 0) > 0
+        warningCodes(end + 1) = 2;
         warningMsgs{end + 1} =   ['STD spindles/sec not montonic function of atoms/sec ' ...
             '--- algorithm may have failed, likely because of large artifacts'];
         warning('spindlerGetParameterCurves:SpindleSTDNotMonotonic',  warningMsgs{end});
@@ -124,7 +128,10 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, out
         params.spindlerLowEligibleCount*length(stdRange) & ...
         baseThresholds ~= 0 & baseThresholds ~= 1);
     if isempty(eligibleThresholdInds)
-        warning('Not enough thresholds have good distribution, taking best');
+        warningCodes(end + 1) = 3;
+        warningMsgs{end + 1} = ...
+             'Not enough thresholds have good distribution, taking best';
+        warning('spindlerGetParameterCurves:SpindleTooFewThresholds',  warningMsgs{end});
         eligibleThresholdInds = find(maskCounts == max(maskCounts));
     end
     mPercent = 100*length(eligibleThresholdInds)/numThresholds;
@@ -184,8 +191,10 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, out
 
     %% Now test the eligible thresholds
     if isempty(eligibleThresholdInds)
-        warning('spindleGetParameterCurves:badThresholds', ...
-            [theName ' does not have thresholds with stable properties']);
+        warningCodes(end + 1) = 4;
+        warningMsgs{end + 1} = ...
+              [theName ' does not have thresholds with stable properties'];
+        warning('spindleGetParameterCurves:badThresholds',  warningMsgs{end});
         bestEligibleThresholdInd = bestThresholdInd;
         bestEligibleThreshold = bestThreshold;
     else
@@ -215,7 +224,7 @@ function [spindleCurves, warningMsgs] = spindlerGetParameterCurves(spindles, out
     end
 
     %% Plot the eligible curves
-    if strcmpi(params.figureLevels, 'all')
+    if ~isempty(outDir) && strcmpi(params.figureLevels, 'all')
         baseTitle = [theName ' eligible curves'];
         theTitle = {'Eligible curves'; theName};
         figEligible = figure('Name', baseTitle);

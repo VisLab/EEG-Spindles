@@ -33,7 +33,13 @@ Spindler uses the input to run a batch analysis. If `eventDir` is not empty, Spi
 ### Dependencies:
 * EEGLAB: https://sccn.ucsd.edu/eeglab/  
 
-### Releases:  
+### Releases:
+Version 1.0.3 Released 09/02/2017
+* Fixed resampling issue in spindlerExtractSpindles when ICA present
+* Added warningCodes to spindlerExtractSpindles
+* Added a generic spindlerAllChannels with example run functions
+* Improved documentation on various functions  
+    
 Version 1.0.1 Released 08/25/2017
 * Changed params and spindlerExtractSpindles to just handle a single channel
 * Added 'basic' figureLevel value that only plots key curves

@@ -24,42 +24,39 @@
 % 
 %% Example 1: Setup for driving data
 dataDir = 'D:\TestData\NCTURWN\raw_data';
+eventDir = [];
 resultsDir = 'D:\TestData\NCTURWN\spindles\results';
-statsDir = 'D:\TestData\NCTURWN\spindles\stats';
+imageDir = 'D:\TestData\NCTURWN\spindles\images';
+% paramsInit = struct('figureClose', true, 'figureLevels', 'basic', ...
+%                      'spindlerGaborFrequencies', 7:14);
+% freqType = 'alpha';
+paramsInit = struct('figureClose', true, 'figureLevels', 'basic', ...
+                     'spindlerGaborFrequencies', 4:7);
+freqType = 'theta';
 excludeLabels = {'EKG'; 'EKG1'};
-frontalChannels = {'Fp1', 'Fp2', 'Fpz', 'AF3', 'AF4', 'F1', 'F2', 'F3', ...
-    'F4', 'F5', 'F6', 'F7', 'F8', 'Fz'};
-midChannels = {'FT7', 'FT8', 'FC1', 'FC2', 'FC3', 'FC4', 'FC5', 'FC6', 'FCz', ...
-    'T7', 'T8', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'Cz'};
-parietalChannels = {'TP7', 'TP8', 'CP1', 'CP2', 'CP3', 'CP4', 'CP5', ...
-    'CP6', 'CPz', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'Pz'};
-occipitalChannels = {'PO3', 'PO4', 'PO5', 'PO6', 'PO7', 'PO8', 'POz', ...
-     'O1', 'O2', 'Oz', 'CB1', 'CB2'};
-                
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', resultsDir, '.mat');
+dataFiles = getFiles('FILES2', dataDir, '.set');
 
 %% Create the output directory if it doesn't exist
-if ~exist(statsDir, 'dir')
-    fprintf('Creating stats directory %s \n', statsDir);
-    mkdir(statsDir);
+if ~exist(resultsDir, 'dir')
+    fprintf('Creating results directory %s \n', resultsDir);
+    mkdir(resultsDir);
+end;
+if  ~exist(imageDir, 'dir')
+    fprintf('Creating image directory %s \n', imageDir);
+    mkdir(imageDir);
 end;
 
-
 %% Process the data
-for k = 1%:length(dataFiles)
+spindleStructInit = struct('channelNumber', NaN, ...
+                         'channelLabel', NaN,  'bestEligibleThreshold', NaN, ...
+                         'bestEligibleAtomsPerSecond', NaN, ... 
+                         'atomRateRange', NaN, 'spindleRateSTD', NaN, ...
+                         'warningMsgs', NaN', 'events', NaN);
+
+for k = 207:length(dataFiles)
     %% Read in the EEG and find the correct channel number
-    test = load(dataFiles{k});
-    params = test.params;
-    srate = params.srate;
-    totalFrames = params.frames;
-    spindleEvents = test.spindleEvents;
-    eventMask = zeros(length(spindleEvents), totalFrames);
-    for n = 1:length(spindleEvents)
-        events = spindleEvents(n).events;
-        for m = 1:length(events)
-            startFrame = round(events(m, 1)*srate) + 1;
-            startFrame = min(startFrame, 
+    EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
     thisImageDir = [imageDir filesep theName];
     if ~exist(thisImageDir, 'dir')
@@ -67,7 +64,7 @@ for k = 1%:length(dataFiles)
     end
     channelLabels = {EEG.chanlocs.labels};
     clear spindleEvents;
-    spindleEvents(length(channelLabels)) = spindleStructInit; %#ok<SAGROW>
+    spindleEvents(length(channelLabels)) = spindlerGetSpindlerEventsStruct();
     channelMask = true(length(channelLabels), 1);
     for n = 1:length(channelMask)
         spindleEvents(n) = spindleStructInit;
@@ -80,8 +77,8 @@ for k = 1%:length(dataFiles)
         
         %% Calculate the spindle representations for a range of parameters
         [spindles, params] = spindlerExtractSpindles(EEG, n, paramsInit);
-        params.name = [theName '_Ch_' channelLabels{n}];
-        [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
+        params.name = [theName '_Ch_' channelLabels{n} '_' freqType];
+        [spindlerCurves, warningMsgs,] = spindlerGetParameterCurves(spindles, thisImageDir, params);
         if spindlerCurves.bestEligibleLinearInd > 0
             events = spindles(spindlerCurves.bestEligibleLinearInd).events;
         end
@@ -97,6 +94,6 @@ for k = 1%:length(dataFiles)
     %% Save the results
     params = rmfield(params, {'channelNumber', 'channelLabel'});
     [~, fileName, ~] = fileparts(dataFiles{k});
-    save([resultsDir filesep fileName, '_spindlerChannelResults.mat'],  ...
+    save([resultsDir filesep freqType filesep fileName, '_', freqType '_spindlerChannelResults.mat'],  ...
          'params', 'spindleEvents', '-v7.3');
 end

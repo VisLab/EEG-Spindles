@@ -6,8 +6,26 @@ function [currentVersion, changeLog, markdown] = getSpindlerVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(1) = ...
+   changeLog(3) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(3).version = '1.0.3';
+    changeLog(3).status = 'Released';
+    changeLog(3).date = '09/02/2017';
+    changeLog(3).changes = { ...
+       'Fixed resampling issue in spindlerExtractSpindles when ICA present'; ...
+       'Added warningCodes to spindlerExtractSpindles'; ...
+       'Added a generic spindlerAllChannels with example run functions'; ...
+       'Improved documentation on various functions'};
+   
+    changeLog(2) = ...
+     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(2).version = '1.0.2';
+    changeLog(2).status = 'Released';
+    changeLog(2).date = '08/25/2017';
+    changeLog(2).changes = { ...
+       'Renamed getChannelNumbers as getChannelNumbersFromLabels'};
 
     changeLog(1).version = '1.0.1';
     changeLog(1).status = 'Released';

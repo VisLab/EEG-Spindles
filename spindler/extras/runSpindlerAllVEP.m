@@ -28,10 +28,17 @@
 % paramsInit = struct('figureClose', true, 'figureLevels', 'basic', ...
 %                      'spindlerGaborFrequencies', 4:7);
 % freqType = 'theta';
+dataDir = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_LARG';
+resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_LARG\results';
 
-dataDir = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_MARA';
-resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results';
+% dataDir = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_MARA';
+% resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results';
+
 imageDirBase = '';
+
+% paramsInit = struct('spindlerGaborFrequencies', 7:14);
+% freqType = 'alpha';
+
 paramsInit = struct('spindlerGaborFrequencies', 4:7);
 freqType = 'theta';
 
@@ -54,7 +61,7 @@ if ~isempty(imageDirBase) && ~exist(imageDirBase, 'dir')
 end;
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 13:length(dataFiles)
     %% Read in the EEG and set up the names
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

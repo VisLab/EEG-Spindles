@@ -6,6 +6,18 @@ function [currentVersion, changeLog, markdown] = getSpindlerVersion()
 end
 
 function changeLog = getChangeLog()
+ 
+   changeLog(4) = ...
+     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(4).version = '1.0.4';
+    changeLog(4).status = 'Released';
+    changeLog(4).date = '09/03/2017';
+    changeLog(4).changes = { ...
+       'Fixed isempty misspelling on removeChannels'; ...
+       'Added a runSpindleStats function', ...
+       'Fixed removing channelLabel field in saving params'};
+
    changeLog(3) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 

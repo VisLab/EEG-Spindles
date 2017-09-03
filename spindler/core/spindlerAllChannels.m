@@ -44,8 +44,8 @@ function [spindleEvents, params] = spindlerAllChannels(EEG, imageDir, baseName, 
     if isfield(params, 'channelNumber')
        params = rmfield(params, 'channelNumber');
     end
-    if isfield(params, 'channelNumber')
-       params = rmfield(params, 'channelNumber');
+    if isfield(params, 'channelLabel')
+       params = rmfield(params, 'channelLabel');
     end
     params.name = baseName;
     params.chanlocs = EEG.chanlocs;

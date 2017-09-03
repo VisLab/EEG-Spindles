@@ -1,0 +1,86 @@
+%% This script shows how to run the Spindler analysis for a data collection
+% for all channels (assuming data is in EEGLAB EEG format with EEG channels
+% designated. This script is designed to be unsupervised and no training 
+% data 
+%  
+% You must set up the following information (see examples below)
+%   dataDir         path of directory containing EEG .set files to analyze
+%   eventDir        directory of labeled event files
+%   resultsDir      directory that Spindler uses to write its output
+%   imageDir        directory that Spindler users to save images
+%   summaryFile     full path name of the file containing the summary analysis
+%   channelLabels   cell array containing possible channel labels 
+%                      (Spindler uses the first label that matches one in EEG)
+%   paramsInit      structure containing the parameter values
+%                   (if an empty structure, Spindler uses defaults)
+%
+% Spindler uses the input to run a batch analysis. If eventDir is not empty, 
+% Spindler runs performance comparisons, provided it can match file names for 
+% files in eventDir with those in dataDir.  Ideally, the event file names 
+% should have the data file names as prefixes, although Spindler tries more
+% complicated matching strategies as well.  Event files contain "ground truth"
+% in text files with two columns containing the start and end times in seconds.
+%
+% 
+%% Example 1: Setup for driving data
+resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results\alpha';
+statsFile = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\CompareMaraVsLargAlpha';
+
+
+%% Create the output directory if it doesn't exist
+if ~exist(statsDir, 'dir')
+    fprintf('Creating stats directory %s \n', statsDir);
+    mkdir(statsDir);
+end;
+
+%% Get the spindle data files and initialize the structure
+dataFiles = getFiles('FILES', resultsDir, '.mat');
+numFiles = length(dataFiles);
+spindleStats(numFiles) = struct('fileName', NaN, 'chanlocs', NaN, ...
+       'srate', NaN, 'timeFraction', NaN, ...
+       'spindleRate', NaN, 'spindleLength', NaN,  'spindleFraction', NaN);
+
+%% Process the data
+for k = 17%:length(dataFiles)
+    test = load(dataFiles{k});
+    spindleStats(k) = spindleStats(end);
+    spindleStats(k).fileName = dataFiles{k};
+    params = test.params;
+    srate = params.srate;
+    spindleStats(k).srate = srate;
+    totalFrames = params.frames;
+    spindleStats(k).chanlocs = params.chanlocs;
+    spindleEvents = test.spindleEvents;
+    
+    numChans = length(spindleEvents);
+    spindleLength = nan(numChans, 1);
+    spindleRate = nan(numChans, 1);
+    spindleFraction = nan(numChans, 1);
+    eventMask = zeros(numChans, totalFrames);
+    totalSeconds = (totalFrames - 1)/srate;
+    totalMinutes = totalSeconds/60;
+    for n = 1:numChans
+        events = spindleEvents(n).events;
+        if isnan(events)
+            continue;
+        end
+        numEvents = size(events, 1);
+        spindleLength(n) = mean(events(:, 2) - events(:, 1));
+        eventFrames = round(events*srate) + 1;
+        eventFrames = min(eventFrames, totalFrames);
+        spindleRate(n) = numEvents/totalMinutes;
+        spindleFraction(n) = spindleLength(n)*numEvents./totalSeconds;
+        for m = 1:numEvents
+            eventMask(n, eventFrames(m, 1): eventFrames(m, 2)) = 1;
+        end       
+    end
+    spindleStats(k).spindleRate = spindleRate;
+    spindleStats(k).spindleLength = spindleLength;
+    spindleStats(k).spindleFraction = spindleFraction;
+    spindleStats(k).timeFraction = mean(eventMask);
+
+end
+
+%% Save the results
+%     save([resultsDir filesep fileName, '_spindlerChannelResults.mat'],  ...
+%          'params', 'spindleEvents', '-v7.3');

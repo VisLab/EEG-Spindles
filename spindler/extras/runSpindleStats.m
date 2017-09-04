@@ -1,11 +1,12 @@
 %% This script calculates basic spindle stats for results files in a directory
 % You must specify the results directory and the full path of stats file
 %
-%% Example 1: Setup for driving data
-resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results\alpha';
-statsFile = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\stats\VEP_PREP_ICA_VEP2_MARA_alpha.mat';
+%% Set up the directories for saving the stats
+% resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results\alpha';
+% statsFile = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\stats\VEP_PREP_ICA_VEP2_MARA_alpha.mat';
 
-
+resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results\theta';
+statsFile = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\stats\VEP_PREP_ICA_VEP2_MARA_theta.mat';
 %% Get the spindle data files and initialize the structure
 dataFiles = getFiles('FILES', resultsDir, '.mat');
 numFiles = length(dataFiles);
@@ -14,7 +15,7 @@ spindleStats(numFiles) = struct('fileName', NaN, 'chanlocs', NaN, ...
        'spindleRate', NaN, 'spindleLength', NaN,  'spindleFraction', NaN);
 
 %% Process the data
-for k = 17%:length(dataFiles)
+for k = 1:length(dataFiles)
     test = load(dataFiles{k});
     spindleStats(k) = spindleStats(end);
     spindleStats(k).fileName = dataFiles{k};
@@ -51,9 +52,7 @@ for k = 17%:length(dataFiles)
     spindleStats(k).spindleLength = spindleLength;
     spindleStats(k).spindleFraction = spindleFraction;
     spindleStats(k).timeFraction = mean(eventMask);
-
 end
 
 %% Save the results
-%     save([resultsDir filesep fileName, '_spindlerChannelResults.mat'],  ...
-%          'params', 'spindleEvents', '-v7.3');
+save(statsFile, 'spindleStats', '-v7.3');

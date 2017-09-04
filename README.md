@@ -34,6 +34,12 @@ Spindler uses the input to run a batch analysis. If `eventDir` is not empty, Spi
 * EEGLAB: https://sccn.ucsd.edu/eeglab/  
 
 ### Releases:
+Version 1.0.4 Released 09/04/2017
+* Fixed isempty misspelling on removeChannels
+* Added a runSpindleStats function
+* Fixed removing channelLabel field in saving params
+* Added function for plotting statistics  
+  
 Version 1.0.3 Released 09/02/2017
 * Fixed resampling issue in spindlerExtractSpindles when ICA present
 * Added warningCodes to spindlerExtractSpindles

@@ -61,7 +61,7 @@ if ~isempty(imageDirBase) && ~exist(imageDirBase, 'dir')
 end;
 
 %% Process the data
-for k = 13:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Read in the EEG and set up the names
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

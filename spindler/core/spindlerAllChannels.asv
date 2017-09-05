@@ -14,13 +14,9 @@ function [spindleEvents, params] = spindlerAllChannels(EEG, imageDir, baseName, 
     if ~isempty(imageDir) && ~exist(imageDir, 'dir')
         mkdir(imageDir);
     end
-    
     channelLabels = {EEG.chanlocs.labels};
     numChans = length(channelLabels);
-    if numChans == 0 
-       spindleEvents = struct();
-       return;
-    end
+    if numChans == 0;
     spindleEvents(numChans) = getEventsStruct(); 
     
     for n = 1:numChans

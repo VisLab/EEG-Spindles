@@ -33,7 +33,7 @@ if ~isempty(imageDirBase) && ~exist(imageDirBase, 'dir')
     mkdir(imageDirBase);
 end;
 
-EEGMissingChannels = {};
+noChannelLocations = {};
 %% Process the data
 for k = 63%1:length(dataFiles)
     %% Read in the EEG and set up the names
@@ -48,16 +48,10 @@ for k = 63%1:length(dataFiles)
         imageDir = '';
     end 
     
+    %% Check if has channel locations
     %% Remove non-EEG channels before proceeding
     EEG = removeChannels(EEG, true, excludeLabels, {});
-    
-    %% Check to make sure that there are still channels after exclusion
-    if isempty(EEG.chanlocs)
-        warning('%d: %s has no channels to perform spindler', k, dataFiles{k});
-        EEGMissingChannels{end + 1} = dataFiles{k};
-        continue;
-    end
-    
+
     %% Get the spindle events for this EEG dataset
     [spindleEvents, params] = ...
                  spindlerAllChannels(EEG, imageDir, baseName, paramsInit);
@@ -66,10 +60,4 @@ for k = 63%1:length(dataFiles)
     [~, fileName, ~] = fileparts(dataFiles{k});
     save([resultTypeDir filesep fileName, '_', freqType '_spindlerChannelResults.mat'],  ...
          'params', 'spindleEvents', '-v7.3');
-end
-
-%% Output the files with missing channels for later
-fprintf('Files missing channel locations:\n');
-for k = 1:length(EEGMissingChannels)
-    fprintf('%s\n', dataFiles{k});
 end

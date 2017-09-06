@@ -33,18 +33,16 @@ function [spindleEvents, params] = spindlerAllChannels(EEG, imageDir, baseName, 
         params.name = ['Ch_' channelLabels{n} '_' baseName];
         [spindlerCurves, warningMsgs, warningCodes] = ...
                   spindlerGetParameterCurves(spindles, imageDir, params);
-        if spindlerCurves.bestEligibleLinearInd > 0
-            events = spindles(spindlerCurves.bestEligibleLinearInd).events;
-        end
-
-        spindleEvents(n).bestEligibleThreshold = spindlerCurves.bestEligibleThreshold;
-        spindleEvents(n).bestEligibleAtomsPerSecond = ...
-        spindlerCurves.bestEligibleAtomsPerSecond;
-        spindleEvents(n).atomRateRange = spindlerCurves.atomRateRange;
-        spindleEvents(n).spindleRateSTD = spindlerCurves.spindleRateSTD;
         spindleEvents(n).warningMsgs = warningMsgs;
         spindleEvents(n).warningCodes = warningCodes;
-        spindleEvents(n).events = events;
+        if spindlerCurves.bestEligibleLinearInd > 0 
+            spindleEvents(n).bestEligibleThreshold = spindlerCurves.bestEligibleThreshold;
+            spindleEvents(n).bestEligibleAtomsPerSecond = ...
+                spindlerCurves.bestEligibleAtomsPerSecond;
+            spindleEvents(n).atomRateRange = spindlerCurves.atomRateRange;
+            spindleEvents(n).spindleRateSTD = spindlerCurves.spindleRateSTD;
+            spindleEvents(n).events = spindles(spindlerCurves.bestEligibleLinearInd).events;
+        end
     end
     if isfield(params, 'channelNumber')
        params = rmfield(params, 'channelNumber');

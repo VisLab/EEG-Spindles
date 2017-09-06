@@ -7,7 +7,16 @@ end
 
 function changeLog = getChangeLog()
  
-   changeLog(5) = ...
+    changeLog(6) = ...
+     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(6).version = '1.0.6';
+    changeLog(6).status = 'Released';
+    changeLog(6).date = '09/06/2017';
+    changeLog(6).changes = { ...
+       'Handled case when algorithm can not find an eligible index because of artifacts'};
+   
+    changeLog(5) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
     changeLog(5).version = '1.0.5';
@@ -15,7 +24,8 @@ function changeLog = getChangeLog()
     changeLog(5).date = '09/05/2017';
     changeLog(5).changes = { ...
        'Handled case when EEG with no channels given to spindlerAllChannels'};
-   changeLog(4) = ...
+   
+    changeLog(4) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
     changeLog(4).version = '1.0.4';

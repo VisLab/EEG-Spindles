@@ -34,7 +34,10 @@ Spindler uses the input to run a batch analysis. If `eventDir` is not empty, Spi
 * EEGLAB: https://sccn.ucsd.edu/eeglab/  
 
 ### Releases:  
-  
+
+Version 1.0.6 Released 09/06/2017
+* Handled case when algorithm can not find an eligible index because of artifacts  
+    
 Version 1.0.5 Released 09/05/2017
 * Handled case when EEG with no channels given to spindlerAllChannels
   

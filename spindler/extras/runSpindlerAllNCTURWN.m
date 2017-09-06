@@ -35,7 +35,7 @@ end;
 
 EEGMissingChannels = {};
 %% Process the data
-for k = 63%1:length(dataFiles)
+for k = 63:length(dataFiles)
     %% Read in the EEG and set up the names
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
@@ -54,7 +54,7 @@ for k = 63%1:length(dataFiles)
     %% Check to make sure that there are still channels after exclusion
     if isempty(EEG.chanlocs)
         warning('%d: %s has no channels to perform spindler', k, dataFiles{k});
-        EEGMissingChannels{end + 1} = dataFiles{k};
+        EEGMissingChannels{end + 1} = dataFiles{k}; %#ok<SAGROW>
         continue;
     end
     

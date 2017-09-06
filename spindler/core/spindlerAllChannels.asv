@@ -14,9 +14,13 @@ function [spindleEvents, params] = spindlerAllChannels(EEG, imageDir, baseName, 
     if ~isempty(imageDir) && ~exist(imageDir, 'dir')
         mkdir(imageDir);
     end
+    
     channelLabels = {EEG.chanlocs.labels};
     numChans = length(channelLabels);
-    if numChans == 0;
+    if numChans == 0 
+       spindleEvents = struct();
+       return;
+    end
     spindleEvents(numChans) = getEventsStruct(); 
     
     for n = 1:numChans
@@ -29,18 +33,17 @@ function [spindleEvents, params] = spindlerAllChannels(EEG, imageDir, baseName, 
         params.name = ['Ch_' channelLabels{n} '_' baseName];
         [spindlerCurves, warningMsgs, warningCodes] = ...
                   spindlerGetParameterCurves(spindles, imageDir, params);
-        if spindlerCurves.bestEligibleLinearInd > 0
-            events = spindles(spindlerCurves.bestEligibleLinearInd).events;
-        end
-
+        spindleEvents(n).warningMsgs = warningMsgs;
+        spindleEvents(n).warningCodes = warningCodes;
+        if spindlerCurves.bestEligibleLinearInd > 0 
         spindleEvents(n).bestEligibleThreshold = spindlerCurves.bestEligibleThreshold;
         spindleEvents(n).bestEligibleAtomsPerSecond = ...
         spindlerCurves.bestEligibleAtomsPerSecond;
         spindleEvents(n).atomRateRange = spindlerCurves.atomRateRange;
         spindleEvents(n).spindleRateSTD = spindlerCurves.spindleRateSTD;
-        spindleEvents(n).warningMsgs = warningMsgs;
-        spindleEvents(n).warningCodes = warningCodes;
-        spindleEvents(n).events = events;
+        
+        spindleEvents(n).events = spindles(spindlerCurves.bestEligibleLinearInd).events;
+        end
     end
     if isfield(params, 'channelNumber')
        params = rmfield(params, 'channelNumber');

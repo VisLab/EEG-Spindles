@@ -1,11 +1,8 @@
-function metrics = getConfusionMetrics(tp, tn, fp, fn)
+function metrics = getConfusionMetrics(confusion)
 %% Compute performance metrics based on the confusion matrix
 % 
 %  Parameters:
-%    tp       True positives  
-%    tn       True negatives  
-%    fp       False positives  
-%    fn       False negatives  
+%    confusion   structure with tp, fn, fp, and tn fields
 %    metrics  (Output) Structure containing the following performance metrics
 %      accuracy
 %      precision
@@ -19,28 +16,45 @@ function metrics = getConfusionMetrics(tp, tn, fp, fn)
 %      roc
 %      auc 
 %      phi
+%      fdr
 %      f1
 %      f2
 %      G
 %      kappa
 %
-%  Written by:  John La Rocco and Kay Robbins, UTSA, 2016-2017
+%  Written by:  John La Rocco and Kay Robbins, UTSA, 2016-2018
 
 %% Initialize the metrics structure
-    metrics = struct('tp', tp, 'tn', tn, 'fn', fn, 'fp', fp, ...
+    metrics = struct('tp', NaN, 'tn', NaN, 'fn', NaN, 'fp', NaN, ...
                      'accuracy', NaN, 'precision', NaN, 'recall', NaN, ...
                      'sensitivity', NaN, 'specificity', NaN, ...
                      'ppv', NaN, 'npv', NaN, 'tpr', NaN, 'fpr', NaN, ...
-                     'roc', NaN, 'auc', NaN, 'phi', NaN, ...
+                     'roc', NaN, 'auc', NaN, 'phi', NaN, 'fdr', NaN, ...
                      'f1', NaN, 'f2', NaN, 'G', NaN, 'kappa', NaN);
 
+%% Make sure that a confusion structure has been passed
+    if ~isfield(confusion, 'tp') || ~isfield(confusion, 'fn') || ...
+            ~isfield(confusion, 'fp') || ~isfield(confusion, 'tn')
+        warning('getConfusionMetrics:InvalidConfusion', ...
+            'confusion must be a structure with tp, fn, fp, and tn fields');
+        return;
+    end
 %% Compute auxillary variables
+    tp = confusion.tp;
+    fn = confusion.fn;
+    fp = confusion.fp;
+    tn = confusion.fn;
+    metrics.tp = tp;
+    metrics.fn = fn;
+    metrics.fp = fp;
+    metrics.tn = tn;
+
     checkSum = tp + tn + fn + fp;
     predPositives = tp + fp;
     predNegatives = tn + fn;
     truePositives = tp + fn;
     trueNegatives = fp + tn;
-
+    
 %% Compute the metrics
     metrics.accuracy = (tp + tn)/checkSum;
     metrics.sensitivity = tp/truePositives;
@@ -70,4 +84,5 @@ function metrics = getConfusionMetrics(tp, tn, fp, fn)
     Po = metrics.accuracy;
     Pe = ((tp + tn)*(tp + fp) + (fp + tn)*(fn + tn))/checkSum;
     metrics.kappa = (Po - Pe)/(1 - Pe);
+    metrics.fdr = fp/(fp + tp);
 end

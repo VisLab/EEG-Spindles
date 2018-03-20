@@ -1,4 +1,4 @@
-function newEvents = combineEvents(events, minLength, minSeparation)
+function epochedEvents = combineEvents(theseEvents, minLength, minSeparation)
 % Combine events within minSeparation of each other and remove short events
 %
 %  Input:
@@ -14,25 +14,25 @@ function newEvents = combineEvents(events, minLength, minSeparation)
 % Modified by: John LaRocca and Kay Robbins, UTSA 2016-2017
 % 
 
-%% Check to make sure that there are events
-newEvents = events;
-if isempty(events)
-    return;
-end
+%% Check to make sure that there are events      
+        %% Combine events separated by less than minSeparation seconds
+    if isempty(theseEvents)
+        epochedEvents = [];
+        return;
+    end
+    interEventIntervals = theseEvents(2:end, 1) - theseEvents(1:end - 1, 2);
+    epochedEvents = theseEvents;
+    k = 1;
+    for i = 1:length(interEventIntervals)
+        if interEventIntervals(i) > minSeparation
+            k = k + 1;
+        else
+            epochedEvents(k, 2) = epochedEvents(k + 1, 2);
+            epochedEvents(k + 1, :) = [];
+        end
+    end
 
-%% Combine events separated by less than minSeparation seconds
-interEventIntervals = events(2:end, 1) - events(1:end - 1, 2);
-newEvents = events;
-k = 1;
-for i = 1:length(interEventIntervals)
-   if interEventIntervals(i) > minSeparation
-       k = k + 1;
-   else
-       newEvents(k, 2) = newEvents(k + 1, 2);
-       newEvents(k + 1, :) = [];
-   end
+    %% Eliminate events that are shorter than minLength seconds
+    eventMask = epochedEvents(:, 2) - epochedEvents(:, 1) < minLength;
+    epochedEvents(eventMask, :) = [];
 end
-
-%% Eliminate events that are shorter than minLength seconds
-eventMask = newEvents(:, 2) - newEvents(:, 1) < minLength;
-newEvents(eventMask, :) = [];

@@ -1,10 +1,10 @@
-function figHan = spindlerShowMetric(spindleParameters, metrics, metricName, ...
+function figHan = spindlerShowMetric(spindleParameters, methods, metricName, ...
                              imageDir, params)
 %% Plot the specified metric for the different evaluation methods
 %
 %  Parameters:
 %     spindleParameters     structure from getSpindlerParameters
-%     metrics               structure from getSpindlerPerformance
+%     methods               structure from getSpindlerPerformance
 %     metricName            name of the metric to plot
 
 %% Set up image directory if saving
@@ -16,21 +16,22 @@ end
 theName = params.name;
 
 %% Make sure the metrics structure has all methods and specified metric
-if ~isfield(metrics, 'timeMetrics') || ...
-   ~isfield(metrics, 'hitMetrics') || ...
-   ~isfield(metrics, 'intersectMetrics') || ...
-   ~isfield(metrics, 'onsetMetrics') 
+if ~isfield(methods, 'time') || ~isfield(methods, 'hit') || ...
+   ~isfield(methods, 'intersect') || ~isfield(methods, 'count') || ...
+   ~isfield(methods, 'onset') 
     warning('showSpindlerMetric:MissingMethod', 'Performance method not available');
     return;
 end
 
 %% Get the metrics data
-sHits = {metrics.hitMetrics};
-sIntersects = {metrics.intersectMetrics};
-sOnsets = {metrics.onsetMetrics};
-sTimes = {metrics.timeMetrics};
+sCounts = {methods.count};
+sHits = {methods.hit};
+sIntersects = {methods.intersect};
+sOnsets = {methods.onset};
+sTimes = {methods.time};
 
-if ~isfield(sHits{1}, metricName) || ...
+if ~isfield(sCounts{1}, metricName) || ...
+   ~isfield(sHits{1}, metricName) || ...
    ~isfield(sIntersects{1}, metricName) || ...
    ~isfield(sOnsets{1}, metricName) || ...
    ~isfield(sTimes{1}, metricName) 
@@ -50,64 +51,75 @@ spindleRateSTD = spindleParameters.spindleRateSTD;
 bestEligibleAtomInd = spindleParameters.bestEligibleAtomInd;
 bestEligibleThresholdInd = spindleParameters.bestEligibleThresholdInd;
 %% Extract the values to plot
+countMetric = zeros(length(sHits), 1);
 hitMetric = zeros(length(sHits), 1);
 intersectMetric = zeros(length(sHits), 1);
 onsetMetric = zeros(length(sHits), 1);
 timeMetric = zeros(length(sHits), 1);
 
 for k = 1:length(sHits)
+    countMetric(k) = sCounts{k}.(metricName);
     hitMetric(k) = sHits{k}.(metricName);
     intersectMetric(k) = sIntersects{k}.(metricName);
     onsetMetric(k) = sOnsets{k}.(metricName);
     timeMetric(k) = sTimes{k}.(metricName);
 end
+countMetric = reshape(countMetric, numAtoms, numThresholds);
+% hitMetricMean = mean([hitMetric(:, minInd), hitMetric(:, maxInd)], 2);
+countMetric = [countMetric(:, minInd), countMetric(:, maxInd),  ...
+               countMetric(:, bestEligibleThresholdInd)];
+         
 hitMetric = reshape(hitMetric, numAtoms, numThresholds);
-hitMetricMean = mean([hitMetric(:, minInd), hitMetric(:, maxInd)], 2);
+% hitMetricMean = mean([hitMetric(:, minInd), hitMetric(:, maxInd)], 2);
 hitMetric = [hitMetric(:, minInd), hitMetric(:, maxInd),  ...
-             hitMetricMean, hitMetric(:, bestEligibleThresholdInd)];
+             hitMetric(:, bestEligibleThresholdInd)];
 
 intersectMetric = reshape(intersectMetric, numAtoms, numThresholds);
-intersectMetricMean = mean([intersectMetric(:, minInd), ...
-                            intersectMetric(:, maxInd)], 2);
+% intersectMetricMean = mean([intersectMetric(:, minInd), ...
+%                             intersectMetric(:, maxInd)], 2);
 intersectMetric = [intersectMetric(:, minInd), intersectMetric(:, maxInd) ...
-         intersectMetricMean, intersectMetric(:, bestEligibleThresholdInd)];
+                   intersectMetric(:, bestEligibleThresholdInd)];
 
 onsetMetric = reshape(onsetMetric, numAtoms, numThresholds);
-onsetMetricMean = mean([onsetMetric(:, minInd), onsetMetric(:, maxInd)], 2);
+%onsetMetricMean = mean([onsetMetric(:, minInd), onsetMetric(:, maxInd)], 2);
 onsetMetric = [onsetMetric(:, minInd), onsetMetric(:, maxInd), ...
-               onsetMetricMean, onsetMetric(:, bestEligibleThresholdInd)];
+              onsetMetric(:, bestEligibleThresholdInd)];
 
 timeMetric = reshape(timeMetric, numAtoms, numThresholds);
-timeMetricMean = mean([timeMetric(:, minInd), timeMetric(:, maxInd)], 2);
+%timeMetricMean = mean([timeMetric(:, minInd), timeMetric(:, maxInd)], 2);
 timeMetric = [timeMetric(:, minInd), timeMetric(:, maxInd), ...
-              timeMetricMean, timeMetric(:, bestEligibleThresholdInd)];
+              timeMetric(:, bestEligibleThresholdInd)];
 
 %% Set up the legends
-legendStrings = {'T_b=0', 'T_b=1', 'T_b center', ...
+legendStrings = {'T_b=0', 'T_b=1', ...
                  ['T_b=' num2str(spindleParameters.bestEligibleThreshold)]};
 
 %% set up the graphics
-legendBoth = cell(1, 16);
-for k = 1:4
-    legendBoth{4*k - 3} = ['H:' legendStrings{k}];
-    legendBoth{4*k - 2} = ['I:' legendStrings{k}];
-    legendBoth{4*k - 1} = ['O:' legendStrings{k}];
-    legendBoth{4*k} = ['T:' legendStrings{k}];
+legendBoth = cell(1, 15);
+for k = 1:3
+    legendBoth{5*k - 4} = ['C:' legendStrings{k}];
+    legendBoth{5*k - 3} = ['H:' legendStrings{k}];
+    legendBoth{5*k - 2} = ['I:' legendStrings{k}];
+    legendBoth{5*k - 1} = ['O:' legendStrings{k}];
+    legendBoth{5*k} = ['T:' legendStrings{k}];
 end
 theTitle = [datasetName ': ' metricName ' vs atoms/second'];
 figHan = figure('Name', theTitle);
 hold on
-newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.5, 0.8, 0.8; 0.3, 0.3, 0.3];
+newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.5, 0.8, 0.8; 0.4, 0.8, 0.5; 0.3, 0.3, 0.3];
 lineWidths = [2, 2, 2, 3];
-for j = 1:4
+lineStyles = {':', '--', '-'};
+for j = 1:3
+    plot(atomsPerSecond, countMetric(:, j), 'LineWidth', lineWidths(j), ...
+         'Color', newColors(1, :), 'LineStyle', lineStyles{j});
     plot(atomsPerSecond, hitMetric(:, j), 'LineWidth', lineWidths(j), ...
-         'Color', newColors(j, :));
+         'Color', newColors(2, :), 'LineStyle', lineStyles{j});
     plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', lineWidths(j), ...
-        'LineStyle', '--', 'Color', newColors(j, :));
+        'LineStyle', '--', 'Color', newColors(3, :), 'LineStyle', lineStyles{j});
     plot(atomsPerSecond, onsetMetric(:, j), 'LineWidth', lineWidths(j), ...
-        'LineStyle', ':', 'Color', newColors(j, :));
+        'LineStyle', ':', 'Color', newColors(4, :), 'LineStyle', lineStyles{j});
     plot(atomsPerSecond, timeMetric(:, j), 'LineWidth', lineWidths(j), ...
-         'LineStyle', '-.', 'Color', newColors(j, :));
+         'LineStyle', '-.', 'Color', newColors(5, :), 'LineStyle', lineStyles{j});
 end
 plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), ...
     'LineWidth', 2, 'Color', [0.7, 0.7, 0.7]);
@@ -119,13 +131,15 @@ line([eligiblePos, eligiblePos], yLimits, ...
     'LineWidth', 2, 'Color', [0.8, 0.8, 0.3]);
 line(spindleParameters.atomRateRange, [0.1, 0.1], ...
     'LineWidth', 4, 'Color', [0.8, 0.8, 0.8]);
-plot(eligiblePos, hitMetric(bestEligibleAtomInd, 4), 'o', ...
+plot(eligiblePos, countMetric(bestEligibleAtomInd, 3), 'o', ...
     'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
-plot(eligiblePos, timeMetric(bestEligibleAtomInd, 4), 'o', ...
+plot(eligiblePos, hitMetric(bestEligibleAtomInd, 3), 'o', ...
     'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
-plot(eligiblePos, onsetMetric(bestEligibleAtomInd, 4), 'o', ...
+plot(eligiblePos, timeMetric(bestEligibleAtomInd, 3), 'o', ...
     'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
-plot(eligiblePos, intersectMetric(bestEligibleAtomInd, 4), 'o', ...
+plot(eligiblePos, onsetMetric(bestEligibleAtomInd, 3), 'o', ...
+    'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
+plot(eligiblePos, intersectMetric(bestEligibleAtomInd, 3), 'o', ...
     'LineWidth', 2.5, 'MarkerSize', 14, 'Color', [0.8, 0.8, 0.3]);
 hold off
 ylabel('Performance')

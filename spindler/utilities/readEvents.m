@@ -1,23 +1,45 @@
-function expertEvents = readEvents(filePath)
+function events = readEvents(filePath, isEpoched, epochTime)
 %% Reads events in either format and returns expertEvents
 %
 %  Parameters
 %     filePath      path of the .mat file containing the events 
-%     expertEvents  (output) two-column event array with start and end
+%     isEpoched     optional logical parameter indicating whether epoched
+%     events       (output) two-column array with event start and ends
+%                      or a cell array whose entries are two-column arrays
 %
 %  Written by:  Kay Robbins, UTSA, 2017
+%
+%  The readEvents function recognizes several formats 
 %% Perform the operations
-    expertEvents = [];
-    if isempty(filePath)
+
+    events = [];
+    if isempty(filePath) || ~exist(filePath, 'file')
         return;
     end
-    testEvents = load(filePath);
-    if isfield(testEvents, 'expert_events') && iscell(testEvents.expert_events)
-        startEvents = cellfun(@double, testEvents.expert_events(:, 2));
-        endEvents = cellfun(@double, testEvents.expert_events(:, 3));
-        expertEvents = [startEvents(:), endEvents(:)];
-    elseif isfield(testEvents, 'expertEvents') && size(testEvents.expertEvents, 2) == 2
-        expertEvents = testEvents.expertEvents;
+    
+    eventsIn = load(filePath);
+    if nargin > 1 && isEpoched
+        events = epochedToList(eventsIn, epochTime);
+        return;
+    end
+
+    
+    if isnumeric(eventsIn) && size(eventsIn, 2) >= 2
+        events = eventsIn(:, 1:2);
+    elseif isfield(eventsIn, 'events')
+        events = eventsIn.events;
+    elseif isfield(eventsIn, 'expert_events')
+        events = eventsIn.expert_events;
+    elseif isfield(eventsIn, 'expertEvents')
+        events = eventsIn.expertEvents;
     else
         warning('readEvents:NotRecognized', 'Unrecognized file format for events');
     end
+    if iscell(events)
+        startEvents = cellfun(@double, events(:, 2));
+        endEvents = cellfun(@double, events(:, 3));
+        events = [startEvents(:), endEvents(:)];
+    end
+
+        
+   

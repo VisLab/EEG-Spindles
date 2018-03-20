@@ -1,0 +1,7 @@
+TRANSFORM TYPE: tqwt_radix2
+ TQWT 1: Q = 4.00, r = 3.00, levels = 30
+ TQWT 2: Q = 1.00, r = 3.00, levels = 10
+
+SALSA PARAMETERS: 
+ mu = 5.000e+00
+ iterations = 100

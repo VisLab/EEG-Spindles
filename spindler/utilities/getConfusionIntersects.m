@@ -1,34 +1,19 @@
-function confusion = getConfusionIntersects(trueEvents, ...
+function [tp, tn, fp, fn] = getConfusionIntersects(trueEvents, ...
             labeledEvents, totalTime, intersectTolerance, spindleDuration)
 %% Evaluate confusion matrix using the intersect method
-%
-%  Parameters:
-%      trueEvents     n x 2 array of start and end times of true events 
-%      labeledEvents  m x 2 array of start and end times of labeled events
-%      tolerance      minimum amount of overlap required for match
-%      intersectInfo  (output) structure containing confusion matrix
-%
-%  Overlap is computed as the ratio of the intersection/union of true and
-%  labeled.
-%
-%  Written by:  Kay Robbins, UTSA, 2017
-%% Evaluate confusion matrix based on if start of events match within tolerance
 %
 %  Parameters:
 %     trueEvents     n x 2 array of start and end times of true events 
 %     labeledEvents  m x 2 array of start and end times of labeled events
 %     totalTime      time in seconds of the dataset
-%     params         structure with other parameters
-%         spindleOnsetTolerance  seconds onsets must agree for events to
-%                                match
-%         spindleSeconds         average spindle length in seconds for
-%                                computing TN
-%
+%     intersectTolerance   minimum time in seconds spindles must overlap to match
+%     spindleDuration fixed assumed spindle length (s) assumed to
+%                    compute true negatives
 %
 %  Written by:  Kay Robbins, UTSA, 2017
 
 %% Set up the parameters and initialize the variables
-confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
+
 
 %% Set up the structure and initialize the variables
     numberTrue = size(trueEvents, 1);
@@ -120,10 +105,7 @@ confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
     tp = sum(TPMat(:));
     fp = sum(FPMat(:));
     fn = sum(FNMat(:));
-    confusion.tp = tp;
-    confusion.fp = fp;
-    confusion.fn = fn;
-    confusion.tn = round((totalTime - spindleDuration * (tp + fp + fn))/spindleDuration);
+    tn = round((totalTime - spindleDuration * (tp + fp + fn))/spindleDuration);
 
 
     function matches = getEventIntersect()

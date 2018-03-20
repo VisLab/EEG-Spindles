@@ -19,6 +19,9 @@
 % in text files with two columns containing the start and end times in seconds.
 %
 % 
+stageDir = [];
+enventDir = [];
+
 %% Example 1: Setup for driving data
 % dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
 % eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
@@ -27,6 +30,9 @@
 % summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
 % channelLabels = {'PO7'};
 % paramsInit = struct();
+% paramsInit.srateTarget = 128;
+% paramsInit.spindlerGaborFrequencies = 6:13;
+%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Example 2: Setup for the BCIT driving collection
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -38,7 +44,7 @@
 
 %% Example 3: Setup for the NCTU labeled driving collection
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events'};
 % resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindler';
 % imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindler';
 % summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Spindler_Summary.mat';
@@ -46,52 +52,113 @@
 % paramsInit = struct();
 
 %% Example 4: Set up for the Dreams sleep collection
-%dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-%eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-%resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
-%imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
-%summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
-%channelLabels = {'C3-A1', 'CZ-A1'};
-%paramsInit = struct();
-%paramsInit.spindlerGaborFrequencies = 10:16;
-%paramsInit.spindlerOnsetTolerance = 0.3;
-%paramsInit.spindlerTimingTolerance = 0.1;
-
-%% Example 5: Set up for the Dreams sleep collection
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
 resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
 imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
 summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
 channelLabels = {'C3-A1', 'CZ-A1'};
 paramsInit = struct();
-paramsInit.spindlerGaborFrequencies = 10:16;
+% paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
+paramsInit.spindlerGaborFrequencies = 10.5:16.5;
 paramsInit.spindlerOnsetTolerance = 0.3;
 paramsInit.spindlerTimingTolerance = 0.1;
+paramsInit.srateTarget = 200;
+% % paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
+%% Example 4: Set up for the MASS sleep collection
+dataDir = 'D:\TestData\Alpha\spindleData\mass\dataRestricted';
+eventDir = 'D:\TestData\Alpha\spindleData\mass\eventsRestricted\combinedUnion';
+stageDir = 'D:\TestData\Alpha\spindleData\mass\eventsRestricted\stage2Events';
+resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsRestrictedSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesRestrictedSpindler';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massRestricted_Spindler_Summary.mat';
+channelLabels = {'C3'};
+paramsInit = struct();
+paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
+%paramsInit.spindlerGaborFrequencies = 10.5:16.5;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
+paramsInit.srateTarget = 256;
+
+%% Example 5: Set up for the Dreams sleep collection
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\dataRestricted';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\eventsRestricted\combinedUnion';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsRestrictedSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesRestrictedSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreamsRestricted_Spindler_Summary.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
+% paramsInit.srateTarget = 200;
+% paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+
+%% Example 6: Driving data supervised 256 Hz
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler256Hz';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler256Hz';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary256.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
+% paramsInit.srateTarget = 256;
+
+%% Example 6: Driving data unsupervised 256 Hz
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerMoreRes';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerMoreRes';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_SummaryMoreRes.mat';
+% channelLabels = {'PO7'};
+% paramsInit = struct();
+% paramsInit.srateTarget = 256;
+% paramsInit.spindlerGaborFrequencies = 6:0.5:13;
+
+%% Example 7 NCTU data unsupervised 
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindlerMoreRes';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerMoreRes';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Spindler_SummaryMoreRes.mat';
+% channelLabels = {'P3'};
+% paramsInit = struct();
+% paramsInit.srateTarget = 250;
+% paramsInit.spindlerGaborFrequencies = 6:0.5:13;
+
+%% Example 5: Set up for the Dreams sleep collection
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerMoreRes';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerMoreRes';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_SummaryMoreRes.mat';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.srateTarget = 200;
+% paramsInit.spindlerGaborFrequencies = 10:0.5:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
+
+%% Example 6: Mas
+% dataDir = 'D:\TestData\Alpha\spindleData\mass\data';
+% eventDir = [];
+% resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsSpindlerMoreRes';
+% imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesSpindlerMoreRes';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\mass_Spindler_SummaryMoreRes.mat';
+% channelLabels = {'C3'};
+% paramsInit = struct();
+% paramsInit.srateTarget = 256;
+% paramsInit.spindlerGaborFrequencies = 10:0.5:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
 %% Metrics to calculate and methods to use
-metricNames = {'f1', 'f2', 'G'};
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
+paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
+%paramsInit.spindlerGaborFrequencies = 10.5:1:16.5;
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
-if isempty(eventDir)
-    eventFiles = {};
-else
-    eFiles = getFiles('FILES', eventDir, '.mat');
-    [eventFiles, leftOvers] = matchFileNames(dataFiles, eFiles);
-    if ~isempty(leftOvers)
-        warning('%d event files were not matched with data files', length(leftOvers));
-        for k = 1:length(leftOvers)
-            fprintf('---%s\n', leftOvers{k});
-        end
-    end
-    for k = 1:length(eventFiles)
-        if isempty(eventFiles{k})
-            warning('Data file %s does not have expert events', dataFiles{k});
-        end
-    end
-end
 
 %% Create the output directory if it doesn't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
@@ -107,56 +174,72 @@ if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
     fprintf('Creating summary directory %s \n', summaryDir);
     mkdir(summaryDir);
 end
-paramsInit.figureClose = false;
+paramsInit.figureClose = true;
 %paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 1%:length(dataFiles)
+for k = 2%1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
+    params = paramsInit;
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
-    [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
-    if isempty(channelNumber)
-        warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
+    EEG.setname = theName;
+    params.name = theName;
+ 
+    %% Get the channel number 
+    [params.channelNumber, params.channelLabel] = getChannelNumber(EEG, channelLabels);
+    if isempty(params.channelNumber)
+        warning('----Dataset %s does not have needed channels', params.name);
         continue;
     end
-    
-    %% Calculate the spindle representations for a range of parameters
-    [spindles, params] = spindlerExtractSpindles(EEG, channelNumber, paramsInit);
-    params.name = theName;
-    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
-     if spindlerCurves.bestEligibleLinearInd > 0
-         events = spindles(spindlerCurves.bestEligibleLinearInd).events;
-     end
-    %% Deal with ground truth if available
-    if isempty(eventFiles) || isempty(eventFiles{k}) || isempty(spindlerCurves)
-        expertEvents = [];
-        allMetrics = [];
-        metrics = [];
-    else
-        expertEvents = readEvents(eventFiles{k});
-        expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
-        for n = 1:length(metricNames)
-            spindlerShowMetric(spindlerCurves, allMetrics, metricNames{n}, ...
-                       imageDir, params);
-        end
-        if spindlerCurves.bestEligibleLinearInd > 0
-            metrics = allMetrics(spindlerCurves.bestEligibleLinearInd);
-        end
-    end
    
-    additionalInfo.spindles = spindles;
-    additionalInfo.spindlerCurves = spindlerCurves;
-    additionalInfo.allMetrics = allMetrics;
-    additionalInfo.warningMsgs = warningMsgs;
-    %% Save the results
-    [~, fileName, ~] = fileparts(dataFiles{k});
-    save([resultsDir filesep fileName, '_spindlerResults.mat'], 'events', ...
-        'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
+    %% Resample EEG if required
+    params.srateOriginal = EEG.srate;
+    EEG = resampleToTarget(EEG, params.srateTarget, params.channelNumber);
+    params.srate = EEG.srate;
+    params.name = EEG.setname;
+    data = EEG.data;
+    srate = EEG.srate;
+    startFrame = 1;
+    endFrame = length(data);
+    %% Read events and stages if available
+    expertEvents = [];
+    if ~isempty(eventDir)
+        expertEvents = readEvents([eventDir filesep theName '.mat']);
+    end
+    stageEvents = [];
+    if ~isempty(stageDir)
+        stageStuff = load([stageDir filesep theName '.mat']);
+        stageEvents = stageStuff.stageEvents;
+        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
+        [maxLength, maxInd] = max(stageLengths);
+        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
+                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
+        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
+        startFrame = max(1, round(stageEvents(maxInd, 1)*srate));
+        endFrame = min(length(data), round(stageEvents(maxInd, 2)*srate));
+        data = data(startFrame:endFrame);
+    end
+    
+    %% Call Spindler
+    [events, metrics, additionalInfo, params] =  ...
+                      spindler(data, expertEvents, imageDir, params);
+     additionalInfo.startFrame = startFrame;
+     additionalInfo.endFrame = endFrame;
+     totalMin = (startFrame - endFrame)/60/srate;
+     fprintf('---%d:%s [%d, %d] %g min %d labeled events %d expert events\n', ...
+         k, theName, startFrame, endFrame, totalMin, size(events, 1), ...
+         size(expertEvents, 1));
+     save([resultsDir filesep theName, '_spindlerResults.mat'], 'events', ...
+         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
 end
 
 %% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames);
+[results, dataNames, upperBounds] = ...
+    consolidateResults(resultsDir, paramsInit.methodNames, paramsInit.metricNames);
+
+%% Save the results
+methodNames = params.methodNames;
+metricNames = params.metricNames;
 save(summaryFile, 'results', 'dataNames', 'methodNames', ...
     'metricNames', 'upperBounds', '-v7.3');

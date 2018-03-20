@@ -35,7 +35,7 @@ end;
 
 EEGMissingChannels = {};
 %% Process the data
-for k = 63:length(dataFiles)
+for k = 501:600
     %% Read in the EEG and set up the names
     EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});

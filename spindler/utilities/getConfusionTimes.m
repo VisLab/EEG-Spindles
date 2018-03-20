@@ -1,14 +1,23 @@
-function confusion = getConfusionTimes(trueEvents, labeledEvents, ...
-                                      totalFrames, srate, timingTolerance)
-%% Evaluate timing errors in comparing labelSet1(truth) against labeledSet2
+function [tp, tn, fp, fn] = getConfusionTimes(trueEvents, labeledEvents, ...
+                                      totalTime, srate, timingTolerance)
+%% Evaluate timing errors in comparing trueEvents(truth) against labeledEvents
 %
 %  Parameters
-%     eventSet
-%% Process the defaults and initialize parameters
-    confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
-
+%     trueEvents       n x 2 array of true event start and end times in seconds
+%     labeledEvents    m x 2 array of labeled event start and end times in seconds
+%     totalTime        total time in seconds
+%     srate            sampling rate in Hz
+%     timingTolerance  timing tolerance in seconds for agreement
+%     tn               time in seconds of true negative
+%     tp               time in seconds of true positives
+%     fp               time in seconds of false positives
+%     fn               time in seconds of false negatives
+%
+%  Written by:  Kay Robbins, 2017, UTSA
+%  Adapted from code by Vernon Lawhern
    
     %% Initialize the variables and express frames in terms of events
+    totalFrames = round(totalTime*srate);
     timingSamples = floor(timingTolerance * srate);
     frameMask1 = getFrameMask(trueEvents);
     frameMask2 = getFrameMask(labeledEvents);
@@ -46,14 +55,18 @@ function confusion = getConfusionTimes(trueEvents, labeledEvents, ...
     overlaps = frameMask1 + frameMask2 + extendMask1 + extendMask2;
     overlaps(overlaps > 2) = 2;
     overlapMask = overlaps == 2;
-    confusion.tp = sum(overlapMask)/srate;
-    confusion.fn = sum(frameMask1 & overlapMask == 0)/srate;
-    confusion.fp = sum(frameMask2 & overlapMask == 0)/srate;
-    confusion.tn = (totalFrames - 1)/srate - confusion.tp - confusion.fn - confusion.fp;
+    tp = sum(overlapMask)/srate;
+    fn = sum(frameMask1 & overlapMask == 0)/srate;
+    fp = sum(frameMask2 & overlapMask == 0)/srate;
+    tn = (totalFrames - 1)/srate - tp - fn - fp;
 
     function [frameMask, eventFrames] = getFrameMask(eventSet)
         %% Calculate frameMask which has true for frames inside events
         frameMask = false(1, totalFrames);
+        if isempty(eventSet)
+            eventFrames = [];
+            return;
+        end
         eventFrames = floor(eventSet*srate) + 1;
         for m = 1:size(eventSet, 1)
             frameMask(eventFrames(m, 1):eventFrames(m, 2)) = true;

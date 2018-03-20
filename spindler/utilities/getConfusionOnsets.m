@@ -1,22 +1,18 @@
-function confusion = getConfusionOnsets(trueEvents, labeledEvents, ...
+function [tp, tn, fp, fn] = getConfusionOnsets(trueEvents, labeledEvents, ...
                                 totalTime, onsetTolerance, spindleDuration)
 %% Evaluate confusion matrix based on if start of events match within tolerance
 %
 %  Parameters:
-%     trueEvents     n x 2 array of start and end times of true events 
-%     labeledEvents  m x 2 array of start and end times of labeled events
-%     totalTime      time in seconds of the dataset
-%     params         structure with other parameters
-%         spindleOnsetTolerance  seconds onsets must agree for events to
-%                                match
-%         spindleSeconds         average spindle length in seconds for
-%                                computing TN
-%
+%     trueEvents      n x 2 array of start and end times of true events 
+%     labeledEvents   m x 2 array of start and end times of labeled events
+%     totalTime       time in seconds of the dataset
+%     onsetTolerance  minimum distance in onsets for two spindles to match
+%     spindleDuration fixed assumed spindle length (s) assumed to
+%                     compute true negatives
 %
 %  Written by:  Kay Robbins, UTSA, 2017
 
 %% Set up the parameters and initialize the variables
-confusion = struct('tp', NaN, 'tn', NaN, 'fp', NaN, 'fn', NaN);
 if isempty(trueEvents)
     trueStarts = [];
 else
@@ -49,7 +45,7 @@ for k = 1:length(trueStarts)
 end
 
 %% Set up confusion matrix for return
-confusion.fp = fp;
-confusion.tp = tp;
-confusion.fn = fn;
-confusion.tn = round((totalTime - spindleDuration * (tp + fp + fn))/spindleDuration);
+fp = fp;
+tp = tp;
+fn = fn;
+tn = round((totalTime - spindleDuration * (tp + fp + fn))/spindleDuration);

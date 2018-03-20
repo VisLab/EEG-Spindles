@@ -8,7 +8,7 @@ function [results, dataNames, upperBounds] = consolidateResults(resultsDir, meth
     resultFiles = getFiles('FILES', resultsDir, '.mat');
 
 %% Create the array of performance values
-    results = zeros(length(methodNames), length(metricNames), length(resultFiles));
+   results = zeros(length(methodNames), length(metricNames), length(resultFiles));
     upperBounds = zeros(length(methodNames), length(metricNames), length(resultFiles));
     dataNames = cell(length(resultFiles), 1);
     for k = 1:length(resultFiles)
@@ -21,6 +21,7 @@ function [results, dataNames, upperBounds] = consolidateResults(resultsDir, meth
        end
     end
 end
+
 
 function result = consolidate(metrics, methodNames, metricNames)   
     result = zeros(length(methodNames), length(metricNames));

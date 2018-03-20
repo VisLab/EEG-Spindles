@@ -2,26 +2,40 @@
 %
 %  Written by: Kay Robbins, UTSA, 2017
 %
-%% Set up the parameters
-resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
-dreamsAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8', 'Sem'};
-drivingAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8'};
+%% Example 1: Set up the parameters for comparing algorithms
+% resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
+% dreamsAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8', 'Sem'};
+% drivingAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8'};
+% drivingTypes = {'', '', '', ''};
+% dreamsTypes = {'', '', '', '', ''};
 
+%% Example 2: Set up the parameters for comparing Spindler settings
+resultsDir = 'D:\TestData\Alpha\spindleData\ResultSummary';
+dreamsAlgs = {'Spindler', 'Spindler'};
+drivingAlgs = {'Spindler', 'Spindler'};
+drivingTypes = {'', 'MoreRes'};
+dreamsTypes = {'', 'MoreRes'};
+%% Set up algorithms
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 metricNames = {'F1', 'F2', 'G'};
 
 %% Read in all of the summary data
 dreamsResults = cell(length(dreamsAlgs), 1);
+dreamsBase = [resultsDir filesep 'dreams_'];
 for k = 1:length(dreamsResults)
-    dreamsResults{k} = load([resultsDir filesep 'dreams_' dreamsAlgs{k} '_Summary.mat']);
+    dreamsFile = [dreamsBase dreamsAlgs{k} '_Summary' dreamsTypes{k} '.mat'];
+    dreamsResults{k} = load(dreamsFile);
     dreamsResults{k}.algorithm = dreamsAlgs{k};
 end
 drivingResults = cell(2*length(drivingAlgs), 1);
+bcitBase = [resultsDir filesep 'bcit_'];
+nctuBase = [resultsDir filesep 'nctu_'];
 for k = 1:length(drivingAlgs)
-    drivingResults{k} = load([resultsDir filesep 'bcit_' drivingAlgs{k} '_Summary.mat']);
+    bcitFile = [bcitBase drivingAlgs{k} '_Summary' drivingTypes{k} '.mat'];
+    drivingResults{k} = load(bcitFile);
     drivingResults{k}.algorithm = [drivingAlgs{k} '_bcit'];
-    
-    drivingResults{length(drivingAlgs) + k} = load([resultsDir filesep 'nctu_' drivingAlgs{k} '_Summary.mat']);
+    nctuFile = [nctuBase drivingAlgs{k} '_Summary' drivingTypes{k} '.mat'];
+    drivingResults{length(drivingAlgs) + k} = load(nctuFile);
     drivingResults{length(drivingAlgs) + k}.algorithm = [drivingAlgs{k} '_nctu'];
 end
 

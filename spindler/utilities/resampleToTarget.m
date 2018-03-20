@@ -1,4 +1,4 @@
-function [EEG, srateNew] = resampleToTarget(EEG, srateTarget)
+function [EEG, srateNew] = resampleToTarget(EEG, srateTarget, channelNumber)
 %% Determines an appropriate resampling strategy based on srateTarget
 %
 %  Parameters:
@@ -9,6 +9,11 @@ function [EEG, srateNew] = resampleToTarget(EEG, srateTarget)
 %  best event divisor for the srateTarget.
 %
 %
+
+%% Create a single signal EEG from channelNumber
+    EEG.data = EEG.data(channelNumber, :);
+    EEG.chanlocs = EEG.chanlocs(channelNumber);
+    EEG.nbchan = 1;
 %% Determine the right sampling rate
    srateNew = getTargetSrate(EEG.srate, srateTarget);
    if isempty(srateNew)

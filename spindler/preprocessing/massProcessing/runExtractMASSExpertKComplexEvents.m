@@ -1,14 +1,10 @@
-%% Convert sleep stage annotations to .mat files
-
 %% Set up the locations
-inDir = 'E:\MASS\SS2\annotations\base_edf';
-outDir = 'D:\TestData\Alpha\spindleData\mass\annotations\stages';
-
-%% Make sure output directory exists
-if ~exist(outDir, 'dir')
-    mkdir(outDir);
-end
-
+%inDir = 'E:\MASS\SS2\annotations\spindle_e1_edf';
+%inDir = 'E:\MASS\SS2\annotations\spindle_e2_edf';
+inDir = 'E:\MASS\SS2\annotations\complexes_e1';
+outDir = 'E:\MASS\SS2\annotationsExtracted';
+%eventType = 'sleepspindle';
+eventType = 'kcomplex';
 %% Get the list of EYE filenames from level 0
 inList = dir(inDir);
 names = {inList(:).name};
@@ -41,7 +37,7 @@ for k = 1:numberFiles
     expert_events = cell(numberEvents, 3);
     srate = round(header.samplingrate);
     for n = 1:length(theEvents.TYP)
-       expert_events{n, 1} = theEvents.TYP{n};
+       expert_events{n, 1} = eventType;
        expert_events{n, 2} = double(theEvents.POS(n) - 1)./srate;
        expert_events{n, 3} = ...
            double(theEvents.POS(n) + theEvents.DUR(n) - 1)./srate;

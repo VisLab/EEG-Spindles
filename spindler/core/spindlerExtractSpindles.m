@@ -1,16 +1,15 @@
-function [spindles, params, atomParams, scaledGabors] = ...
+function [spindles, atomParams, sigmaFreq, scaledGabors, params] = ...
                                      spindlerExtractSpindles(data, params)
-%% Calculate spindle events from different Gabor reconstructions 
+%% Calculate Gabor representation and corresponding spindle events 
 %  
 %  Parameters:
 %    data             1 x n data
-%    expertEvents     A two-column vector with the start and end times of
-%                     spindles (in seconds) giving ground truth. If empty,
-%                     no performance metrics are computed.
 %    params           (Input/Output) Structure with parameters for algorithm 
-%                            (See getSpindleDefaults)
-%    spindles         (Output) Structure with MP and performance information
-%    atomParams       (Output) Array with frequency, scale, and phase of dictionary
+%                              (See getSpindleDefaults)
+%    spindles         (Output) Structure with spindles as a function of 
+%                              number of atoms/sec and threshold.
+%    atomParams       (Output) Array of frequency, scale, and phase indices
+%    sigmaFreq        (Output) Table of Gabor frequency and scales
 %    scaledGabors     (Output) Gabor atoms that form the dictionary.
 %
 %  Written by:     J. LaRocco, K. Robbins, UTSA 2016-2017
@@ -18,7 +17,7 @@ function [spindles, params, atomParams, scaledGabors] = ...
 
 %% Process the input parameters and set up the calculation
 defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
-params = processParameters('extractSpindles', nargin, 2, params, defaults);
+params = processParameters('spindlerExtractSpindles', nargin, 2, params, defaults);
 
 atomsPerSecond = params.spindlerAtomsPerSecond;
 minLength = params.spindleLengthMin;
@@ -41,7 +40,7 @@ totalTime = (numFrames - 1)/params.srate;
 params.frames = numFrames;
 
 %% Generate the Gabor dictionary for the MP decomposition
-gabors = getGabors(params.srate, params);
+[gabors, sigmaFreq] = getGabors(params.srate, params);
 
 %% Bandpass filter the data using pop_eegfiltnew
 dataBand = getFilteredData(data, params);

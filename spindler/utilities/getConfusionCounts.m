@@ -1,5 +1,5 @@
 function [tp, tn, fp, fn] = getConfusionCounts(trueEvents, labeledEvents, ...
-                              totalTime, spindleDuration, epochTime)
+                              totalTime, spindleDuration, segmentTime)
 %% Evaluate confusion matrix based on total spindle counts
 %
 %  Parameters:
@@ -10,8 +10,8 @@ function [tp, tn, fp, fn] = getConfusionCounts(trueEvents, labeledEvents, ...
 %                     compute true negatives
 %
 %  Written by:  Kay Robbins, UTSA, 2017
-    [~, trueList] = epochEvents(trueEvents, totalTime, epochTime);
-    [~, labeledList] = epochEvents(labeledEvents, totalTime, epochTime);
+    [~, trueList] = segmentEvents(trueEvents, totalTime, segmentTime);
+    [~, labeledList] = segmentEvents(labeledEvents, totalTime, segmentTime);
     tp = 0;
     tn = 0;
     fp = 0;

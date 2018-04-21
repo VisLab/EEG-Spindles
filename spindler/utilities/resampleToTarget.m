@@ -1,4 +1,4 @@
-function [EEG, srateNew] = resampleToTarget(EEG, srateTarget, channelNumber)
+function EEG = resampleToTarget(EEG, srateTarget, channelNumber)
 %% Determines an appropriate resampling strategy based on srateTarget
 %
 %  Parameters:
@@ -14,27 +14,5 @@ function [EEG, srateNew] = resampleToTarget(EEG, srateTarget, channelNumber)
     EEG.data = EEG.data(channelNumber, :);
     EEG.chanlocs = EEG.chanlocs(channelNumber);
     EEG.nbchan = 1;
-%% Determine the right sampling rate
-   srateNew = getTargetSrate(EEG.srate, srateTarget);
-   if isempty(srateNew)
-      return;
-   end
-   EEG =  pop_resample(EEG, srateNew);
-end
-
-function srateNew = getTargetSrate(srate, srateTarget)
-    srateNew = [];
-    if isempty(srateTarget) || srate <= srateTarget
-        return;
-    end
-    srateRem = rem(srate, srateTarget);
-    if srateRem == 0
-        srateNew = srateTarget;
-        return;
-    end
-    targetDivisor = floor(srate/srateTarget);
-    if targetDivisor == 1
-        return;
-    end
-    srateNew = srateTarget;
+    EEG =  pop_resample(EEG, srateNew);
 end

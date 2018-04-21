@@ -20,13 +20,13 @@
 %
 % 
 %% Example 1: Setup for driving data
-% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
-% channelLabels = {'PO7'};
-% paramsInit = struct();
+dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerTest';
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerTest';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
+channelLabels = {'PO7'};
+paramsInit = struct();
 
 %% Example 2: Setup for the BCIT driving collection
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -115,17 +115,17 @@
 % paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Example 6: Mas
-dataDir = 'D:\TestData\Alpha\spindleData\mass\data';
-eventDir = [];
-resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsSpindlerMoreRes';
-imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesSpindlerMoreRes';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\mass_Spindler_SummaryMoreRes.mat';
-channelLabels = {'C3'};
-paramsInit = struct();
-paramsInit.srateTarget = 256;
-paramsInit.spindlerGaborFrequencies = 10:0.5:16;
-paramsInit.spindlerOnsetTolerance = 0.3;
-paramsInit.spindlerTimingTolerance = 0.1;
+% dataDir = 'D:\TestData\Alpha\spindleData\mass\data';
+% eventDir = [];
+% resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsSpindlerMoreRes';
+% imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesSpindlerMoreRes';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\mass_Spindler_SummaryMoreRes.mat';
+% channelLabels = {'C3'};
+% paramsInit = struct();
+% paramsInit.srateTarget = 256;
+% paramsInit.spindlerGaborFrequencies = 10:0.5:16;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
@@ -154,7 +154,7 @@ end
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
-end;
+end
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);

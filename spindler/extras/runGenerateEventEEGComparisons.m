@@ -1,4 +1,4 @@
-%% This script shows how to run the Spindler analysis for a data collection
+%% This script displays EEG data overlaid with events 
 %  
 % You must set up the following information (see examples below)
 %   dataDir         path of directory containing EEG .set files to analyze
@@ -24,14 +24,15 @@ eventDir = [];
 
 %% Example 1: Setup for driving data
 % dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
+% eventDirs = {'D:\TestData\Alpha\spindleData\bcit\events'};
 % resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerNew';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerNew';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_SummaryNew.mat';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerNewOverlays';
 % channelLabels = {'PO7'};
-% paramsInit = struct();
-% paramsInit.srateTarget = 128;
-% paramsInit.spindlerGaborFrequencies = 6:0.5:13;
+% lowFreq = 6;
+% highFreq = 13;
+% epochTime = 30;
+% showPredicted = true;
+% baseBand = [1, 20];
 
 %% Example 2: Setup for the BCIT driving collection
 % dataDir = 'E:\CTADATA\BCIT\level_0';
@@ -43,14 +44,16 @@ eventDir = [];
 
 %% Example 3: Setup for the NCTU labeled driving collection
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events'};
+% eventTitles = {'expert'};
 % resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindlerNew';
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerNew';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Spindler_SummaryNew.mat';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerNewOverlayNoPredictions';
 % channelLabels = {'P3'};
-% paramsInit = struct();
-% paramsInit.srateTarget = 128;
-% paramsInit.spindlerGaborFrequencies = 6:0.5:13;
+% lowFreq = 6;
+% highFreq = 13;
+% epochTime = 30;
+% showPredicted = false;
+% baseBand = [1, 20];
 
 %% Example 4: Set up for the Dreams sleep collection
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
@@ -69,18 +72,17 @@ eventDir = [];
 
 %% Example 4: Set up for the MASS sleep collection
 dataDir = 'D:\TestData\Alpha\spindleData\mass\dataRestricted';
-eventDir = 'D:\TestData\Alpha\spindleData\mass\eventsRestricted\combinedUnion';
-stageDir = 'D:\TestData\Alpha\spindleData\mass\eventsRestricted\stage2Events';
+eventDirs = {'D:\TestData\Alpha\spindleData\mass\events\spindlesE1'; ...
+             'D:\TestData\Alpha\spindleData\mass\events\spindlesE1'};
+eventTypes = {'expert1', 'expert2'};      
 resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsRestrictedSpindlerNew1';
-imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesRestrictedSpindlerNew1';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massRestricted_Spindler_SummaryNew1.mat';
+imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesRestrictedSpindlerNew1Overlays';
 channelLabels = {'CZ'};
-paramsInit = struct();
-paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
-%paramsInit.spindlerGaborFrequencies = 10.5:16.5;
-paramsInit.spindlerOnsetTolerance = 0.3;
-paramsInit.spindlerTimingTolerance = 0.1;
-%paramsInit.srateTarget = 256;
+lowFreq = 10;
+highFreq = 20;
+epochTime = 30;
+showPredicted = true;
+baseBand = [1, 20];
 
 %% Example 5: Set up for the Dreams sleep collection
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\dataRestricted';
@@ -153,84 +155,148 @@ paramsInit.spindlerTimingTolerance = 0.1;
 % paramsInit.spindlerGaborFrequencies = 10:0.5:16;
 % paramsInit.spindlerOnsetTolerance = 0.3;
 % paramsInit.spindlerTimingTolerance = 0.1;
-%% Metrics to calculate and methods to use
-paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
-paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
-%paramsInit.spindlerGaborFrequencies = 10.5:1:16.5;
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
 
 %% Create the output directory if it doesn't exist
-if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
-    fprintf('Creating results directory %s \n', resultsDir);
-    mkdir(resultsDir);
-end
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);
 end
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
-end
-paramsInit.figureClose = false;
-%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 2%:length(dataFiles)
-    %% Read in the EEG and find the correct channel number
-    params = paramsInit;
-    [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
-           getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
+events = {};
+eventLabels = {};
+startMarks = [];
+for k = 1:length(dataFiles)
+    %% Get the results file with spindle information
+    [~, theName, ~] = fileparts(dataFiles{k});
+    test = load([resultsDir filesep theName, '_spindlerResults.mat']);
+   
+
+    params = test.params;
+    additionalInfo = test.additionalInfo;
+    
+    %% Read in the EEG and find the correct channel number   
+    [data, params] = getChannelData(dataFiles{k}, channelLabels, params);
     if isempty(data)
         warning('No data found for %s\n', dataFiles{k});
         continue;
     end
-    startFrame = 1;
-    endFrame = length(data);
-    %% Read events and stages if available
-    [~, theName, ~] = fileparts(dataFiles{k});
-    expertEvents = [];
-    if ~isempty(eventDir)
-        expertEvents = readEvents([eventDir filesep theName '.mat']);
-    end
-    stageEvents = [];
-    %% Use the longest stetch in the stage events
-    if ~isempty(stageDir)
-        stageStuff = load([stageDir filesep theName '.mat']);
-        stageEvents = stageStuff.stageEvents;
-        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
-        [maxLength, maxInd] = max(stageLengths);
-        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
-                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
-        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
-        startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
-        endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
-        data = data(startFrame:endFrame);
+    
+    %% Also get a filtered signal to overlay 
+    dataBand = getFilteredData(data, params.srate, lowFreq, highFreq);
+    if ~isempty(baseBand)
+        data = getFilteredData(data, params.srate, baseBand(1), baseBand(2));
     end
     
-    %% Call Spindler to find the spindles and metrics
-    [events, metrics, additionalInfo, params] =  ...
-                      spindler(data, expertEvents, imageDir, params);
-     additionalInfo.startFrame = startFrame;
-     additionalInfo.endFrame = endFrame;
-     additioanlInfo.srate = params.srate;
-     totalMin = (startFrame - endFrame)/60/params.srate;
-     fprintf('---%d:%s [%d, %d] %g min %d labeled events %d expert events\n', ...
-         k, theName, startFrame, endFrame, totalMin, size(events, 1), ...
-         size(expertEvents, 1));
-     save([resultsDir filesep theName, '_spindlerResults.mat'], 'events', ...
-         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
+    %% Make sure that the image directory exists
+    thisImageDir = [imageDir filesep theName];
+    if ~exist(thisImageDir, 'dir')
+       fprintf('Creating image directory %s \n', thisImageDir);
+       mkdir(thisImageDir);
+    end
+    
+    %% Set up the plots
+    baseTime = (additionalInfo.startFrame - 1)./params.srate;
+    data = data(additionalInfo.startFrame:additionalInfo.endFrame);
+    dataBand = dataBand(additionalInfo.startFrame:additionalInfo.endFrame);
+    
+    %% Scale data  
+    maxValue = min(12*mad(abs(data), 1), max(abs(data)));
+    data(data > maxValue) = maxValue;
+    data(data < -maxValue) = -maxValue;
+    dataBand(dataBand > maxValue) = maxValue;
+    dataBand(dataBand < -maxValue) = -maxValue;    
+    totalTime = (length(data) - 1)/params.srate;
+    startTime = (additionalInfo.startFrame - 1)/params.srate;
+    eventStarts = [];
+    events = {};
+    eventLabels = {};
+    if showPredicted && isfield(test, 'events') && ~isempty(test.events)
+       events{end + 1} = test.events;
+       eventLabels{end + 1} = 'Predicted';
+       eventStarts(end + 1) = 0;
+    end
+   
+    if isfield(test, 'expertEvents') && ~isempty(test.expertEvents)
+       events{end + 1} = test.expertEvents;
+       eventLabels{end + 1} = 'Expert';
+       eventStarts(end + 1) = 0;
+    end
+    for n = 1:length(eventDirs)
+        theseEvents = readEvents([eventDirs{n} filesep theName '.mat']);
+        if isempty(theseEvents)
+            continue;
+        end
+        events{end + 1} = theseEvents;
+        eventLabels{end + 1} = eventTypes{n};
+        eventStarts(end + 1) = startTime;
+    end
+  
+    eventColors = jet(length(events) + 1);
+    eventCounts = {};
+    eventLists = {};
+    for n = 1:length(events)
+       [counts, lists] = epochEvents(expertEvents, 0, totalTime, epochTime);
+    [eventCounts, eventList] = epochEvents(events, 0, totalTime, epochTime);
+    framesSegment = round(epochTime*params.srate);
+    numSegments = length(expertList);
+    startSegment = 1;
+    for n = 1:numSegments
+        endSegment = startSegment + framesSegment - 1;
+        theData = data(startSegment:endSegment)';
+        theBand = dataBand(startSegment:endSegment)';
+        theTitle = [theName ' channel ' params.channelLabel, ...
+                   ' Segment:' num2str(n) ' Frames:[' num2str(startSegment) ':' num2str(endSegment) ']'];
+        hFig1 = figure('Name', theTitle);
+        t = (startSegment:endSegment)';
+        t = (t-1)/params.srate + baseTime;
+        hold on
+        plot(t, theBand, 'g-', 'LineWidth', 2);
+        p1 = plot(t, theData, 'k-');
+        xlabel('time (s)')
+        ylabel('Voltage');
+        set(hFig1, 'Position', [300 500 1500 400]);
+        %yLim = get(gca, 'yLim');
+        %yMax = max(abs(yLim));         
+%         expertPos = 1.05*yMax;
+%         eventPos = 1.1*yMax;
+        expertPos = 1.05*maxValue;
+        eventPos = 1.1*maxValue;   
+        set(gca, 'YLimMode', 'manual', 'YLim', [-1.3, 1.3]*maxValue); 
+        set(gca, 'XLimMode', 'manual', 'XLim', [min(t), max(t)]);
+        expertEv = expertList{n};
+        theseEvents = eventList{n};    
+        legendStrings = ...
+            {['EEG [' num2str(lowFreq) ',' num2str(highFreq), '] Hz'], ...
+             ['EEG [' num2str(baseBand(1)) ',' num2str(baseBand(2)), '] Hz']};
+        if ~isempty(expertEv)
+            line(expertEv(1, :) + min(t), [expertPos, expertPos], ...
+                'Color', [0,0,0], 'LineWidth', 2);
+            legendStrings{end + 1} = 'Expert'; %#ok<*SAGROW>
+        end
+        
+        if ~isempty(theseEvents)
+            line(theseEvents(1, :) + min(t), [eventPos, eventPos], ...
+                'Color', [1,0,0], 'LineWidth', 2);
+            legendStrings{end + 1} = 'Predicted';
+        end
+        for j = 2:size(expertEv, 1)
+            line(expertEv(j, :) + min(t), [expertPos, expertPos], 'Color', [0,0,0], 'LineWidth', 2);
+        end
+       
+        for j = 2:size(theseEvents, 1)
+            line(theseEvents(j, :) + min(t), [eventPos, eventPos], 'Color', [1,0,0], 'LineWidth', 2);
+        end
+        hleg = legend(legendStrings, 'Location', 'SouthEast');
+        title(theTitle, 'Interpreter', 'None');
+        hold off
+        box on
+        startSegment = endSegment + 1;
+        imageName = [thisImageDir filesep theName '_' num2str(n) '.png'];
+        saveas(hFig1, imageName, 'png');
+        close(hFig1);
+    end
 end
-
-%% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = ...
-    consolidateResults(resultsDir, paramsInit.methodNames, paramsInit.metricNames);
-
-%% Save the results
-methodNames = params.methodNames;
-metricNames = params.metricNames;
-save(summaryFile, 'results', 'dataNames', 'methodNames', ...
-    'metricNames', 'upperBounds', '-v7.3');

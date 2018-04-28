@@ -33,7 +33,7 @@ dataFiles = getFiles('FILES', splitFileDir, '.mat');
 %% Create the output, image, and summary directories if they don't exist
 if ~exist(supervisedResultsDir, 'dir')
     mkdir(supervisedResultsDir);
-end;
+end
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end

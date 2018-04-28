@@ -378,7 +378,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     set(hLine, 'YData', [0, yLimits(2)]) %####
     set(hLine1, 'YData', [0.1, 0.1]*yLimits(2));
     set(gca, 'YLim', [0, yLimits(2)], 'YLimMode', 'manual', 'YTickMode', 'auto');
-    hleg1 = legend(ax(1), legendStrings, 'Location', 'SouthEast');
+    hleg1 = legend(legendStrings, 'Location', 'SouthEast');
     %hleg2 = legend(ax(2), 'STD', 'STD range', 'Location', 'NorthEast');
     if ~earlyMatlabVersion
         title(hleg1, 'Parameters');

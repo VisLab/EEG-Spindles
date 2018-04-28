@@ -9,8 +9,7 @@ function [events, metrics, additionalInfo, params] =  spindler(data, expertEvent
 %
 %     
     %% Calculate the spindle representations for a range of parameters
-    [spindles, atomParams, sigmaFreq, scaledGabors, params] = ...
-                                  spindlerExtractSpindles(data, params);
+    [spindles, params] = spindlerExtractSpindles(data, params);
     [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
     if spindlerCurves.bestEligibleLinearInd > 0
          events = spindles(spindlerCurves.bestEligibleLinearInd).events;

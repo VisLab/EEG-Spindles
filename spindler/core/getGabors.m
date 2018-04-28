@@ -1,4 +1,5 @@
-function [gabors, sigmaFreq] = getGabors(srate, params)
+function [gabors, sigmaFreq] = ...
+         getGabors(srate, atomSupportFactor, atomScales, atomFrequencies)
 %% Create a dictionary of zero-phase Gabor atoms for specified parameters
 %
 %  Parameters:
@@ -17,10 +18,7 @@ function [gabors, sigmaFreq] = getGabors(srate, params)
 %
 
 %% Set up the parameters
-params = processParameters('getGabors', nargin, 1, params, spindlerGetDefaults());
-atomSupportFactor = params.spindlerGaborSupportFactor; 
-atomScales = params.spindlerGaborScales;
-atomFrequencies = params.spindlerGaborFrequencies;
+
 numberScales = length(atomScales);
 numberFreq = length(atomFrequencies);
 numberGabors = numberFreq*numberScales;

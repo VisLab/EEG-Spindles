@@ -1,8 +1,8 @@
 %% Read the annotation files for sleep stages
 
 %% Set up the locations
-inDir = 'E:\MASS\SS2\annotations\base_edf';
-outDir = 'D:\TestData\Alpha\spindleData\mass\stages20Seconds';
+inDir = 'D:\TestData\Alpha\spindleData\massNew\eventsEDF\base';
+outDir = 'D:\TestData\Alpha\spindleData\massNew\events\base';
 
 %% Make sure output directory exists
 if ~exist(outDir, 'dir')
@@ -24,26 +24,24 @@ for k = 1:length(fileNames)
     %% Open the file to write the text
     [thePath, theName, theExt] = fileparts(fileNames{k});
     numberEvents = length(theEvents.POS);
-    expertEvents = zeros(numberEvents, 2);
-    expertEventTypes = cell(numberEvents, 1);
+    events = zeros(numberEvents, 2);
+    eventTypes = cell(numberEvents, 1);
     srate = header.samplingrate;
     for n = 1:length(theEvents.TYP)
-       expertEventTypes{n} = theEvents.TYP{n}(13:13);
-       expertEvents(n, 1) = double(theEvents.POS(n) - 1)./srate;
-       expertEvents(n, 2) = ...
-           double(theEvents.POS(n) + theEvents.DUR(n) - 1)./srate;
+       eventTypes{n} = theEvents.TYP{n}(13:13);
+       events(n, 1) = double(theEvents.POS(n) - 1)./srate;
+       events(n, 2) = double(theEvents.POS(n) + theEvents.DUR(n) - 1)./srate;
     end
     fprintf('%d: %g seconds\n', k, theEvents.DUR(1)./srate);
     sampleTime = 1.0/srate;
     for n = 2:length(theEvents.TYP)
-        theDiff = expertEvents(n, 1) - expertEvents(n-1, 2);
+        theDiff = events(n, 1) - events(n-1, 2);
         if theDiff > 3*sampleTime
             fprintf('%d:%d not adjacent, srate=%g, diff=%g\n', ...
                     k, n, srate, theDiff);
             break;
         end
     end
-    baseName = [theName(1:11) 'PSG.mat'];
-    save([outDir filesep baseName '.mat'], 'expertEvents', 'srate', ...
-                                           'expertEventTypes',  '-v7.3');
+    save([outDir filesep theName(1:11) 'PSG.mat'], 'events', 'srate', ...
+                                           'eventTypes',  '-v7.3');
 end

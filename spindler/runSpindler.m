@@ -18,9 +18,6 @@
 % complicated matching strategies as well.  Event files contain "ground truth"
 % in text files with two columns containing the start and end times in seconds.
 %
-% 
-stageDir = [];
-eventDir = [];
 
 %% Example 1: Setup for driving data
 % dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
@@ -68,19 +65,19 @@ eventDir = [];
 % % % paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Example 4: Set up for the MASS sleep collection
-dataDir = 'D:\TestData\Alpha\spindleData\mass\dataRestricted';
-eventDir = 'D:\TestData\Alpha\spindleData\mass\eventsRestricted\combinedUnion';
-stageDir = 'D:\TestData\Alpha\spindleData\mass\eventsRestricted\stage2Events';
-resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsRestrictedSpindlerNew1';
-imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesRestrictedSpindlerNew1';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massRestricted_Spindler_SummaryNew1.mat';
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpindler';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spindler_Summary.mat';
 channelLabels = {'CZ'};
 paramsInit = struct();
 paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
 %paramsInit.spindlerGaborFrequencies = 10.5:16.5;
 paramsInit.spindlerOnsetTolerance = 0.3;
 paramsInit.spindlerTimingTolerance = 0.1;
-%paramsInit.srateTarget = 256;
+paramsInit.srateTarget = 128;
 
 %% Example 5: Set up for the Dreams sleep collection
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\dataRestricted';
@@ -175,23 +172,26 @@ if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
     fprintf('Creating summary directory %s \n', summaryDir);
     mkdir(summaryDir);
 end
-paramsInit.figureClose = false;
-%paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+paramsInit.figureClose = true;
+paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Process the data
-for k = 2%:length(dataFiles)
+for k = 1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     params = paramsInit;
+    [~, theName, ~] = fileparts(dataFiles{k});
+   params.name = theName;
     [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
            getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
+    params.srate = params.srateTarget;
     if isempty(data)
         warning('No data found for %s\n', dataFiles{k});
         continue;
     end
     startFrame = 1;
     endFrame = length(data);
-    %% Read events and stages if available
-    [~, theName, ~] = fileparts(dataFiles{k});
+    
+    %% Read events and stages if available 
     expertEvents = [];
     if ~isempty(eventDir)
         expertEvents = readEvents([eventDir filesep theName '.mat']);
@@ -200,7 +200,7 @@ for k = 2%:length(dataFiles)
     %% Use the longest stetch in the stage events
     if ~isempty(stageDir)
         stageStuff = load([stageDir filesep theName '.mat']);
-        stageEvents = stageStuff.stageEvents;
+        stageEvents = stageStuff.stage2Events;
         stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
         [maxLength, maxInd] = max(stageLengths);
         eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...

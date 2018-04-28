@@ -1,8 +1,8 @@
 %% This script reads in and convert the EDF formats to EEG
 
 %% Set up the locations
-inDir = 'E:\MASS\SS2\version2015';
-outDir = 'E:\MASS\SS2\level0A';
+inDir = 'D:\TestData\Alpha\spindleData\massNew\dataEDF';
+outDir = 'D:\TestData\Alpha\spindleData\massNew\data';
 
 %% Make the output directory
 if ~exist(outDir, 'dir')
@@ -22,7 +22,6 @@ for k = 1:length(fileNames)
     dataIsnan = sum(~isnan(data) & data ~= 0, 2) ~= 0;
     data = data(dataIsnan, :);
     chans = chans(dataIsnan);
-    samplingRates = round(hdr.samples(dataIsnan)./hdr.duration);
     EEGchans = strcmpi({chans.type}, 'EEG');
     EEG.chanlocs = chans;
     EEG.data = data;
@@ -43,4 +42,3 @@ for k = 1:length(fileNames)
     EEG.setname = theName;
     save([outDir filesep theName '.set'], 'EEG', '-v7.3');
 end
-

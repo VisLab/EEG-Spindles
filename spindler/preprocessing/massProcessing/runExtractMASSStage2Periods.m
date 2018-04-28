@@ -1,8 +1,8 @@
 %% Read the annotation files for sleep stages
 
 %% Set up the locations
-inDir = 'D:\TestData\Alpha\spindleData\mass\events\stages20Seconds';
-outDir = 'D:\TestData\Alpha\spindleData\mass\stage2Events';
+inDir = 'D:\TestData\Alpha\spindleData\massNew\events\base';
+outDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
 
 %% Make sure output directory exists
 if ~exist(outDir, 'dir')
@@ -12,13 +12,13 @@ end
 %% Get the list of EYE filenames from level 0
 fileNames = getFileListWithExt('FILES', inDir, '.mat');
 
-%%
-for k = 1%:length(fileNames)
+%% Extract the stage 2 event list
+for k = 1:length(fileNames)
     test = load(fileNames{k});
-    expertEvents = test.expertEvents;
-    expertEventTypes = test.expertEventTypes;
-    events = getStageList(expertEvents, expertEventTypes, '2');
-   
-    %save([outDir filesep baseName '.mat'], 'expertEvents', 'srate', ...
-     %                                      'expertEventTypes',  '-v7.3');
+    events = test.events;
+    eventTypes = test.eventTypes;
+    srate = test.srate;
+    stage2Events = getStageList(events, eventTypes, '2');
+    [thePath, theName, theExt] = fileparts(fileNames{k});
+    save([outDir filesep theName(1:11) 'PSG.mat'], 'stage2Events', 'srate', '-v7.3');
 end

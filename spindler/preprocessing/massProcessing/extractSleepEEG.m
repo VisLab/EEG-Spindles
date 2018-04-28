@@ -56,7 +56,7 @@ function [EEG, hdr, data] = extractSleepEEG(fileName)
         end
     end
     %% Check the sampling rate for the EEG channels now we know which are EEG
-    EEG.srate = round(EEGsRates(1)/hdr.duration);
+    EEG.srate = EEGsRates(1)/hdr.duration;
     EEG.xmin = 0;
     EEG.xmax = (EEG.pnts - 1)/EEG.srate;
     EEG.times = 1000*(0:EEG.pnts-1)/EEG.srate;

@@ -1,3 +1,5 @@
+function [data, header] = readEDFAnnotations(filename)
+%% Modified lab_read_edf to read annotation files
 % lab_read_edf() - read eeg data in EDF+ format.
 %
 % Orignal Code-file:
@@ -40,7 +42,7 @@
 %      header.aux - auxillary channels / samplingrates auf auxillary channels
 %      header.hdr - original header
 
-function [data, header] = readEDFAnnotations(filename)
+
    
 fp = fopen(filename, 'r', 'ieee-le');
 if fp == -1
@@ -114,10 +116,10 @@ while m > 0 && strcmp(hdr.channelname(m, 1:15), 'EDF Annotations')
     eventstmp = data((end - hdr.numbersperrecord(m) + 1):end, :);
     data = data(1:end-hdr.numbersperrecord(m),:);
     for i = 1:hdr.records
-        eventsall(i,:) = typecast(int16(eventstmp(:,i)),'uint8')'; %#ok<AGROW>
+        eventsall(i,:) = typecast(int16(eventstmp(:,i)),'uint8')'; 
         tmp = find(eventsall(i,:) == 20);
         numberstops = tmp(eventsall(i,tmp+1) == 0);
-        eventsall(i,eventsall(i,:) == 32) = 95;
+        eventsall(i,eventsall(i,:) == 32) = 95; %#ok<*AGROW>
         eventsall(i,eventsall(i,:) == 20) = 32;
         eventsall(i,eventsall(i,:) == 21) = 32;
         if numberstops > 0
@@ -131,7 +133,7 @@ while m > 0 && strcmp(hdr.channelname(m, 1:15), 'EDF Annotations')
                 tmp = tmp{1,1};
                 header.events.POS = [header.events.POS int64(str2double(tmp(1,1))*header.samplingrate)];
                 header.events.OFF = [header.events.OFF int64(0)];
-                if size(tmp,1) > 2 & str2double(tmp(2,1)) > 0
+                if size(tmp,1) > 2 && str2double(tmp(2,1)) > 0
                     header.events.DUR = [header.events.DUR int64(str2double(tmp(2,1))*header.samplingrate)];
                     header.events.TYP = [header.events.TYP tmp(3,1)];
                 elseif size(tmp,1) > 1
@@ -209,22 +211,25 @@ if m > 0
     includeref = false;
     haveref = false;
     while m > 1
-        if ~isempty(strfind(upper(header.channels(m,:)),'ECG')) | ~isempty(strfind(upper(header.channels(m,:)),'EKG'))
+        if contains(upper(header.channels(m,:)),'ECG') || ...
+           contains(upper(header.channels(m,:)),'EKG')
             extrachannel(1,m) = 1;
             header.ecg_ch = m;
-        elseif ~isempty(strfind(upper(header.channels(m,:)),'EOG'))
+        elseif contains(upper(header.channels(m,:)),'EOG')
             extrachannel(1,m) = 1;
             header.eog_ch = m;
-        elseif ~isempty(strfind(upper(header.channels(m,:)),'PHOTIC'))
+        elseif contains(upper(header.channels(m,:)),'PHOTIC')
             extrachannel(1,m) = 1;
-        elseif ~isempty(strfind(upper(header.channels(m,:)),'REF')) & ~strcmpi(header.channels(m,1:3),'REF')
+        elseif contains(upper(header.channels(m,:)),'REF') && ...
+            ~strcmpi(header.channels(m,1:3),'REF')
             includeref = true;
-        elseif ~isempty(strfind(upper(header.channels(m,:)),'REF')) & strcmpi(header.channels(m,1:3),'REF')
+        elseif contains(upper(header.channels(m,:)),'REF') && ...
+            strcmpi(header.channels(m,1:3),'REF')
             haveref = true;
         end
         m = m - 1;
     end
-    if includeref == true & haveref == false
+    if includeref == true && haveref == false
         extrachannel(1, end + 1) = 0;
         data(end + 1, :) = zeros(1, size(data, 2));
         header.channels(end + 1, 1:3) = 'REF';

@@ -8,6 +8,7 @@ imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerSupervised';
 summaryFile = 'D:\TestData\Alpha\spindleData\resultSummarySupervised\bcitSpindlerSummarySupervised.mat';
 channelLabels = {'PO7'};
 paramsInit = struct();
+
 %% NCTU
 % splitFileDir = 'D:\TestData\Alpha\spindleData\nctu\splitData';
 % supervisedResultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSpindlerSupervised';
@@ -37,7 +38,8 @@ paramsInit = struct();
 
 %% Metrics to calculate and methods to use
 metricNames = {'f1', 'f2', 'G'};
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+methodNames = {'countMetrics', 'hitMetrics', 'intersectMetrics', ...
+               'onsetMetrics', 'timeMetrics'};
 numMetrics = length(metricNames);
 numMethods = length(methodNames);
 
@@ -47,7 +49,7 @@ dataFiles = getFiles('FILES', splitDir, '.mat');
 %% Create the output and summary directories if they don't exist
 if ~exist(supervisedResultsDir, 'dir')
     mkdir(supervisedResultsDir);
-end;
+end
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end
@@ -177,4 +179,3 @@ end
 [results, dataNames, upperBounds] = consolidateSupervisedResults(supervisedResultsDir, methodNames, metricNames);
 save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', ...
 'upperBounds', '-v7.3');
-end

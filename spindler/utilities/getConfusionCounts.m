@@ -10,8 +10,8 @@ function [tp, tn, fp, fn] = getConfusionCounts(trueEvents, labeledEvents, ...
 %                     compute true negatives
 %
 %  Written by:  Kay Robbins, UTSA, 2017
-    [~, trueList] = segmentEvents(trueEvents, totalTime, segmentTime);
-    [~, labeledList] = segmentEvents(labeledEvents, totalTime, segmentTime);
+    [~, trueList] = segmentEvents(trueEvents, 0, totalTime, segmentTime);
+    [~, labeledList] = segmentEvents(labeledEvents, 0, totalTime, segmentTime);
     tp = 0;
     tn = 0;
     fp = 0;

@@ -24,18 +24,18 @@ eventDir = [];
 eventColors = [0.8, 0, 0; 0, 0.9, 0; 0, 0, 0.9; 0.5, 0, 0.9; 0, 0, 0];
 
 %% Example 1: Setup for driving data
-dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-eventDirs = {'D:\TestData\Alpha\spindleData\bcit\events'};
-eventTypes = {'expert'};
-imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerOverlays';
-channelLabels = {'PO7'};
-lowFreq = 6;
-highFreq = 13;
-baseBand = [1, 20];
-srateTarget = 128;
-segmentTime = 30;
-scaleFactor = 15;
-figureFormats = {'png', 'fig'};
+% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+% eventDirs = {'D:\TestData\Alpha\spindleData\bcit\events'};
+% eventTypes = {'expert'};
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerOverlays';
+% channelLabels = {'PO7'};
+% lowFreq = 6;
+% highFreq = 13;
+% baseBand = [1, 20];
+% srateTarget = 128;
+% segmentTime = 30;
+% scaleFactor = 15;
+% figureFormats = {'png', 'fig'};
 
 %% Example 2: Setup for the NCTU labeled driving collection
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
@@ -67,21 +67,21 @@ figureFormats = {'png', 'fig'};
 % figureFormats = {'png', 'fig'};
 % scaleFactor = 20;
 %% Example 4: Set up for the MASS sleep collection
-% dataDir = 'D:\TestData\Alpha\spindleData\mass\data';
-% eventDirs = {'D:\TestData\Alpha\spindleData\mass\events\combinedUnion'; ...
-%     'D:\TestData\Alpha\spindleData\mass\events\spindlesE1'; ...
-%     'D:\TestData\Alpha\spindleData\mass\events\spindlesE1'};
-% eventTypes = {'combined', 'expert1', 'expert2'};
-% stage2Dir = 'D:\TestData\Alpha\spindleData\mass\events\stage2Events';
-% imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesEventOverlays';
-% channelLabels = {'CZ'};
-% lowFreq = 10;
-% highFreq = 17;
-% segmentTime = 30;
-% baseBand = [1, 20];
-% srateTarget = 128;
-% figureFormats = {'png', 'fig'};
-
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+eventDirs = {'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion'; ...
+    'D:\TestData\Alpha\spindleData\massNew\events\expert1'; ...
+    'D:\TestData\Alpha\spindleData\massNew\events\expert2'};
+eventTypes = {'combined', 'expert1', 'expert2'};
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesEventOverlays';
+channelLabels = {'CZ'};
+lowFreq = 10;
+highFreq = 17;
+segmentTime = 30;
+baseBand = [1, 20];
+srateTarget = 128;
+figureFormats = {'png', 'fig'};
+scaleFactor = 15;
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
 
@@ -103,7 +103,6 @@ for k = 1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     [data, srateOriginal, channelNumber, channelLabel] = ...
         getChannelData(dataFiles{k}, channelLabels, srateTarget);
-    params.srate = srateTarget;
     if isempty(data)
         warning('No data found for %s\n', dataFiles{k});
         continue;
@@ -128,10 +127,10 @@ for k = 1:length(dataFiles)
     stageFile = [stageDir filesep theName '.mat'];
     if ~isempty(stageDir) && exist(stageFile, 'file')
         test = load(stageFile);
-        stageEvents = test.stageEvents;
+        stageEvents = test.stage2Events;
         [~, maxInd] = max(stageEvents(:, 2) - stageEvents(:, 1));
-        startFrame = 1 + floor(stageEvents(maxInd, 2)/srateTarget);
-        endFrame = 1 + floor(stageEvents(maxInd, 3)/srateTarget);
+        startFrame = 1 + floor(stageEvents(maxInd, 1)*srateTarget);
+        endFrame = 1 + floor(stageEvents(maxInd, 2)*srateTarget);
     end
     
     %% Set up the plots

@@ -24,7 +24,7 @@ numFiles = length(EEGFiles);
 %% Create the output directory if it doesn't exist
 if ~exist(splitDir, 'dir')
     mkdir(splitDir);
-end;
+end
 
 %% Process the data
 numExperts = length(eventDirs);

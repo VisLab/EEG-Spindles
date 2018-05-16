@@ -1,50 +1,51 @@
-dreamsAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8', 'Sem'};
+sleepAlgs = {'Spindler', 'Cwt_a7', 'Cwt_a8', 'Sem'};
 drivingAlgs = {'Spindler', 'Asd', 'Cwt_a7', 'Cwt_a8'};
 drivingAlgsSupervised = {'Spindler', 'Sdar'};
 drivingDirBase = {'D:\TestData\Alpha\spindleData\bcit\results'; ...
                   'D:\TestData\Alpha\spindleData\nctu\results'};
-dreamsDirBase = {'D:\TestData\Alpha\spindleData\dreams\results'};
+sleepDirBase = {'D:\TestData\Alpha\spindleData\dreams\results';
+                'D:\TestData\Alpha\spindleData\massNew\results'};
 %algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 algColors = [0.8, 0.8, 0.2; 0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
-metricNames = {'f1', 'f2', 'g'};
+methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
+metricNames = {'f1', 'f2', 'g', 'fdr'};
 dreamsSets = 1:6;
 % [drivingStatsSupervised, drivingNamesSupervised] = ...
 %         getSummaryStatisticsSupervised(drivingDirBase, drivingAlgs, ...
 %                                      methodNames, metricNames);
 [drivingStats, drivingStatNames] = getSummaryStatistics(drivingDirBase, drivingAlgs);
-[dreamsStats, dreamsStatNames] = getSummaryStatistics(dreamsDirBase, dreamsAlgs);
-dreamsStats = dreamsStats(:, dreamsSets, :);
+[sleepStats, sleepStatNames] = getSummaryStatistics(sleepDirBase, sleepAlgs);
+sleepStats = sleepStats(:, dreamsSets, :);
 
 %% Plot the Driving statistics
 baseIndex = 1;
 otherIndices = 2;
 for k = 1:length(drivingStatNames)
-    theTitle = 'Driving';
+    theTitle = 'Alpha spindles';
     figHan = compareStatistic(drivingStats(:, :, k), baseIndex, otherIndices, ...
                 drivingStatNames{k}, drivingAlgs, algColors, theTitle);
 end
 
-%% Plot dreams statistics
+%% Plot sleep statistics
 baseIndex = 1;
 otherIndices = 2:5;
 for k = 1:length(drivingStatNames)
-    theTitle = 'Dreams';
-    figHan = compareStatistic(dreamsStats(:, :, k), baseIndex, otherIndices, ...
-                dreamsStatNames{k}, dreamsAlgs, algColors, theTitle);
+    theTitle = 'Sleep spindles';
+    figHan = compareStatistic(sleepStats(:, :, k), baseIndex, otherIndices, ...
+                sleepStatNames{k}, sleepAlgs, algColors, theTitle);
 end
 
 %% Calculate the driving stats mean and std
 drivingMean = squeeze(mean(drivingStats, 2));
 drivingStd = squeeze(std(drivingStats, 0, 2));
-dreamsMean = squeeze(mean(dreamsStats, 2));
-dreamsStd = squeeze(std(dreamsStats, 0, 2));
+sleepMean = squeeze(mean(sleepStats, 2));
+sleepStd = squeeze(std(sleepStats, 0, 2));
 
 %% Calculate the statistics with errorbars
 dreamsInd = [1, 3, 4, 5]; 
 drivingInd = 1:2;
-theMeans = [drivingMean(drivingInd, :); dreamsMean(dreamsInd, :)];
-theStds = [drivingStd(drivingInd, :); dreamsStd(dreamsInd, :)];
+theMeans = [drivingMean(drivingInd, :); sleepMean(dreamsInd, :)];
+theStds = [drivingStd(drivingInd, :); sleepStd(dreamsInd, :)];
 algColors = [0, 0, 0; 0.8, 0.8, 0.2; 0, 0, 0; ...
              0, 0.7, 0.9; 0, 0, 0.7; 0, 0.6, 0];
 markers = {'o', 'o', 's', 's', 's', 's', 's'};
@@ -73,10 +74,10 @@ dreamsInd = [1, 3, 4, 5];
 drivingInd = 1:2;
 slabels = {'Spin-A', 'ASD-A', 'Spin-S', 'CWTa7-S', 'CWTa8-S', 'SEM-S'};
 driveNums = repmat([1;2], 1, size(drivingStats, 2));
-dreamsNums = repmat([3; 4; 5; 6], 1, size(dreamsStats, 2));
+dreamsNums = repmat([3; 4; 5; 6], 1, size(sleepStats, 2));
 
 drive = drivingStats(drivingInd, :, :);
-dreams = dreamsStats(dreamsInd, :, :);
+dreams = sleepStats(dreamsInd, :, :);
 statNames = drivingStatNames;
 %legendStrings = {'Spindler(A)', 'ASD(A)', 'Spindler(S)', 'CWT-a7(S)', 'CWT-a8(S)', 'SEM-a6(S)'};
 theColors = [0, 0, 0; 0, 0, 0; 0, 0.7, 0.9; 0, 0.7, 0.9; 0, 0.7, 0.9; 0, 0.7, 0.9];

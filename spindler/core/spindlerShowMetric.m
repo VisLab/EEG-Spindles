@@ -9,7 +9,7 @@ function figHan = spindlerShowMetric(spindleParameters, methods, metricName, ...
 
 %% Set up image directory if saving
 defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());     
-params = processParameters('showSpindlerMetric', nargin, 4, params, defaults);
+params = processParameters('spindlerShowMetric', nargin, 5, params, defaults);
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end
@@ -19,7 +19,7 @@ theName = params.name;
 if ~isfield(methods, 'time') || ~isfield(methods, 'hit') || ...
    ~isfield(methods, 'intersect') || ~isfield(methods, 'count') || ...
    ~isfield(methods, 'onset') 
-    warning('showSpindlerMetric:MissingMethod', 'Performance method not available');
+    warning('spindlerShowMetric:MissingMethod', 'Performance method not available');
     return;
 end
 
@@ -115,11 +115,11 @@ for j = 1:3
     plot(atomsPerSecond, hitMetric(:, j), 'LineWidth', lineWidths(j), ...
          'Color', newColors(2, :), 'LineStyle', lineStyles{j});
     plot(atomsPerSecond, intersectMetric(:, j), 'LineWidth', lineWidths(j), ...
-        'LineStyle', '--', 'Color', newColors(3, :), 'LineStyle', lineStyles{j});
+        'LineStyle', lineStyles{j}, 'Color', newColors(3, :));
     plot(atomsPerSecond, onsetMetric(:, j), 'LineWidth', lineWidths(j), ...
-        'LineStyle', ':', 'Color', newColors(4, :), 'LineStyle', lineStyles{j});
+        'LineStyle', lineStyles{j}, 'Color', newColors(4, :));
     plot(atomsPerSecond, timeMetric(:, j), 'LineWidth', lineWidths(j), ...
-         'LineStyle', '-.', 'Color', newColors(5, :), 'LineStyle', lineStyles{j});
+         'LineStyle', lineStyles{j}, 'Color', newColors(5, :));
 end
 plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), ...
     'LineWidth', 2, 'Color', [0.7, 0.7, 0.7]);

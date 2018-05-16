@@ -2,8 +2,8 @@
 
 
 %% Set up the directory spinky demo data
-dataDir = 'D:\TestData\Alpha\spindleData\spinkyDemo\data';
-eventDir = 'D:\TestData\Alpha\spindleData\spinkyDemo\events';
+dataDir = 'D:\Research\AlphaCharacterization\alphaWorking\EEG-Spindles\spindler\external\spinky';
+eventDir = 'D:\Research\AlphaCharacterization\alphaWorking\EEG-Spindles\spindler\external\spinky';
 epochLength = 30;
 srate = 1000;
 isEpoched = true;
@@ -35,8 +35,8 @@ paramsInit.methodNames = {'countMetrics', 'hitMetrics', 'intersectMetrics', 'ons
 paramsInit.spindleLengthMin = 0.2;
 %% Run the algorithm
 params = paramsInit;
-[labeledEvents, metrics, additionalInfo, params] =  ...
-                               spinky(data, expertEvents,  params);
+%[labeledEvents, metrics, additionalInfo, params] =  ...
+labeledEvents =   spinky(data, expertEvents,  params);
 
 %     theFile = [resultsDir filesep theName '_spinky.mat'];
 %     save(theFile, 'labeledEvents', 'expertEvents', 'metrics', ...

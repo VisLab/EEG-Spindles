@@ -1,8 +1,24 @@
+function oscil = getSpinkySignalDecomposition(data, fs)
+%% Returns the oscillatory representation of epochs for Spinky
+%  
+%  Parameters:
+%     data  epochs x epochSize array of data
+%     fs    sampling frequency
+%     oscil  epochs x epochSize signal decomposition.
+    numEpochs = size(data, 1);
+    oscil = zeros(size(data));
+    for k = 1:numEpochs
+        oscil(k, :) = signalDecomposition(data(k, :), fs);
+    end
+end
+
+
 function [oscil, transit] = signalDecomposition(x, fs)
 
 % Set example parameters
     N=length(x);
-    wn=[0.2 45];
+    upperFreq = min(45, fs/2 - 1);
+    wn=[0.2 upperFreq];
     x=filtrage_fir(x,wn,105,fs);
     % High Q-factor wavelet transform parameters
     Q1 =5.5;
@@ -24,4 +40,3 @@ function [oscil, transit] = signalDecomposition(x, fs)
     lam2 = (1-theta) * now2;
     [oscil, transit] = dualQ(x,Q1,r1,J1,Q2,r2,J2,lam1,lam2,mu,Nit);
 end
-

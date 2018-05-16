@@ -1,4 +1,4 @@
-function [spindles, params] = sdarExtractSpindles(EEG, channelNumber, params)
+function [spindles, params] = sdarExtractSpindles(data, params)
 %% Calculate spindle events from different Gabor reconstructions 
 %  
 %  Parameters:
@@ -18,55 +18,23 @@ function [spindles, params] = sdarExtractSpindles(EEG, channelNumber, params)
 
 %% Process the input parameters and set up the calculation
 defaults = concatenateStructs(getGeneralDefaults(), sdarGetDefaults());
-params = processParameters('extractSpindlesSdar', nargin, 2, params, defaults);
+params = processParameters('sdarExtractSpindles', nargin, 2, params, defaults);
 
-params.channelNumber = channelNumber;
-params.channelLabels = EEG.chanlocs(channelNumber).labels;
-if isempty(channelNumber)
-    error('extractSpindlesSdar:NoChannels', 'Must have non-empty');
-end  
-
-minLength = params.minSpindleLength;
-minSeparation = params.minSpindleSeparation;
-
-%% Handle the baseThresholds (making sure thresholds 0 and 1 are included)
-% baseThresholds = params.sdarBaseThresholds;
-% baseThresholds = sort(baseThresholds);
-% if baseThresholds(1) ~= 0
-%     baseThresholds = [0, baseThresholds];
-% end
-% if baseThresholds(end) ~= 1
-%     baseThresholds = [baseThresholds, 1];
-% end
-% params.sdarBaseThresholds = baseThresholds;
-
-%% Extract the channels and filter the EEG signal 
-if channelNumber > size(EEG.data, 1)
-    error('sdarExtractSpindles:BadChannel', 'The EEG does not have channel needed');
-end
-params.srateOriginal = EEG.srate;
-EEG.data = EEG.data(channelNumber, :);
-EEG.chanlocs = EEG.chanlocs(channelNumber);
-EEG.nbchan = 1;
-EEG = resampleToTarget(EEG, params.srateTarget);
-srate = EEG.srate;
-numFrames = size(EEG.data, 2);
-totalTime = (numFrames - 1)/srate;
-params.srate = srate;
-params.frames = numFrames;
-
-%% Bandpass filter the EEG
+%% Bandpass the data to start
 lowFreq = max(1, params.sdarFrequencies(1));
-highFreq = min(ceil(EEG.srate/2.1), max(params.sdarFrequencies(2)));
-EEGFilt = pop_eegfiltnew(EEG, lowFreq, highFreq);
+highFreq = min(ceil(params.srate/2.1), max(params.sdarFrequencies(2)));
+data = getFilteredData(data, params.srate, lowFreq, highFreq);
+minLength = params.spindleLengthMin;
+minSeparation = params.spindleSeparationMin;
 
 %% Calculate the discounted AR model
 order = params.sdarModelOrder;
 discountRate = params.sdarDiscountRate;
 initialPoints = params.sdarInitialPoints;
-[mu, sigma, loss, ~] = SDARv3(EEGFilt.data, order, discountRate, initialPoints);
+[mu, sigma, loss, ~] = SDARv3(data, order, discountRate, initialPoints);
 params.mu = mu;
 params.sigma = sigma;
+params.frames = length(data);
 
 %% Smooth the model
 smoothed = moving_average(loss, params.sdarSmoothWindow);
@@ -77,20 +45,17 @@ smoothed = moving_average(loss, params.sdarSmoothWindow);
 baseThresholds = min(smoothed) + params.sdarThresholds*(max(smoothed) - min(smoothed));
 %% Combine adjacent spindles and eliminate items that are too short.
 numThresholds = size(baseThresholds(:), 1);
-spindles(numThresholds) = ...
-    struct('baseThresholds', NaN', 'numberSpindles', NaN, 'spindleTime', NaN, ...
-          'spindleTimeRatio', NaN, 'events', NaN, 'meanEventTime', NaN);
+spindles(numThresholds) = struct('baseThresholds', NaN', ...
+           'numberSpindles', NaN, 'spindleTime', NaN, 'events', NaN);
                
 for k = 1:numThresholds
    spindles(k) = spindles(end);
    spindles(k).baseThresholds = baseThresholds(k);
-   eventCells =  applyThreshold(smoothed, EEG.srate, baseThresholds(k), 1/3);
+   eventCells =  applyThreshold(smoothed, params.srate, baseThresholds(k), 1/3);
    startEvents = cellfun(@double, eventCells(:, 2));
    endEvents = cellfun(@double, eventCells(:, 3));
    events = [startEvents(:), endEvents(:)];
    events = combineEvents(events, minLength, minSeparation);
    spindles(k).events = events;
-   [spindles(k).numberSpindles, spindles(k).spindleTime, ...
-        spindles(k).meanEventTime] = getSpindleCounts(events);
-    spindles(k).spindleTimeRatio = spindles(k).spindleTime/totalTime;
+   [spindles(k).numberSpindles, spindles(k).spindleTime] = getSpindleCounts(events);
 end

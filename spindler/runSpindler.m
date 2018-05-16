@@ -21,10 +21,11 @@
 
 %% Example 1: Setup for driving data
 % dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindlerNew';
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerNew';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_SummaryNew.mat';
+% stageDir = [];
+% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events2Col';
+% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Spindler_Summary.mat';
 % channelLabels = {'PO7'};
 % paramsInit = struct();
 % paramsInit.srateTarget = 128;
@@ -65,19 +66,19 @@
 % % % paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
 
 %% Example 4: Set up for the MASS sleep collection
-dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spindler_Summary.mat';
-channelLabels = {'CZ'};
-paramsInit = struct();
-paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
-%paramsInit.spindlerGaborFrequencies = 10.5:16.5;
-paramsInit.spindlerOnsetTolerance = 0.3;
-paramsInit.spindlerTimingTolerance = 0.1;
-paramsInit.srateTarget = 128;
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spindler_Summary.mat';
+% channelLabels = {'CZ'};
+% paramsInit = struct();
+% paramsInit.spindlerGaborFrequencies = 10.5:0.5:16.5;
+% %paramsInit.spindlerGaborFrequencies = 10.5:16.5;
+% paramsInit.spindlerOnsetTolerance = 0.3;
+% paramsInit.spindlerTimingTolerance = 0.1;
+% paramsInit.srateTarget = 128;
 
 %% Example 5: Set up for the Dreams sleep collection
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\dataRestricted';
@@ -126,30 +127,33 @@ paramsInit.srateTarget = 128;
 % paramsInit.spindlerGaborFrequencies = 6:0.5:13;
 
 %% Example 5: Set up for the Dreams sleep collection
+% stageDir = [];
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindlerMoreRes';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindlerMoreRes';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_SummaryMoreRes.mat';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
 % channelLabels = {'C3-A1', 'CZ-A1'};
 % paramsInit = struct();
-% paramsInit.srateTarget = 200;
+% paramsInit.srateTarget = 128;
 % paramsInit.spindlerGaborFrequencies = 10:0.5:16;
 % paramsInit.spindlerOnsetTolerance = 0.3;
 % paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Example 6: Mas
-% dataDir = 'D:\TestData\Alpha\spindleData\mass\data';
-% eventDir = [];
-% resultsDir = 'D:\TestData\Alpha\spindleData\mass\resultsSpindlerMoreRes';
-% imageDir = 'D:\TestData\Alpha\spindleData\mass\imagesSpindlerMoreRes';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\mass_Spindler_SummaryMoreRes.mat';
-% channelLabels = {'C3'};
-% paramsInit = struct();
-% paramsInit.srateTarget = 256;
-% paramsInit.spindlerGaborFrequencies = 10:0.5:16;
-% paramsInit.spindlerOnsetTolerance = 0.3;
-% paramsInit.spindlerTimingTolerance = 0.1;
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpindler';
+imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpindler';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spindler_Summary.mat';
+channelLabels = {'C3'};
+paramsInit = struct();
+paramsInit.srateTarget = 256;
+paramsInit.spindlerGaborFrequencies = 10:0.5:16;
+paramsInit.spindlerOnsetTolerance = 0.3;
+paramsInit.spindlerTimingTolerance = 0.1;
+
 %% Metrics to calculate and methods to use
 paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
 paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
@@ -173,14 +177,14 @@ if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
     mkdir(summaryDir);
 end
 paramsInit.figureClose = true;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+paramsInit.figureFormats = {'png', 'fig'};
 
 %% Process the data
 for k = 1:length(dataFiles)
     %% Read in the EEG and find the correct channel number
     params = paramsInit;
     [~, theName, ~] = fileparts(dataFiles{k});
-   params.name = theName;
+    params.name = theName;
     [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
            getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
     params.srate = params.srateTarget;
@@ -216,7 +220,7 @@ for k = 1:length(dataFiles)
                       spindler(data, expertEvents, imageDir, params);
      additionalInfo.startFrame = startFrame;
      additionalInfo.endFrame = endFrame;
-     additioanlInfo.srate = params.srate;
+     additionalInfo.srate = params.srate;
      totalMin = (startFrame - endFrame)/60/params.srate;
      fprintf('---%d:%s [%d, %d] %g min %d labeled events %d expert events\n', ...
          k, theName, startFrame, endFrame, totalMin, size(events, 1), ...

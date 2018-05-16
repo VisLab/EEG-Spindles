@@ -1,4 +1,4 @@
-function [x, s, cost] = mcsleepSeparateSignal(y, params)
+function [x, s, cost, lambda2] = mcsleepSeparateSignal(y, lambda2, params)
 %% Separate transients and oscillations in multichannel EEG
 %
 % This function separates transients and oscillations in multichannel EEG
@@ -45,6 +45,10 @@ function [x, s, cost] = mcsleepSeparateSignal(y, params)
     H = @(x,s,k) Op_A(x,s,k);
     HT = @(x,s,k) Op_AT(x,s,k);
 
+%% Check the parameters
+   if isempty(lambda2)
+       lambda2 = params.mcsleepLambda2;
+   end
 %% Initialize the outputs
     cost = zeros(params.mcsleepNit,1);
     [m, n] = size(y);
@@ -61,7 +65,7 @@ function [x, s, cost] = mcsleepSeparateSignal(y, params)
         %% Fused Lasso Step
         for j = 1:m
             x(j,:) = soft(tvd(u(j,:) - d1(j,:), n, ...
-                     params.mcsleepLambda2/params.mcsleepMu), ...
+                     lambda2/params.mcsleepMu), ...
                      params.mcsleepLambda1/params.mcsleepMu);
         end
 
@@ -85,7 +89,7 @@ function [x, s, cost] = mcsleepSeparateSignal(y, params)
             cost(i) = 0.5 * norm(y - (x + ...
                  HT(c, params.mcsleepK, params.mcsleepO)), 'fro')^2 + ...
                  params.mcsleepLambda1 * norm(x, 1) + ...
-                 params.mcsleepLambda2 * norm(diff(x,2), 1) + ...
+                 lambda2 * norm(diff(x,2), 1) + ...
                  params.mcsleepLambda3 * sum_of_nuc_norm(c);
         end
     end

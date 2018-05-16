@@ -2,22 +2,25 @@
 % of algorithm parameters. The analyzeSpindles selects best parameters.
 
 %% Setup the directories for input and output for driving data
-% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-% resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSdar';
-% imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Sdar_Summary.mat';
-% channelLabels = {'PO7'};
-% paramsInit = struct();
+dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
+stageDir = [];
+eventDir = 'D:\TestData\Alpha\spindleData\bcit\events2Col';
+resultsDir = 'D:\TestData\Alpha\spindleData\bcit\resultsSdar';
+imageDir = 'D:\TestData\Alpha\spindleData\BCIT\imagesSdar';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\bcit_Sdar_Summary.mat';
+channelLabels = {'PO7'};
+paramsInit = struct();
+paramsInit.srateTarget = 128;
+%paramsInit.sdarFrequencies = 6:0.5:13;
 
 %% Set up the directory
-dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar';
-imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
-channelLabels = {'P3'};
-paramsInit = struct();
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\nctu\resultsSdar';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSdar';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\nctu_Sdar_Summary.mat';
+% channelLabels = {'P3'};
+% paramsInit = struct();
 
 %% 
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
@@ -58,34 +61,16 @@ paramsInit = struct();
 % paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Metrics to calculate and methods to use
-metricNames = {'f1', 'f2', 'G'};
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
+paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
 
-%% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', dataDir, '.set');
-if isempty(eventDir)
-    eventFiles = {};
-else
-    eFiles = getFiles('FILES', eventDir, '.mat');
-    [eventFiles, leftOvers] = matchFileNames(dataFiles, eFiles);
-    if ~isempty(leftOvers)
-        warning('%d event files were not matched with data files', length(leftOvers));
-        for k = 1:length(leftOvers)
-            fprintf('---%s\n', leftOvers{k});
-        end
-    end
-    for k = 1:length(eventFiles)
-        if isempty(eventFiles{k})
-            warning('Data file %s does not have expert events', dataFiles{k});
-        end
-    end
-end
-
-%% Create the output, image, and summary directories if they don't exist
+%% Create the output directory if it doesn't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
+    fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
-end;
+end
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);
 end
 [summaryDir, ~, ~] = fileparts(summaryFile);
@@ -93,50 +78,67 @@ if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
     fprintf('Creating summary directory %s \n', summaryDir);
     mkdir(summaryDir);
 end
-paramsInit.figureClose = false;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
+paramsInit.figureClose = true;
+paramsInit.figureFormats = {'png', 'fig'};
+
+%% Get the data and event file names and check that we have the same number
+dataFiles = getFiles('FILES', dataDir, '.set');
 
 %% Process the data
 for k = 1%:length(dataFiles)
-    %% Load data file
-    EEG = pop_loadset(dataFiles{k});
+     %% Read in the EEG and find the correct channel number
+    params = paramsInit;
     [~, theName, ~] = fileparts(dataFiles{k});
- 
-    %% Calculate the spindle representations for a range of parameters
-    [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
-    if isempty(channelNumber)
-        warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
+    params.name = theName;
+    [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
+           getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
+    params.srate = params.srateTarget;
+    if isempty(data)
+        warning('No data found for %s\n', dataFiles{k});
         continue;
     end
-    [spindles, params] = sdarExtractSpindles(EEG, channelNumber, paramsInit);
-    params.name = theName;
-    sdarShowCurves(spindles, imageDir, params);
-    metrics = [];
-    events = [];
-    %% Deal with ground truth if available
-    if isempty(eventFiles) || isempty(eventFiles{k}) 
-        expertEvents = [];
-        allMetrics = [];
-        metrics = [];
-        events = [];
-    else
-        expertEvents = readEvents(eventFiles{k});
-        expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        [allMetrics, params] = calculatePerformance(spindles, expertEvents, params);
-        for n = 1:length(metricNames)
-            sdarShowMetric(spindles, allMetrics, metricNames{n}, imageDir, params);
-        end
+    startFrame = 1;
+    endFrame = length(data);
+        %% Read events and stages if available 
+    expertEvents = [];
+    if ~isempty(eventDir)
+        expertEvents = readEvents([eventDir filesep theName '.mat']);
     end
-   
-    additionalInfo.spindles = spindles;
-    additionalInfo.allMetrics = allMetrics;
-    %% Save the results
-    [~, fileName, ~] = fileparts(dataFiles{k});
-    save([resultsDir filesep fileName, '_sdarResults.mat'], 'events', ...
-        'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
+    stageEvents = [];
+    %% Use the longest stetch in the stage events
+    if ~isempty(stageDir)
+        stageStuff = load([stageDir filesep theName '.mat']);
+        stageEvents = stageStuff.stage2Events;
+        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
+        [maxLength, maxInd] = max(stageLengths);
+        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
+                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
+        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
+        startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
+        endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
+        data = data(startFrame:endFrame);
+    end
+    
+        %% Call Spindler to find the spindles and metrics
+    [events, metrics, additionalInfo, params] =  ...
+                      sdar(data, expertEvents, imageDir, params);
+     additionalInfo.startFrame = startFrame;
+     additionalInfo.endFrame = endFrame;
+     additionalInfo.srate = params.srate;
+     totalMin = (startFrame - endFrame)/60/params.srate;
+     fprintf('---%d:%s [%d, %d] %g min %d labeled events %d expert events\n', ...
+         k, theName, startFrame, endFrame, totalMin, size(events, 1), ...
+         size(expertEvents, 1));
+     save([resultsDir filesep theName, '_sdarResults.mat'], 'events', ...
+         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
 end
 
 %% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames);
-save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', ...
-                  'upperBounds', '-v7.3');
+[results, dataNames, upperBounds] = ...
+    consolidateResults(resultsDir, paramsInit.methodNames, paramsInit.metricNames);
+
+%% Save the results
+methodNames = params.methodNames;
+metricNames = params.metricNames;
+save(summaryFile, 'results', 'dataNames', 'methodNames', ...
+    'metricNames', 'upperBounds', '-v7.3');

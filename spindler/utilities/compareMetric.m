@@ -1,9 +1,16 @@
 function figHan = compareMetric(results, metricName, algorithmNames, ...
               theColors, theTitle)
-
+%% Parameters plot the comparison of first algorithm against the rest.
+%
+%  Parameters:
+%     results = files x methods x algorithms results for a metric
+%     metricName  string specifying metric
+%     algorithmNames  cell array with algorithm names for legend
+%     colors for the different algorithsm
+%     theTitle   string for title
 theTitle = [theTitle ': ' metricName];
-methodNames = {'H', 'I', 'O', 'T'};
-methodMarkers = {'o', 's', '^', 'v'};
+methodNames = {'C', 'H', 'I', 'O', 'T'};
+methodMarkers = {'+', 'o', 's', '^', 'v'};
 figHan = figure('Name', theTitle);
 hold on
 legendStrings = cell(1, length(methodNames)*(length(algorithmNames) - 1));

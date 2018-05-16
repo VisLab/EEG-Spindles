@@ -1,47 +1,30 @@
-%% Wrapper to call the CWT algorithms proposed by Tsanas et al.
-
-%% Set up the parameters for BCIT
-% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-% channelLabels = {'PO7'};
-% defaults = concatenateStructs(getGeneralDefaults(), cwtGetDefaults());
-% paramsInit = processParameters('runCwt', 0, 0, struct(), defaults);     
-% paramsInit.srateTarget = 100;
-% paramsInit.cwtAlgorithm = 'a8';
-% paramsInit.cwtSpindleFrequencies = 6:14;
-% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-%     'bcit_Cwt_' paramsInit.cwtAlgorithm '_Summary.mat'];
-% resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsCwt_' ...
-%                paramsInit.cwtAlgorithm];
-
-% %% Set up for nctu
-% dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% channelLabels = {'P3'};
-% defaults = concatenateStructs(getGeneralDefaults(), cwtGetDefaults());
-% paramsInit = processParameters('runCwt', 0, 0, struct(), defaults);     
-% paramsInit.srateTarget = 100;
-% paramsInit.cwtAlgorithm = 'a8';
-% paramsInit.cwtSpindleFrequencies = 6:14;
-% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-%     'nctu_Cwt_' paramsInit.cwtAlgorithm '_Summary.mat'];
-% resultsDir = ['D:\TestData\Alpha\spindleData\nctu\resultsCwt_' ...
-%                paramsInit.cwtAlgorithm];
+%% Wrapper to call spinky algorithm proposed by Lajnef et al.
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpinky';
+imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpinky';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spinky_Summary.mat';
+channelLabels = {'CZ'};
+paramsInit = struct();
+paramsInit.srateTarget = 0;
+paramsInit.params.figureFormats = {'.png', '.fig'};
 
 %% Set up the directory for dreams
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
-channelLabels = {'C3-A1', 'CZ-A1'};
-defaults = concatenateStructs(getGeneralDefaults(), spinkyGetDefaults());
-paramsInit = processParameters('runSpinky', 0, 0, struct(), defaults);
-paramsInit.srateTarget = 0;
-summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-               'dreams_Spinky_Summary.mat'];
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpinky';
-           
+% stageDir = [];
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpinky';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpinky';
+% paramsInit = struct();
+% paramsInit.srateTarget = 0;
+% paramsInit.params.figureFormats = {'.png', '.fig'};
+
 %% Metrics to calculate and methods to use
-paramsInit.metricNames = {'f1', 'f2', 'G'};
-paramsInit.methodNames = {'countMetrics', 'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+%% Metrics to calculate and methods to use
+paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
+paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -49,49 +32,48 @@ dataFiles = getFiles('FILES', dataDir, '.set');
 %% Create the output and summary directories if they don't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
-end;
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
 end
 
 %% Run the algorithm
-for k = 4:length(dataFiles)
+for k = 1:length(dataFiles)
     params = paramsInit;
-    EEG = pop_loadset(dataFiles{k});
     [~, theName, ~] = fileparts(dataFiles{k});
-     params.name = theName;
-   
-    %% Now load the events and epoch
-    if isempty(eventDir)
-       expertEvents = [];
-    else
-       expertEvents = readEvents([eventDir filesep theName '.mat']);
-   
-    end
-    params.srateOriginal = EEG.srate;
-    params.srate = EEG.srate;
-    [params.channelNumber, params.channelLabel] = getChannelNumber(EEG, channelLabels);
-    if isempty(params.channelNumber)
-        warning('Dataset %s does not have needed channels', params.name);
-        return;
+    params.name = theName;
+    [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
+           getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
+    params.srate = params.srateOriginal;
+    if isempty(data)
+        warning('No data found for %s\n', dataFiles{k});
+        continue;
     end
     
-    %% Load the file and extrad the data for the channel
-    data = EEG.data(params.channelNumber, :);
-    [labeledEvents, metrics, additionalInfo, params] =  ...
-                        spinky(data, expertEvents,  params);
-
+           %% Read events and stages if available 
+    expertEvents = [];
+    if ~isempty(eventDir)
+        expertEvents = readEvents([eventDir filesep theName '.mat']);
+    end
+    
+    %% Use the longest stetch in the stage events
+    stageEvents = [];
+    if ~isempty(stageDir)
+        stageStuff = load([stageDir filesep theName '.mat']);
+        stageEvents = stageStuff.stage2Events;
+        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
+        [maxLength, maxInd] = max(stageLengths);
+        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
+                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
+        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
+        startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
+        endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
+        data = data(startFrame:endFrame);   
+    end
+    
+    %% Now call spinky
+    params.frames = length(data);
+    [spindles, allMetrics, additionalInfo, params] =  ...
+                              spinky(data, expertEvents, imageDir, params); 
+    
     theFile = [resultsDir filesep theName '_spinky.mat'];
-    save(theFile, 'labeledEvents', 'expertEvents', 'metrics', ...
+    save(theFile, 'spindles', 'expertEvents', 'allMetrics', ...
         'params', 'additionalInfo', '-v7.3');
  end
-
-%% Now create a summary of the performance results
-if ~isempty(summaryFile)
-    methodNames = paramsInit.methodNames;
-    metricNames = paramsInit.metricNames;
-   [results, dataNames] = consolidateResults(resultsDir, methodNames, metricNames);
-    save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', '-v7.3');
-end

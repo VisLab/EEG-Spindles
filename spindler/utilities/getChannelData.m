@@ -6,7 +6,7 @@ function [data, srateOriginal, channelNumber, channelLabel] = ...
 %     fileName         full path of an EEG structure
 %     channelLabels    cell array of potential channel label matches
 %                        will take the first one
-%     srateTarget      target sampling rate for the data
+%     srateTarget      target sampling rate for data or 0 if no resampling
 %     data             (output) time series with the data
 %     srateOriginal    (output) sampling rate for the original data
 %     channelNumber    (output) channel number of the data
@@ -28,6 +28,8 @@ function [data, srateOriginal, channelNumber, channelLabel] = ...
     EEG.data = EEG.data(channelNumber, :);
     EEG.chanlocs = EEG.chanlocs(channelNumber);
     EEG.nbchan = 1;
-    EEG =  pop_resample(EEG, srateTarget);
+    if ~isempty(srateTarget) && srateTarget > 0
+        EEG =  pop_resample(EEG, srateTarget);
+    end
     data = EEG.data;
 end

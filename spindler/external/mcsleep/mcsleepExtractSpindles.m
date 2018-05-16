@@ -1,10 +1,4 @@
-function [spindles] = mcsleepExtractSpindles(y, params)
-% function [spindles] = parallelSpindleDetection(params)
-%
-% This function runs the mcsleep spindle detection in parallel
-% Ensure that the EDF file given by params.filename is in the current
-% directory (or added to path)
-% 
+function [spindles, params] = mcsleepExtractSpindles(y, params)
 % Please cite as: 
 % Multichannel Sleep Spindle Detection using Sparse Low-Rank Optimization 
 % A. Parekh, I. W. Selesnick, R. S. Osorio, A. W. Varga, D. M. Rapoport and I. Ayappa 
@@ -16,181 +10,46 @@ function [spindles] = mcsleepExtractSpindles(y, params)
 %
 % Copyright (c) 2017. Ankit Parekh 
 
-% fprintf('Multichannel spindle detector \n');
-% % Load the edf and necessary information
-% [data, header] = lab_read_edf([params.filename, '.edf']);
-% fprintf([params.filename, '.edf loaded \n']);
-% fs = header.samplingrate;
-% 
-% % Load the desired channels
-% N = header.numtimeframes;
-% numChannels = length(params.channels);
-% y = zeros(numChannels, N);
-% for i = 1:numChannels
-%     y(i,:) = data(params.channels(i),:);
-% end
-% 
-% % Clear expensive variables that are not required
-% clear data;
-
-% % Estimate the raw oscillations
-% fprintf('Starting mcsleep transient separation algorithm ...\n')
+%% Calculate the spindle masks
+defaults = concatenateStructs(getGeneralDefaults(), mcsleepGetDefaults());
+params = processParameters('mcsleepExtractSpindles', nargin, 2, params, defaults);
+thresholds = params.mcsleepThresholds;
+lambda2s = params.mcsleepLambda2s;
+mcsleepSpindles = mcsleepCalculateSpindles(y, thresholds, lambda2s, params);
 
 %% Set up the parameters
-[numChans, numFrames] = size(y);
-fs = params.srate;
-f1 = params.mcsleepSpindleFrequencyRange(1);
-f2 = params.mcsleepSpindleFrequencyRange(2);
-
-%%Convert data for parfor
-numEpochs = floor(numFrames / (fs *30));
-X = cell(numEpochs,1);
-C = cell(numEpochs,1);
-Y = cell(numEpochs,1);
-
-%% Segment input signal into cells of 30 seconds in length
-for i = 1:numEpochs
-    Y{i} = y(:, (i-1)*30*fs + 1: i*30*fs);
+numParms = length(mcsleepSpindles);
+spindles(numParms) = struct('lambda2', 0, 'threshold', 0, ...
+    'numberSpindles', 0, 'spindleTime', 0, 'events', NaN);
+posMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
+for k = 1:numParms
+    keyString = [num2str(mcsleepSpindles(k).lambda2) ',' ...
+                 num2str(mcsleepSpindles(k).threshold)];
+    posMap(keyString) = k;
 end
 
-parfor i = 1:numEpochs
-    [X{i}, C{i}, ~] = mcsleepSeparateSignal(Y{i}, params);
-end
-
-%% Reassemble the signal
-x = zeros(numChans, numFrames);
-s = x;
-y = s;
-for i = 1:numEpochs
-    x(:, (i-1)*30*fs + 1:i*30*fs) = X{i};
-    s(:, (i-1)*30*fs + 1:i*30*fs) = C{i};
-    y(:, (i-1)*30*fs + 1:i*30*fs) = Y{i};
-end
-
-%% Apply bandpass filter to oscillatory component
-[B, A] = butter(params.mcsleepFilterOrder, [f1 f2]/(fs/2));
-bandpassFiltered = filtfilt(B, A, s');
-
-%% Apply Teager Operator and get the envelope
-fprintf('Evaluating envelope of bandpass filtered signal ... \n');
-envelopeSpindle = T(mean(bandpassFiltered, 2));
-binary = envelopeSpindle > params.mcsleepThreshold;
-
-% Discard all spindles less than 0.5 seconds and larger than 3 seconds
-fprintf('Discarding all spindles less than 0.5 seconds and larger than 3 seconds ... \n')
-E = binary(2:end)-binary(1:end-1);
-sise = size(binary);
-
-begins = find(E==1)+1;
-
-if binary(1) == 1
-    if sise(1) > 1
-        begins = [1; begins];
-    elseif sise(2) > 1
-        begins = [1 begins];
-    else
-        error('The input signal is not one dimensional')
-    end
-elseif numel(begins) == 0 && binary(1) == 0
-    begins = NaN;
-end
-
-ends = find(E==-1);
-if binary(end) == 1
-    if sise(1) > 1
-        ends = [ends; length(binary)];
-    elseif sise(2) > 1
-        ends = [ends length(binary)];
-    else
-        error('The input signal is not one dimensional')
-    end
-elseif numel(ends) == 0 && binary(end) == 0
-    ends = NaN;
-end
-
-[binary,~,~] = minimum_duration(binary,begins,ends,0.5,fs);
-[binary,~,~] = maximum_duration(binary,begins,ends,3,fs);
-
-spindles = [0 binary];
-fprintf('Spindle calculation done ... \n');
-
-%% Teager operator
-    function [ y ] = T( x )
-        %applies the teager operator, and returns the output
-        %y = T(x)
-        
-        for i = 2:length(x)-1
-            y(i) = x(i)^2 - x(i-1)*x(i+1);
+%% Now create the spindles
+pos = 0;
+for k = 1:length(thresholds)
+    for m = 1:length(lambda2s)
+        pos = pos + 1;
+        spindles(pos) = spindles(end);
+        keyString = [num2str(lambda2s(m)) ',' num2str(thresholds(k))];
+        if ~isKey(posMap, keyString)
+            warning('threshold-lambda combination not available');
+            continue;
         end
-        
-    end
-
-%% Functions from Warby et al. 2014 for discarding spindles
-
-    function [DD,begins,ends] = minimum_duration(DD,begins,ends,min_dur,fs)
-        % MINIMUM_DURATION - checks the sample duration of the spindles.
-        % Input is a vector containing ones in the interval where the spindle is
-        % and indexs describing the start and end of the spindle. The last two
-        % inputs are the minimum duration given in seconds and the sampling
-        % frequency given in Hz.
-        % Output is a vector containing ones in the interval where the spindle with
-        % duration longer than or equal to the minimum duration is and indexs
-        % describing the start and end of the spindle.
-        
-        duration_samples = ends-begins+1;
-        for k = 1:length(begins)
-            if duration_samples(k) < min_dur*fs
-                DD(begins(k):ends(k)) = 0;
-                begins(k) = 0;
-                ends(k) = 0;
-            end
+        thisValue = posMap(keyString);   
+        spindles(pos).threshold = mcsleepSpindles(thisValue).threshold;
+        spindles(pos).lambda2 = mcsleepSpindles(thisValue).lambda2;
+        events = combineEvents(mcsleepSpindles(thisValue).spindles, ...
+            params.spindleLengthMin, params.spindleSeparationMin);
+        spindles(pos).events = events;
+        if ~isempty(events)
+            spindles(pos).numberSpindles = size(events, 1);
+            spindles(pos).spindleTime = sum(events(:, 2) - events(:, 1));
         end
-        begins = begins(begins~=0);
-        ends = ends(ends~=0);
     end
-
-    function [DD,begins,ends] = maximum_duration(DD,begins,ends,max_dur,fs)
-        % MAXIMUM_DURATION - checks the sample duration of the spindles.
-        % Input is a vector containing ones in the interval where the spindle is
-        % and indexs describing the start and end of the spindle. The last two
-        % inputs are the maximum duration given in seconds and the sampling
-        % frequency given in Hz.
-        % Output is a vector containing ones in the interval where the spindle with
-        % duration shorter than or equal to the maximum duration is and indexs
-        % describing the start and end of the spindle.
-        
-        duration_samples = ends-begins+1;
-        for k = 1:length(begins)
-            if duration_samples(k) > max_dur*fs
-                DD(begins(k):ends(k)) = 0;
-                begins(k) = 0;
-                ends(k) = 0;
-            end
-        end
-        begins = begins(begins~=0);
-        ends = ends(ends~=0);
-    end
-
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+%% This is a test
+fprintf('Finished\n');

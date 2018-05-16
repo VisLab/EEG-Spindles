@@ -19,29 +19,65 @@
 % in text files with two columns containing the start and end times in seconds.
 %
 % 
-stageDir = [];
-eventDir = [];
+
 eventColors = [0.8, 0, 0; 0, 0.9, 0; 0, 0, 0.9; 0.5, 0, 0.9; 0, 0, 0];
 
 %% Example 1: Setup for driving data
-% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDirs = {'D:\TestData\Alpha\spindleData\bcit\events'};
-% eventTypes = {'expert'};
-% imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerOverlays';
-% channelLabels = {'PO7'};
-% lowFreq = 6;
-% highFreq = 13;
-% baseBand = [1, 20];
-% srateTarget = 128;
-% segmentTime = 30;
-% scaleFactor = 15;
-% figureFormats = {'png', 'fig'};
-
+dataDir = 'D:\TestData\Alpha\spindleData\bcit\dataMara';
+eventDirs = {'D:\TestData\Alpha\spindleData\bcit\events'; ...
+             'D:\TestData\Alpha\spindleData\bcit\eventsScottRerate'; ...
+             'D:\TestData\Alpha\spindleData\bcit\eventsAaronRerate'};
+%eventDirs = {'D:\TestData\Alpha\spindleData\bcit\events2Col'};
+eventTypes = {'original', 'scott', 'aaron'};
+stageDir = [];
+imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerOverlaysMaraNew';
+%imageDir = 'D:\TestData\Alpha\spindleData\bcit\imagesSpindlerOverlays';
+channelLabels = {'PO7'};
+lowFreq = 6;
+highFreq = 13;
+baseBand = [1, 20];
+srateTarget = 128;
+segmentTime = 30;
+scaleFactor = 15;
+figureFormats = {'png', 'fig'};
+%dataType = 'Mara cleaned ';
+dataType = '';
 %% Example 2: Setup for the NCTU labeled driving collection
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\dataMara';
+% %eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events2Col'};
+% eventDirs = {};
+% %imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlayMaraCleaned';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlayMaraCleanedNoEvents';
+% %eventTypes = {'expert'};
+% eventTypes = {};
+% %dataType = 'Mara cleaned';
+% dataType = 'Mara cleaned no events';
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\dataMara';
+% stageDir = [];
+% %eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events2Col'};
+% eventDirs = {};
+% %imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlayMaraCleaned';
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlayMaraCleanedNoEvents';
+% %eventTypes = {'expert'};
+% eventTypes = {};
+% %dataType = 'Mara cleaned';
+% dataType = 'Mara cleaned no events';
+
+% dataDir = 'D:\TestData\Alpha\spindleData\nctu\dataMara';
+% eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events2Col'; ...
+%              'D:\TestData\Alpha\spindleData\nctu\eventsJohnReratedMAT'};
+% eventTypes = {'John original', 'John rerate'};
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlayMaraCleanedJohnRerated';
+% dataType = 'Mara cleaned';
+
 % dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-% eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events'};
-% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlay';
-% eventTypes = {'expert'};
+% eventDirs = {'D:\TestData\Alpha\spindleData\nctu\events2Col'; ...
+%              'D:\TestData\Alpha\spindleData\nctu\eventsJohnReratedMAT'};
+% eventTypes = {'John original', 'John rerate'};
+% imageDir = 'D:\TestData\Alpha\spindleData\nctu\imagesSpindlerOverlayJohnRerated';
+% dataType = 'Mara cleaned';
+% 
+% stageDir = [];
 % channelLabels = {'P3'};
 % lowFreq = 6;
 % highFreq = 13;
@@ -53,6 +89,7 @@ eventColors = [0.8, 0, 0; 0, 0.9, 0; 0, 0, 0.9; 0.5, 0, 0.9; 0, 0, 0];
 
 %% Example 3: Set up for the Dreams sleep collection
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+%stageDir = [];
 % eventDirs = {'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion'; ...
 %              'D:\TestData\Alpha\spindleData\dreams\events\expert1'; ...
 %              'D:\TestData\Alpha\spindleData\dreams\events\expert2'};
@@ -67,21 +104,23 @@ eventColors = [0.8, 0, 0; 0, 0.9, 0; 0, 0, 0.9; 0.5, 0, 0.9; 0, 0, 0];
 % figureFormats = {'png', 'fig'};
 % scaleFactor = 20;
 %% Example 4: Set up for the MASS sleep collection
-dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-eventDirs = {'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion'; ...
-    'D:\TestData\Alpha\spindleData\massNew\events\expert1'; ...
-    'D:\TestData\Alpha\spindleData\massNew\events\expert2'};
-eventTypes = {'combined', 'expert1', 'expert2'};
-stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesEventOverlays';
-channelLabels = {'CZ'};
-lowFreq = 10;
-highFreq = 17;
-segmentTime = 30;
-baseBand = [1, 20];
-srateTarget = 128;
-figureFormats = {'png', 'fig'};
-scaleFactor = 15;
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+% eventDirs = {'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion'; ...
+%     'D:\TestData\Alpha\spindleData\massNew\events\expert1'; ...
+%     'D:\TestData\Alpha\spindleData\massNew\events\expert2'};
+% eventTypes = {'combined', 'expert1', 'expert2'};
+% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesEventOverlays';
+% channelLabels = {'CZ'};
+% lowFreq = 10;
+% highFreq = 17;
+% segmentTime = 30;
+% baseBand = [1, 20];
+% srateTarget = 128;
+% figureFormats = {'png'};
+% scaleFactor = 15;
+
+
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
 
@@ -92,7 +131,7 @@ if ~isempty(imageDir) && ~exist(imageDir, 'dir')
 end
 
 %% Process the data
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     %% Get the results file with spindle information
     [~, theName, ~] = fileparts(dataFiles{k});
     
@@ -162,24 +201,38 @@ for k = 1:length(dataFiles)
         t = (t-1)/srateTarget + baseTime;
         theData = data(startSegment:endSegment)';
         theBand = dataBand(startSegment:endSegment)';
-        theTitle = [theName ' channel ' channelLabel  ...
+        theTitle = [dataType theName ' channel ' channelLabel  ...
             ' Segment ' num2str(n) ...
             ' [' num2str(round(min(t))) ':' num2str(round(max(t))) '] sec' ...
             ' Frames [' num2str(startSegment) ':' num2str(endSegment) ']'];
         hFig1 = figure('Name', theTitle);
         hold on
-        plot(t, theBand, 'g-', 'LineWidth', 2);
-        p1 = plot(t, theData, 'k-');
+        plot(t, theData, 'Color', [0.8, 0.8, 0.8], 'LineWidth', 1);
+        p1 = plot(t, theBand, 'k-');
         xlabel('time (s)')
         ylabel('Voltage');
         set(hFig1, 'Position', [300 500 1500 400]);
-        
+        xTicks = ceil(min(t)):floor(max(t));
+     
         set(gca, 'YLimMode', 'manual', 'YLim', [-maxLimit, maxLimit]);
-        set(gca, 'XLimMode', 'manual', 'XLim', [min(t), max(t)]);
-        
+        set(gca, 'XLimMode', 'manual', 'XLim', [min(t), max(t)], ...
+            'XTickMode', 'manual', 'XTick', xTicks);
+         xTickLabels = cell(length(xTicks), 0);
+        if xTicks(1) >= 10000.0
+           for m = 1:length(xTicks)
+               if mod(m-1, 5) == 0
+                   xTickLabels{m} = sprintf('%6.2f', xTicks(m));
+               else
+                   xTickLabels{m} = '';
+               end
+           end
+           set(gca, 'XTickLabelMode', 'manual', 'XTickLabel', xTickLabels);
+        end
+        grid on
+        grid minor
         legendStrings = ...
-            {['EEG [' num2str(lowFreq) ',' num2str(highFreq), '] Hz'], ...
-            ['EEG [' num2str(baseBand(1)) ',' num2str(baseBand(2)), '] Hz']};
+            {['EEG [' num2str(baseBand(1)) ',' num2str(baseBand(2)), '] Hz'], ...
+            ['EEG [' num2str(lowFreq) ',' num2str(highFreq), '] Hz']};
         
         %% Plot the first event in each group to outsmart the legend
         for m = 1:length(eventList)
@@ -222,5 +275,6 @@ for k = 1:length(dataFiles)
         end
         
         close(hFig1);
+   
     end
 end

@@ -3,7 +3,7 @@
 
 %% Set up the locations for MASS dataset
 inDirs = {'D:\TestData\Alpha\spindleData\massNew\events\expert1'; ...
-          'D:\TestData\Alpha\spindleData\massNew\events\expert2'};
+    'D:\TestData\Alpha\spindleData\massNew\events\expert2'};
 outDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
 
 %% Set up the locations for the DREAMS dataset
@@ -19,7 +19,7 @@ if ~exist(outDir, 'dir')
     mkdir(outDir);
 end
 
-%% Get the list of EYE filenames from level 
+%% Get the list of EYE filenames from level
 filePaths = cell(length(inDirs), 1);
 fileNames = cell(length(inDirs), 1);
 uniqueNames = {};
@@ -27,7 +27,7 @@ for k = 1:length(inDirs)
     theseFiles = getFileListWithExt('FILES', inDirs{k}, '.mat');
     theNames = cell(length(theseFiles), 1);
     for n = 1:length(theNames)
-         [~, theNames{n}, ~] = fileparts(theseFiles{n});
+        [~, theNames{n}, ~] = fileparts(theseFiles{n});
     end
     filePaths{k} = theseFiles;
     fileNames{k} = theNames;
@@ -37,23 +37,16 @@ end
 %% Match expert event files with EEG files
 for k = 1:length(uniqueNames)
     events = [];
-    srate = [];
     for n = 1:length(inDirs)
         nextFile = [inDirs{n} filesep uniqueNames{k} '.mat'];
-  
-    if ~exist(nextFile, 'file')
-        continue;
-    end
+        
+        if ~exist(nextFile, 'file')
+            continue;
+        end
         test = load(nextFile);
-     events = [events; test.events]; %#ok<*AGROW>
-     if isempty(srate)
-         srate = test.srate;
-     elseif srate ~= test.srate
-         warning('%d(%d): %s does not have same srate as rest', k, n, nextFile);
-     end
+        events = [events; test.events]; %#ok<*AGROW>
     end
     eventsTemp = events;
     events = mergeExpertRatings(events, method);
-   
-    save([outDir filesep uniqueNames{k} '.mat'], 'events', 'srate', '-v7.3')
+    save([outDir filesep uniqueNames{k} '.mat'], 'events', '-v7.3');
 end

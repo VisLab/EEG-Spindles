@@ -11,18 +11,22 @@ function eventList = getSegmentedEvents(eventDirs, baseName, eventTypes, ...
 %     totalTime     total time over which to segment the events
 %
 numDirs = length(eventDirs);
+if numDirs == 0
+    eventList = [];
+    return;
+end
 eventList(numDirs) = struct('fileName', '', 'eventType', '', ...
-                    'startTime', startTime, 'totalTime', totalTime, ...
-                    'eventCounts', '', 'eventSegments', '');
+    'startTime', startTime, 'totalTime', totalTime, ...
+    'eventCounts', '', 'eventSegments', '');
 
 for n = 1:numDirs
-   eventList(n) = eventList(end);
-   eventList(n).eventType = eventTypes{n};
-   eventList(n).fileName = [eventDirs{n} filesep baseName '.mat'];
-   theseEvents = readEvents(eventList(n).fileName);
-   if isempty(theseEvents)
-            continue;
-   end
-   [eventList(n).eventCounts, eventList(n).eventSegments] = ...
-                segmentEvents(theseEvents, startTime, totalTime, segmentTime);
+    eventList(n) = eventList(end);
+    eventList(n).eventType = eventTypes{n};
+    eventList(n).fileName = [eventDirs{n} filesep baseName '.mat'];
+    theseEvents = readEvents(eventList(n).fileName);
+    if isempty(theseEvents)
+        continue;
+    end
+    [eventList(n).eventCounts, eventList(n).eventSegments] = ...
+        segmentEvents(theseEvents, startTime, totalTime, segmentTime);
 end

@@ -1,9 +1,9 @@
 %% Read the expert ratings for mass spindles
-% inDir = 'D:\TestData\Alpha\spindleData\massNew\eventsEDF\expert1';
-% outDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
+inDir = 'D:\TestData\Alpha\spindleData\massNew\eventsEDF\expert1';
+outDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
 
-inDir = 'D:\TestData\Alpha\spindleData\massNew\eventsEDF\expert2';
-outDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert2';
+% inDir = 'D:\TestData\Alpha\spindleData\massNew\eventsEDF\expert2';
+% outDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert2';
 
 %% Make sure output directory exists
 if ~exist(outDir, 'dir')
@@ -34,6 +34,5 @@ for k = 1:length(fileNames)
        events(n, 2) = ...
            double(theEvents.POS(n) + theEvents.DUR(n) - 1)./srate;
     end
-    save([outDir filesep theName(1:11) 'PSG.mat'], 'events', 'srate', ...
-                                           'eventTypes',  '-v7.3');
+    save([outDir filesep theName(1:11) 'PSG.mat'], 'events', '-v7.3');
 end

@@ -17,8 +17,7 @@ for k = 1:length(fileNames)
     test = load(fileNames{k});
     events = test.events;
     eventTypes = test.eventTypes;
-    srate = test.srate;
     stage2Events = getStageList(events, eventTypes, '2');
     [thePath, theName, theExt] = fileparts(fileNames{k});
-    save([outDir filesep theName(1:11) 'PSG.mat'], 'stage2Events', 'srate', '-v7.3');
+    save([outDir filesep theName(1:11) 'PSG.mat'], 'stage2Events', '-v7.3');
 end

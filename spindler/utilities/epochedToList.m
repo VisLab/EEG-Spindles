@@ -1,21 +1,25 @@
-function events = epochedToList(eventsIn, epochTime)
-%% Translate a three-column array of epoched events to a cell array
+function events = epochedToList(epochedEvents, epochTime)
+%% Translate a cell array of epoched events to a single array of events
 %
 %  Parameters:
-%      events      Three column array (epoch#, startTime, endTime) of events
-%      cellEvents  Cell array with one cell for each epoch. Each cell
-%                  contains an nx2 array of start and end time
+%      epochedEvents  Cell array containing events for each epoch
+%      events         n x 2 array with consolidated event list
+%
 
 %% Process the events
-if isempty(eventsIn) || size(eventsIn, 2) < 3
+if isempty(epochedEvents) || ~iscell(epochedEvents)
     events = [];
-    warning('Expecting a three-column array of epoched events');
+    return;
+elseif ~iscell(epochedEvents)
+    events = epochedEvents;
     return;
 end
 
-numEvents = size(eventsIn, 1);
-events = zeros(numEvents, 2);
-for k = 1:numEvents
-    events(k, :) = eventsIn(k, 2:3) + (eventsIn(k, 1) - 1)*epochTime;
+numEpochs = length(epochedEvents);
+eventTime  = 0;
+events = epochedEvents{1};
+for k = 2:numEpochs
+    eventTime = eventTime + epochTime;
+    nextEvents = epochedEvents{k} + epochTime;
+    events = [events; nextEvents]; %#ok<AGROW>
 end
-    

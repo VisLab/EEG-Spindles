@@ -28,7 +28,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
         'spindleRateSTD', NaN);
 
     defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
-    params = processParameters('getSpindlerCurves', nargin, 2, params, defaults);
+    params = processParameters('spindlerGetParameterCurves', nargin, 2, params, defaults);
     atomsPerSecond = unique(cellfun(@double, {spindles.atomsPerSecond}))';
     baseThresholds = unique(cellfun(@double, {spindles.baseThreshold}));
     numAtoms = length(atomsPerSecond);
@@ -320,7 +320,99 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     if params.figureClose
         close(h1Figa);
     end
-    
+
+    %% Show the spindle length summary values without spin/min STD --- temp
+%     eligiblePos = atomsPerSecond(bestEligibleAtomInd);
+%     theColors = jet(numThresholds);
+%     legendStrings = {['T_b=' num2str(bestEligibleThreshold)], ...
+%         'T_b centered', ...
+%         ['T_b=' num2str(baseThresholds(1))], ...
+%         ['T_b=' num2str(baseThresholds(end))],'STD range', ...
+%         ['N_s=' num2str(atomsPerSecond(bestEligibleAtomInd))]};
+%     baseTitle = [params.name ':Average spindle length vs atoms/second no STD'];
+%     theTitle = {'Average spindle length vs atoms/second no STD'; params.name; ...
+%         ['STD range: [' num2str(lowerAtomRate) ',' ...
+%         num2str(upperAtomRate) '] ' ...
+%         ' Best atoms/sec: ' num2str(atomsPerSecond(bestEligibleAtomInd)) ...
+%         ' Best threshold: ' ...
+%         num2str(baseThresholds(bestEligibleThresholdInd))]};
+%     h1Figa = figure('Name', baseTitle);
+%     hold on
+%         eligibleThresholdInds = 1:length(baseThresholds);
+%     numEligibleThresholds = length(eligibleThresholdInds);
+%     tempLegends = cell(1, numEligibleThresholds);
+%     for k = 1:numEligibleThresholds
+%         thisInd = eligibleThresholdInds(k);
+%         tempLegends{k} = sprintf('%f12.5', baseThresholds(k));
+%         plot(atomsPerSecond, meanSpindleLen(:, thisInd), ...
+%             'Color', theColors(thisInd, :));
+%     end
+%     h1 = plot(atomsPerSecond, meanSpindleLen(:, bestEligibleThresholdInd));
+%     theColor = get(h1, 'Color');
+%     set(h1, 'Color', [0, 0, 0], 'LineWidth', 3);
+%     plot(atomsPerSecond, meanSpindleLenCentral, ...
+%         'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
+%     plot(atomsPerSecond, meanSpindleLen(:, 1), ...
+%         'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
+%     plot(atomsPerSecond, meanSpindleLen(:, end), ...
+%         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
+%     yLimits = get(gca, 'YLim');
+%     hLine1 = line([lowerAtomRate, upperAtomRate], [0.1, 0.1]*yLimits(2), ...
+%         'LineWidth', 4, 'Color', [0.85, 0.85, 0.85]);
+%     yLimitsTemp = [meanSpindleLen(:, end), meanSpindleLen(:, 1)];
+%     hLine = line([eligiblePos, eligiblePos], yLimitsTemp, ... ###
+%         'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
+%  
+%    %hleg1 = legend(gca, legendStrings, 'Location', 'SouthEast');
+% %     for k = 1:numThresholds
+% %         plot(atomsPerSecond, meanSpindleLen(:, k), 'Color', theColors(k, :));
+% %     end
+%     eligibleThresholdInds = 1:length(baseThresholds);
+%     numEligibleThresholds = length(eligibleThresholdInds);
+%     for k = 1:numEligibleThresholds
+%         thisInd = eligibleThresholdInds(k);
+%         plot(atomsPerSecond, meanSpindleLen(:, thisInd), ...
+%             'Color', theColors(thisInd, :));
+%     end
+%     plot(atomsPerSecond, meanSpindleLenCentral, ...
+%         'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
+%     plot(atomsPerSecond, meanSpindleLen(:, 1), ...
+%         'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
+%     plot(atomsPerSecond, meanSpindleLen(:, end), ...
+%         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
+%     plot(atomsPerSecond, meanSpindleLen(:, bestEligibleThresholdInd),...
+%         'LineWidth', 3, 'Color', [0, 0, 0]);
+%     
+%     set(gca, 'YLimMode', 'auto', 'YTickMode', 'auto')
+%     yLimits = get(gca, 'YLim');
+%     set(hLine, 'YData', [0, yLimits(2)]) %####
+%     set(hLine1, 'YData', [0.1, 0.1]*yLimits(2));
+%     set(gca, 'YLim', [0, yLimits(2)], 'YLimMode', 'manual', 'YTickMode', 'auto');
+%     %hleg1 = legend(gca, legendStrings, 'Location', 'SouthEast');
+%     %hleg2 = legend(ax(2), 'STD', 'STD range', 'Location', 'NorthEast');
+%     hleg1 = legend(gca, tempLegends, 'Location', 'EastOutside');
+%     if ~earlyMatlabVersion
+%         title(hleg1, 'Parameters');
+%         %title(hleg2, 'Spindles/min')
+%     end
+%     if ~earlyMatlabVersion
+%         title(hleg1, 'Parameters');
+%     end
+% 
+%     ylabel('Average spindle length (sec)');
+%     xlabel('Atoms/sec');
+%     box('on')
+%     hold off
+%     title(theTitle, 'Interpreter', 'None');
+%     for k = 1:length(params.figureFormats)
+%         thisFormat = params.figureFormats{k};
+%         saveas(h1Figa, [outDir filesep params.name '_AverageSpindleLengthTemp.' ...
+%             thisFormat], thisFormat);
+%     end
+%     if params.figureClose
+%         close(h1Figa);
+%     end
+%     
    %% Show the fraction of time spindling
     eligiblePos = atomsPerSecond(bestEligibleAtomInd);
     theColors = jet(numThresholds);

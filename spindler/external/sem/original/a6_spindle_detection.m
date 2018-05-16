@@ -231,7 +231,8 @@ result_03(sum_res_03 >= 1) = 1;
         
         % Fourier transform of the bandpass filtered central signal. Find the
         % frequency between 8-16 Hz where the amplitude is greatest.
-        fftC = abs(fftshift(fft(C3,2*fs)));
+        %fftC = abs(fftshift(fft(C3,2*fs)));
+        fftC = abs(fftshift(fft(C3,round(2*fs)))); %%---added rounding KR
         fftC = fftC(round(length(fftC)/2):end);
         freq = [0:length(fftC)-1]*round(fs/2)/(length(fftC)-1);
         freq_cut = freq(freq>=8 & freq<=16);

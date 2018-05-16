@@ -42,6 +42,6 @@ for k = 1:length(fileNames)
             break;
         end
     end
-    save([outDir filesep theName(1:11) 'PSG.mat'], 'events', 'srate', ...
-                                           'eventTypes',  '-v7.3');
+    save([outDir filesep theName(1:11) 'PSG.mat'], 'events', ...
+         'eventTypes',  '-v7.3');
 end

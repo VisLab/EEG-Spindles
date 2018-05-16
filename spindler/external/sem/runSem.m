@@ -8,96 +8,111 @@
 % paramsInit = struct();
 
 %% Set up the directory for dreams
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSem';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSem';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sem_Summary.mat';
-centralLabels = {'C3-A1', 'CZ-A1'};
-occipitalLabels = {'O1-A1'};
+% stageDir = [];
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSem';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sem_Summary.mat';
+% centralLabels = {'C3-A1', 'CZ-A1'};
+% occipitalLabels = {'O1-A1'};
+% paramsInit = struct();
+
+%% Set up the directory for mass
+stageDir = [];
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSem';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Sem_Summary.mat';
+centralLabels = {'Cz'};
+occipitalLabels = {'O1'};
 paramsInit = struct();
 
 %% Metrics to calculate and methods to use
-metricNames = {'f1', 'f2', 'G'};
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
+paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
-if isempty(eventDir)
-    eventFiles = {};
-else
-    eFiles = getFiles('FILES', eventDir, '.mat');
-    [eventFiles, leftOvers] = matchFileNames(dataFiles, eFiles);
-    if ~isempty(leftOvers)
-        warning('%d event files were not matched with data files', length(leftOvers));
-        for k = 1:length(leftOvers)
-            fprintf('---%s\n', leftOvers{k});
-        end
-    end
-    for k = 1:length(eventFiles)
-        if isempty(eventFiles{k})
-            warning('Data file %s does not have expert events', dataFiles{k});
-        end
-    end
-end
 
-%% Create the output, image, and summary directories if they don't exist
+%% Create the output and summary directories if they don't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
     mkdir(resultsDir);
-end;
-if ~isempty(imageDir) && ~exist(imageDir, 'dir')
-    mkdir(imageDir);
-end
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
 end
 
 %% Run the algorithm
 for k = 1:length(dataFiles)
     params = processParameters('Wendt_a6', 0, 0, paramsInit, getGeneralDefaults());
-    EEG = pop_loadset(dataFiles{k});
-    [centralNumber, centralLabel] = getChannelNumber(EEG, centralLabels);
-    [occipitalNumber, occipitalLabel] = getChannelNumber(EEG, occipitalLabels);
-    if isempty(centralNumber) || isempty(occipitalNumber)
-        warning('Dataset %d: %s does not have needed channels', k, dataFiles{k});
+    [~, theName, ~] = fileparts(dataFiles{k});
+    params.name = theName;
+    params.srateTarget = 0;
+    [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
+           getChannelData(dataFiles{k}, centralLabels, params.srateTarget);
+    params.srate = params.srateOriginal;
+ 
+   [dataOccipital, params.srateOriginal, params.occipitalNumber, ...
+       params.occipitalLabel] = getChannelData(dataFiles{k}, ...
+       centralLabels, params.srateTarget);
+   
+    if isempty(data) || isempty(dataOccipital)
+        warning('No occipital or central data found for %s\n', dataFiles{k});
         continue;
     end
+   
+       %% Read events and stages if available 
+    expertEvents = [];
+    if ~isempty(eventDir)
+        expertEvents = readEvents([eventDir filesep theName '.mat']);
+    end
+    
+    %% Use the longest stetch in the stage events
+    stageEvents = [];
+    if ~isempty(stageDir)
+        stageStuff = load([stageDir filesep theName '.mat']);
+        stageEvents = stageStuff.stage2Events;
+        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
+        [maxLength, maxInd] = max(stageLengths);
+        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
+                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
+        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
+        startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
+        endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
+        data = data(startFrame:endFrame);
+        dataOccipital = dataOccipital(startFrame:endFrame);
+    end
+    
     
     %% Load the file
-    centralData = EEG.data(centralNumber, :)';
-    occipitalData = EEG.data(occipitalNumber, :)';
-    detection = a6_spindle_detection(centralData, occipitalData, EEG.srate);
-    events = getMaskEvents(detection, EEG.srate);
-    events = combineEvents(events, params.minSpindleLength, params.minSpindleSeparation);
-    params.srate = EEG.srate;
-    params.frames = size(EEG.data, 2);
-    
-    %% Deal with ground truth if available
-    if isempty(eventFiles) || isempty(eventFiles{k})
-        expertEvents = [];
-        metrics = [];
+    detection = a6_spindle_detection(data(:), dataOccipital(:), params.srate);
+    events = getMaskEvents(detection, params.srate);
+    events = combineEvents(events, params.spindleLengthMin, ...
+                           params.spindleSeparationMin);
+                       
+    if ~isempty(expertEvents)
+        totalTime = length(data)/params.srate;
+        metrics = getPerformanceMetrics(expertEvents, events, totalTime, params);
     else
-        metrics = struct('hitMetrics', NaN, 'intersectMetrics', NaN, ...
-            'onsetMetrics', NaN, 'timeMetrics', NaN);
-        expertEvents = readEvents(eventFiles{k});
-        expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        [metrics.hitMetrics, metrics.intersectMetrics, ...
-            metrics.onsetMetrics, metrics.timeMetrics] = ...
-            getPerformanceMetrics(expertEvents, events, params.frames, ...
-                                  params.srate, params);
+        metrics = [];
     end
-    [~, theName, ~] = fileparts(dataFiles{k});
-    
-    params.name = theName;
     additionalInfo = struct();
-    save([resultsDir filesep theName '_Ch_' centralLabel '_' occipitalLabel '_Sem.mat'], ...
-        'events', 'expertEvents', 'metrics', 'params', '-v7.3');
+%% Save the results
+    theFile = [resultsDir filesep theName '_Ch_' params.channelLabel ...
+               '_' params.occipitalLabel '_Sem.mat'];
+    save(theFile, 'events', 'expertEvents', 'metrics', ...
+        'params', 'additionalInfo', '-v7.3');
+
 end
 
-%% Now create a summary of the performance results
-if ~isempty(summaryFile)
-   [results, dataNames] = consolidateResults(resultsDir, methodNames, metricNames);
-    save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', '-v7.3');
+%% Now consolidate the events for the collection and create a summary
+[results, dataNames, upperBounds] = ...
+    consolidateResults(resultsDir, paramsInit.methodNames, paramsInit.metricNames);
+
+%% Save the results
+[summaryDir, ~, ~] = fileparts(summaryFile);
+if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
+    fprintf('Creating summary directory %s \n', summaryDir);
+    mkdir(summaryDir);
 end
+methodNames = params.methodNames;
+metricNames = params.metricNames;
+save(summaryFile, 'results', 'dataNames', 'methodNames', ...
+      'metricNames', 'upperBounds', '-v7.3');

@@ -157,7 +157,7 @@ baseBand = [1, 20];
 % paramsInit.spindlerTimingTolerance = 0.1;
 
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES', dataDir, '.set');
 
 %% Create the output directory if it doesn't exist
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')

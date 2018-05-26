@@ -50,13 +50,13 @@ hemiDefs = {leftChannels; centerChannels; rightChannels};
 freqType = 'alpha';
 
 %% Get the spindle data files
-dataFiles = getFiles('FILES', [resultsBaseDir filesep freqType], '.mat');
+dataFiles = getFileListWithExt('FILES', [resultsBaseDir filesep freqType], '.mat');
 
 %% Create the output directory if it doesn't exist
 if ~exist(statsDir, 'dir')
     fprintf('Creating stats directory %s \n', statsDir);
     mkdir(statsDir);
-end;
+end
 
 
 %% Process the data

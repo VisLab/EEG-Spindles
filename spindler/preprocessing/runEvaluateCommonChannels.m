@@ -2,7 +2,7 @@
 inDir = 'D:\TestData\Alpha\spindleData\mass\data';
 
 %% Get the list of EYE filenames from level 0
-fileNames = getFiles('FILES', inDir, '.set');
+fileNames = getFileListWithExt('FILES', inDir, '.set');
 numberFiles = length(fileNames);
 %% Now find the common channels
 theLabels = cell(numberFiles, 1);

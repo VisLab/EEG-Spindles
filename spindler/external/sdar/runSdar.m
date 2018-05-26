@@ -82,7 +82,7 @@ paramsInit.figureClose = true;
 paramsInit.figureFormats = {'png', 'fig'};
 
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES', dataDir, '.set');
 
 %% Process the data
 for k = 1%:length(dataFiles)

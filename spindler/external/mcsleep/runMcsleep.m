@@ -41,8 +41,9 @@ paramsInit = processParameters('runMcsleep', 0, 0, struct(), defaults);
 % channelLabelsOccipital = {'O1-A1'};
 % paramsInit.srateTarget = 200;
 % summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-%     'dreams_Mcsleep_Summary.mat'];
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsMcsleep';
+%     'dreams_McsleepP_Summary.mat'];
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsMcsleepP';
+% imagesDir = 'D:\TestData\Alpha\spindleData\dreams\imagesMcsleepP';
 % params.lam1 = 0.3;
 % params.lam2 = 6.5;
 % params.lam3 = 36;
@@ -50,7 +51,7 @@ paramsInit = processParameters('runMcsleep', 0, 0, struct(), defaults);
 % params.Nit = 80;
 % params.K = 200;
 % params.O = 100;
-
+% 
 % Bandpass filter & Teager operator parameters
 % params.f1 = 11;
 % params.f2 = 17;
@@ -58,8 +59,13 @@ paramsInit = processParameters('runMcsleep', 0, 0, struct(), defaults);
 % params.Threshold = 0.5; 
 % 
 % % Other function parameters
-% params.fs = 200;
-
+% % params.fs = 200;
+% 
+% paramsInit.mcsleepLambda1 = 0.6;
+% % paramsInit.mcsleepLambda2 = 7;
+% paramsInit.mcsleepLambda3 = 45;
+% paramsInit.mcsleepMu = 0.5;
+% paramsInit.mcSleepNit = 40;
 %% MASS parameters
 stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
 dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
@@ -71,36 +77,37 @@ paramsInit.srateTarget = 0;
 paramsInit.mcsleepK = 256;
 paramsInit.mcsleepO = 128;
 
-% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-%     'massNew_Mcsleep_Summary.mat'];
-% imageDir = 'D:\TestData\Alpha\spindleData\massNew\mcsleepImages';
-% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsMcsleep';
-% paramsInit.mcsleepLambda1 = 0.6;
-% paramsInit.mcsleepLambda3 = 45;
-% paramsInit.mcsleepMu = 0.5;
-% paramsInit.mcSleepNit = 40;
-
 summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-    'massNew_Mcsleep_SummaryD.mat'];
-imageDir = 'D:\TestData\Alpha\spindleData\massNew\mcsleepImagesD';
-resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsMcsleepD';
-paramsInit.mcsleepLambda1 = 0.3;
-paramsInit.mcsleepLambda3 = 36;
+    'massNew_McsleepR_Summary.mat'];
+imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesMcSleep';
+resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsMcsleep';
+paramsInit.mcsleepLambda0 = 0.6;
+paramsInit.mcsleepLambda1 = 7;
+paramsInit.mcsleepLambda2s = 20:50;
+paramsInit.mcsleepThresholds = 0.5:0.1:3.0;
 paramsInit.mcsleepMu = 0.5;
-paramsInit.mcSleepNit = 80;
+paramsInit.mcSleepNit = 40;
+
+% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
+%     'massNew_Mcsleep_SummaryD.mat'];
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\mcsleepImagesD';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsMcsleepD';
+% paramsInit.mcsleepLambda1 = 0.3;
+% paramsInit.mcsleepLambda3 = 36;
+% paramsInit.mcsleepMu = 0.5;
+% paramsInit.mcSleepNit = 80;
 
 %% Bandpass filter & Teager operator parameters
 paramsInit.mcsleepFiltOrder = 4;
 paramsInit.mcsleepCalculateCost = false;
 paramsInit.figureFormats = {'png', 'fig'};
-
+paramsInit.figureClose = true;
 %% Metrics to calculate and methods to use
 paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
 paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
 
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES', dataDir, '.set');
 
 %% Create the output and summary directories if they don't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
@@ -117,7 +124,7 @@ end
 
 
 %% Run the algorithm
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     params = paramsInit;    
     [~, theName, ~] = fileparts(dataFiles{k});
     params.name = theName;
@@ -134,8 +141,7 @@ for k = 1:length(dataFiles)
         warning('Missing frontral, occipital or central data for %s\n', dataFiles{k});
         continue;
     end
-    params.srateTarget = round(params.srateOriginal);
-    params.srate = round(params.srateOriginal);
+    params.srate = params.srateOriginal;
     data = [dataFrontal; dataCentral; dataOccipital];
     %% Read events and stages if available 
     expertEvents = [];
@@ -155,15 +161,13 @@ for k = 1:length(dataFiles)
         expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
         startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
         endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
-        data = data(:, startFrame:endFrame);
-        
+        data = data(:, startFrame:endFrame);    
     end
-    params.frames = size(data, 2);
    
     %% Now call mcsleep
     [spindles, allMetrics, additionalInfo, params] =  ...
                               mcsleepy(data, expertEvents, imageDir, params); 
-    
+    additionalInfo.stageEvents = stageEvents;
     theFile = [resultsDir filesep theName '_mcsleep.mat'];
     save(theFile, 'spindles', 'expertEvents', 'allMetrics', ...
         'params', 'additionalInfo', '-v7.3');

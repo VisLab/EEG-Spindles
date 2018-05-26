@@ -9,13 +9,13 @@ freqType1 = 'alpha';
 freqType2 = 'alpha';
 compareDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\CompareMaraVsLargAlpha';
 %% Get the spindle data files
-dataFiles = getFiles('FILES', dataDir1, '.mat');
+dataFiles = getFileListWithExt('FILES', dataDir1, '.mat');
 
 %% Create the output directory if it doesn't exist
 if ~exist(compareDir, 'dir')
     fprintf('Creating comparison directory %s \n', compareDir);
     mkdir(compareDir);
-end;
+end
 
 %% Process the data
 for k = 1%:length(dataFiles)

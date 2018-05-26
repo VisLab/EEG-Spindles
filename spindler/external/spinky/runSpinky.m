@@ -1,30 +1,31 @@
 %% Wrapper to call spinky algorithm proposed by Lajnef et al.
-dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpinky';
-imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpinky';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spinky_Summary.mat';
-channelLabels = {'CZ'};
-paramsInit = struct();
-paramsInit.srateTarget = 0;
-paramsInit.params.figureFormats = {'.png', '.fig'};
-
-%% Set up the directory for dreams
-% stageDir = [];
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpinky';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpinky';
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpinkyR';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpinkyR';
+% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spinky_SummaryR.mat';
+% channelLabels = {'CZ'};
 % paramsInit = struct();
 % paramsInit.srateTarget = 0;
-% paramsInit.params.figureFormats = {'.png', '.fig'};
+% paramsInit.figureFormats = {'png', 'fig'};
+% % paramsInit.figureClose = false;
+%% Set up the directory for dreams
+stageDir = [];
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpinky';
+channelLabels = {'C3-A1', 'CZ-A1'};
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpinky';
+summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreamsNew_Spinky_Summary.mat';
+paramsInit = struct();
+paramsInit.srateTarget = 0;
+paramsInit.figureFormats = {'png', 'fig'};
+paramsInit.spindleFrequencyRange = [10.5, 16.5];
+paramsInit.toleranceOnset = 0.5;
 
 %% Metrics to calculate and methods to use
-%% Metrics to calculate and methods to use
 paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
-paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFiles('FILES', dataDir, '.set');
@@ -35,7 +36,7 @@ if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
 end
 
 %% Run the algorithm
-for k = 1:length(dataFiles)
+for k = 1%:length(dataFiles)
     params = paramsInit;
     [~, theName, ~] = fileparts(dataFiles{k});
     params.name = theName;

@@ -28,7 +28,7 @@ methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 numMetrics = length(metricNames);
 numMethods = length(methodNames);
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', splitFileDir, '.mat');
+dataFiles = getFileListWithExt('FILES', splitFileDir, '.mat');
 
 %% Create the output, image, and summary directories if they don't exist
 if ~exist(supervisedResultsDir, 'dir')

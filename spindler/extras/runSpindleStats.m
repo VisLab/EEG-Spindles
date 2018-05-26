@@ -8,7 +8,7 @@
 resultsDir = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\VEP_PREP_ICA_VEP2_MARA\results\theta';
 statsFile = 'D:\TestData\Alpha\spindleData\vep\resultsSpindler\stats\VEP_PREP_ICA_VEP2_MARA_theta.mat';
 %% Get the spindle data files and initialize the structure
-dataFiles = getFiles('FILES', resultsDir, '.mat');
+dataFiles = getFileListWithExt('FILES', resultsDir, '.mat');
 numFiles = length(dataFiles);
 spindleStats(numFiles) = struct('fileName', NaN, 'chanlocs', NaN, ...
        'srate', NaN, 'timeFraction', NaN, ...

@@ -32,7 +32,7 @@ paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
 paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
 
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES', dataDir, '.set');
 
 %% Create the output and summary directories if they don't exist
 if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
@@ -85,7 +85,7 @@ for k = 1:length(dataFiles)
     detection = a6_spindle_detection(data(:), dataOccipital(:), params.srate);
     events = getMaskEvents(detection, params.srate);
     events = combineEvents(events, params.spindleLengthMin, ...
-                           params.spindleSeparationMin);
+                 params.spindleSeparationMin, params.spindleLengthMax);
                        
     if ~isempty(expertEvents)
         totalTime = length(data)/params.srate;

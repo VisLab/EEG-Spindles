@@ -34,11 +34,11 @@ metricNames = {'f1', 'f2', 'G'};
 methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
 
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES', dataDir, '.set');
 if isempty(eventDir)
     eventFiles = {};
 else
-    eFiles = getFiles('FILES', eventDir, '.mat');
+    eFiles = getFileListWithExt('FILES', eventDir, '.mat');
     [eventFiles, leftOvers] = matchFileNames(dataFiles, eFiles);
     if ~isempty(leftOvers)
         warning('%d event files were not matched with data files', length(leftOvers));

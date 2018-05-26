@@ -9,10 +9,19 @@ function [events, metrics, additionalInfo, params] =  spindler(data, expertEvent
 %
 %     
     %% Calculate the spindle representations for a range of parameters
+    events = [];
+    metrics = [];
+    if isempty(data)
+       additionalInfo.warningMsgs = 'spindler: data is empty algorithm fails';
+       warning(additionalInfo.warningMsgs);
+       return
+    end
     [spindles, params] = spindlerExtractSpindles(data, params);
-    [spindlerCurves, warningMsgs] = spindlerGetParameterCurves(spindles, imageDir, params);
-    if spindlerCurves.bestEligibleLinearInd > 0
-         events = spindles(spindlerCurves.bestEligibleLinearInd).events;
+    [spindlerCurves, warningMsgs] = ...
+                  spindlerGetParameterCurves(spindles, imageDir, params);
+    if spindlerCurves.bestEligibleAtomInd > 0
+         events = spindles(spindlerCurves.bestEligibleAtomInd, ...
+                           spindlerCurves.bestEligibleThresholdInd).events;
     else
         events = [];
     end
@@ -22,20 +31,24 @@ function [events, metrics, additionalInfo, params] =  spindler(data, expertEvent
                         'onset', NaN, 'time', NaN); 
     if ~isempty(expertEvents)
         totalTime = length(data)/params.srate;
-        numExp = length(spindles);
-        allMetrics(numExp) = metrics;
-        for n = 1:numExp
-            allMetrics(n) = getPerformanceMetrics(expertEvents, spindles(n).events, ...
-                totalTime, params);
+        [numAtoms, numThresholds] = size(spindles);
+        allMetrics(numAtoms, numThresholds) = metrics;
+        for k = 1:numAtoms
+            for j = 1:numThresholds
+                allMetrics(k, j) = getPerformanceMetrics(expertEvents, ...
+                                 spindles(k, j).events, totalTime, params);
+            end
         end
         
         for n = 1:length(params.metricNames)
-            spindlerShowMetric(spindlerCurves, allMetrics, params.metricNames{n}, ...
-                imageDir, params);
+            spindlerShowMetric(spindlerCurves, allMetrics, ...
+                params.metricNames{n}, imageDir, params);
         end
         metrics = struct();
-        if spindlerCurves.bestEligibleLinearInd > 0
-            metrics = allMetrics(spindlerCurves.bestEligibleLinearInd);
+        if spindlerCurves.bestEligibleThresholdInd > 0 && ...
+           spindlerCurves.bestEligibleAtomInd > 0
+            metrics = allMetrics(spindlerCurves.bestEligibleAtomInd, ...
+                                 spindlerCurves.bestEligibleThresholdInd);
         end
     end
     additionalInfo.spindles = spindles;

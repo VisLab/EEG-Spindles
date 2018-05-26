@@ -43,22 +43,22 @@ paramsInit = struct('spindlerGaborFrequencies', 4:7);
 freqType = 'theta';
 
 %% Get the EEG data files (example assumes all in one directory)
-dataFiles = getFiles('FILES', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES', dataDir, '.set');
 
 %% Create the output directories if they doesn't exist
 if ~exist(resultsDir, 'dir')
     fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
-end;
+end
 resultTypeDir = [resultsDir filesep freqType];
 if ~exist(resultTypeDir, 'dir')
     fprintf('Creating results directory %s \n', resultTypeDir);
     mkdir(resultTypeDir);
-end;
+end
 if ~isempty(imageDirBase) && ~exist(imageDirBase, 'dir')
     fprintf('Creating image directory %s \n', imageDirBase);
     mkdir(imageDirBase);
-end;
+end
 
 %% Process the data
 for k = 1:length(dataFiles)

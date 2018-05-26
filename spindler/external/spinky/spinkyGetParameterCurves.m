@@ -42,8 +42,8 @@ function spindleCurves = spinkyGetParameterCurves(spindles, outDir, params)
     %% Show the spindle length summary values
     theTitle = [params.name ' Average spindle length'];
     h1Fig = figure('Name', theTitle);
-    plot(thresholds, meanSpindleLen);
-    ylim = get(gca, 'YLim')
+    plot(thresholds, meanSpindleLen, 'k', 'LineWidth', 2);
+    ylim = get(gca, 'YLim');
     ylim(1) = 0;
     set(gca, 'YLimMode', 'manual', 'YLim', ylim);
     xlabel('Threshold')
@@ -62,7 +62,7 @@ function spindleCurves = spinkyGetParameterCurves(spindles, outDir, params)
     %% Show the spindle length summary values
     theTitle = [params.name ' Spindle rate'];
     h2Fig = figure('Name', theTitle);
-    plot(thresholds, spindleRate);
+    plot(thresholds, spindleRate, 'k', 'LineWidth', 2);
     xlabel('Threshold')
     ylabel('Spindles/min');
     title(theTitle);

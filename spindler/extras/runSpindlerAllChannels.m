@@ -35,17 +35,17 @@ paramsInit = struct('figureClose', true, 'figureLevels', 'basic', ...
 freqType = 'theta';
 excludeLabels = {'EKG'; 'EKG1'};
 %% Get the data and event file names and check that we have the same number
-dataFiles = getFiles('FILES2', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES2', dataDir, '.set');
 
 %% Create the output directory if it doesn't exist
 if ~exist(resultsDir, 'dir')
     fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
-end;
+end
 if  ~exist(imageDir, 'dir')
     fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);
-end;
+end
 
 %% Process the data
 spindleStructInit = struct('channelNumber', NaN, ...
@@ -64,7 +64,7 @@ for k = 207:length(dataFiles)
     end
     channelLabels = {EEG.chanlocs.labels};
     clear spindleEvents;
-    spindleEvents(length(channelLabels)) = spindlerGetSpindlerEventsStruct();
+    spindleEvents(length(channelLabels)) = spindlerGetSpindlerEventsStruct(); %#ok<SAGROW>
     channelMask = true(length(channelLabels), 1);
     for n = 1:length(channelMask)
         spindleEvents(n) = spindleStructInit;

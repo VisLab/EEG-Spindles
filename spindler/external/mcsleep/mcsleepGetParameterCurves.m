@@ -1,5 +1,4 @@
-function [spindleCurves, warningMsgs, warningCodes] = ...
-                   mcsleepGetParameterCurves(spindles, outDir, params)
+function spindleCurves = mcsleepGetParameterCurves(spindles, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -15,11 +14,8 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
 
 %% Get the atoms per second and thresholds
     earlyMatlabVersion = verLessThan('matlab', '9.0');
-    warningMsgs = {};
-    warningCodes = [];
- 
-    lambda2s = unique(cellfun(@double, {spindles.lambda2}))';
-    thresholds = unique(cellfun(@double, {spindles.threshold}));
+    lambda2s = params.mcsleepLambda2s;
+    thresholds = params.mcsleepThresholds;
     numLambda2s = length(lambda2s);
     numThresholds = length(thresholds);
     totalSeconds = params.frames./params.srate;
@@ -43,10 +39,14 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     for k = 1:numThresholds
        legendStrings{k} = num2str(thresholds(k));
     end
+    theColors = parula(numThresholds);
     baseTitle = [params.name ':Average spindle length vs Lambda2'];
     h1Fig = figure('Name', baseTitle);
     hold on
-    plot(lambda2s, meanSpindleLen, 'LineWidth', 2)
+    for m = 1:numThresholds
+        plot(lambda2s(:), meanSpindleLen(:, m), ...
+            'LineWidth', 2, 'Color', theColors(m, :))
+    end
     xlabel('\lambda_2');
     ylabel('Average spindle length(s)')
     title(baseTitle, 'Interpreter', 'None');
@@ -73,7 +73,10 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     baseTitle = [params.name ':Spindle rate vs Lambda2'];
     h2Fig = figure('Name', baseTitle);
     hold on
-    plot(lambda2s, spindleRate, 'LineWidth', 2)
+    for m = 1:numThresholds
+        plot(lambda2s(:), spindleRate(:, m), ...
+            'LineWidth', 2, 'Color', theColors(m, :))
+    end
     xlabel('\lambda_2');
     ylabel('Spindles/min')
     title(baseTitle, 'Interpreter', 'None');
@@ -100,10 +103,14 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     for k = 1:numLambda2s
        legendStringsT{k} = num2str(lambda2s(k));
     end
+    theColors = parula(numLambda2s);
     baseTitle = [params.name ':Average spindle length vs Threshold'];
     h1Fig = figure('Name', baseTitle);
     hold on
-    plot(thresholds, meanSpindleLen', 'LineWidth', 2)
+    for m = 1:numLambda2s
+        plot(thresholds(:), meanSpindleLen(m, :)', ...
+            'LineWidth', 2, 'Color', theColors(m, :))
+    end
     xlabel('Threshold');
     ylabel('Average spindle length(s)')
     title(baseTitle, 'Interpreter', 'None');
@@ -130,7 +137,11 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     baseTitle = [params.name ':Spindle rate vs Thresholds'];
     h2Fig = figure('Name', baseTitle);
     hold on
-    plot(thresholds, spindleRate', 'LineWidth', 2)
+    for m = 1:numLambda2s
+        plot(thresholds(:), spindleRate(m, :)', ...
+            'LineWidth', 2, 'Color', theColors(m, :))
+    end
+  
     xlabel('Threshold');
     ylabel('Spindles/min')
     title(baseTitle, 'Interpreter', 'None');

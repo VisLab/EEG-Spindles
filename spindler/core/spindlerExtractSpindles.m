@@ -18,20 +18,21 @@ function [spindles, params] = spindlerExtractSpindles(data, params)
 defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
 params = processParameters('spindlerExtractSpindles', nargin, 2, params, defaults);
 
-atomsPerSecond = params.spindlerAtomsPerSecond;
+atomsPerSecond = sort(params.spindlerAtomsPerSecond);
+params.spindlerAtomsPerSecond = atomsPerSecond;
 minLength = params.spindleLengthMin;
 minSeparation = params.spindleSeparationMin;
-
-%% Handle the baseThresholds (making sure thresholds 0 and 1 are included)
-baseThresholds = params.spindlerBaseThresholds;
-baseThresholds = sort(baseThresholds);
-if baseThresholds(1) ~= 0
-    baseThresholds = [0, baseThresholds];
+maxLength = params.spindleLengthMax;
+%% Handle the thresholds (making sure thresholds 0 and 1 are included)
+thresholds = params.spindlerThresholds;
+thresholds = sort(thresholds);
+if thresholds(1) ~= 0
+    thresholds = [0, thresholds];
 end
-if baseThresholds(end) ~= 1
-    baseThresholds = [baseThresholds, 1];
+if thresholds(end) ~= 1
+    thresholds = [thresholds, 1];
 end
-params.spindlerBaseThresholds = baseThresholds;
+params.spindlerThresholds = thresholds;
 
 %% Extract the channels and filter the signal before MP
 numFrames = length(data);
@@ -39,6 +40,10 @@ totalTime = (numFrames - 1)/params.srate;
 params.frames = numFrames;
 
 %% Generate the Gabor dictionary for the MP decomposition
+freqLow = params.spindleFrequencyRange(1);
+freqHigh = params.spindleFrequencyRange(2);
+freqRes = params.spindlerGaborFrequencyResolution;
+params.spindlerGaborFrequencies = freqLow:freqRes:freqHigh;
 [gabors, sigmaFreq] = getGabors(params.srate, ...
     params.spindlerGaborSupportFactor, params.spindlerGaborScales, ...
     params.spindlerGaborFrequencies);
@@ -58,35 +63,32 @@ rgdelta  = 1:padsize;
 rgdelta  = rgdelta - mean(rgdelta);
 yp = zeros(1, 2*padsize + numFrames);
 numAtoms = size(theAtoms(:), 1);
-numThresholds = size(baseThresholds(:), 1);
-spindles(numAtoms*numThresholds) = ...
-            struct('atomsPerSecond', 0, 'numberAtoms', 0, ...
-                   'baseThreshold', 0', 'numberSpindles', 0, ...
-                   'spindleTime', 0, 'events', NaN);
+numThresholds = size(thresholds(:), 1);
+spindles(numAtoms, numThresholds) = ...
+    struct('atomsPerSecond', 0, 'numberAtoms', 0,  'threshold', 0, ...
+           'numberSpindles', 0, 'spindleTime', 0, 'events', NaN);
 
 atomsPerSecond = sort(atomsPerSecond);
 currentAtom = 1;
 for k = 1:numAtoms
     for m = currentAtom:theAtoms(k)  
-            theFrames = atomParams(m, 2) + rgdelta;
-            yp(theFrames) = yp(theFrames) + ...
+        theFrames = atomParams(m, 2) + rgdelta;
+        yp(theFrames) = yp(theFrames) + ...
                 atomParams(m, 3)*scaledGabors(:, atomParams(m, 1))';
     end
     currentAtom = theAtoms(k) + 1;
     y = yp(padsize + 1:end-padsize);
     for j = 1:numThresholds
-        p = (j - 1)*numAtoms + k;
-        spindles(p) = spindles(end);
-        spindles(p).atomsPerSecond = atomsPerSecond(k);
-        spindles(p).numberAtoms = theAtoms(k);
-        spindles(p).baseThreshold = baseThresholds(j);
+        spindles(k, j) = spindles(numAtoms, numThresholds);
+        spindles(k, j).atomsPerSecond = atomsPerSecond(k);
+        spindles(k, j).numberAtoms = theAtoms(k);
+        spindles(k, j).baseThreshold = thresholds(j);
         events = spindlerDetectEvents(y, params.srate, ...
-                baseThresholds(j), params.signalTrimFactor);
-        events = combineEvents(events, minLength, minSeparation);
-        spindles(p).events = events;
-        [spindles(p).numberSpindles, spindles(p).spindleTime] = ...
-                getSpindleCounts(events);
-       
+                thresholds(j), params.signalTrimFactor);
+        events = combineEvents(events, minLength, minSeparation, maxLength);
+        spindles(k, j).events = events;
+        [spindles(k, j).numberSpindles, spindles(k, j).spindleTime] = ...
+                getSpindleCounts(events);     
     end
 end
 

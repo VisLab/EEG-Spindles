@@ -13,7 +13,7 @@ if ~exist(outDir, 'dir')
 end
 
 %% Get the list of EYE filenames from level 0
-fileNames = getFiles('FILES', inDir, '.edf');
+fileNames = getFileListWithExt('FILES', inDir, '.edf');
 numberFiles = length(fileNames);
 
 %% Process the files

@@ -41,7 +41,6 @@ end
 
 %% Figure out the thresholds to plot and calculate the mean
 datasetName = params.name;
-numThresholds = length(thresholds);
 
 %% Extract the values to plot
 countMetric = zeros(length(sHits), 1);
@@ -62,7 +61,7 @@ end
 theTitle = [datasetName ': ' metricName ' vs atoms/second'];
 figHan = figure('Name', theTitle);
 hold on
-newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.2, 0.8, 0.8; 0.0, 0.6, 0.0; 0.3, 0.3, 0.3];
+newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.2, 0.8, 0.8; 0.0, 0.5, 0.0; 0.3, 0.3, 0.3];
     plot(thresholds(:), countMetric(:), 'LineWidth', 2, ...
          'Color', newColors(1, :), 'LineStyle', '-');
     plot(thresholds(:), hitMetric(:), 'LineWidth', 2, ...
@@ -76,7 +75,7 @@ newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.2, 0.8, 0.8; 0.0, 0.6, 0.0; 0.3, 0.
 
 hold off
 ylabel('Performance')
-xlabel('threshold')
+xlabel('Threshold')
 title(theTitle, 'Interpreter', 'None');
 legend({'Count', 'Hit', 'Intersect', 'Onset', 'Time'}, ...
        'Location', 'eastoutside');

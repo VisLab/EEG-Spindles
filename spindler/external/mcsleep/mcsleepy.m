@@ -7,18 +7,23 @@ function  [spindles, allMetrics, additionalInfo, params] =  ...
    
     %% Calculate the spindles
     [spindles, params] = mcsleepExtractSpindles(data, params);
-    parameterCurves = mcsleepGetParameterCurves(spindles, imageDir, params);
-    additionalInfo.parameterCurves = parameterCurves;
+    additionalInfo.parameterCurves = ...
+                     mcsleepGetParameterCurves(spindles, imageDir, params);
+    additionalInfo.spindles = spindles;
+    numThresholds = length(params.mcsleepThresholds);
+    numLambda2s = length(params.mcsleepLambda2s);
+    
     %% Process the expert events if available
     metrics = struct('count', NaN, 'hit', NaN, 'intersect', NaN, ...
-                        'onset', NaN, 'time', NaN); 
+        'onset', NaN, 'time', NaN);
+    allMetrics(numLambda2s, numThresholds) = metrics;
     if ~isempty(expertEvents)
         totalTime = length(data)/params.srate;
-        numExp = length(spindles);
-        allMetrics(numExp) = metrics;
-        for n = 1:numExp
-            allMetrics(n) = getPerformanceMetrics(expertEvents, spindles(n).events, ...
-                totalTime, params);
+        for n = 1:numLambda2s
+            for m = 1:numThresholds
+                allMetrics(n, m) = getPerformanceMetrics(expertEvents, ...
+                    spindles(n, m).events, totalTime, params);
+            end
         end
         
         for n = 1:length(params.metricNames)
@@ -27,6 +32,6 @@ function  [spindles, allMetrics, additionalInfo, params] =  ...
         end
     
     end
-    additionalInfo.spindles = spindles;
+    
     additionalInfo.allMetrics = allMetrics;
 end

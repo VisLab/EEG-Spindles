@@ -1,4 +1,5 @@
-function epochedEvents = combineEvents(theseEvents, minLength, minSeparation)
+function epochedEvents = combineEvents(theseEvents, minLength, ...
+                                       minSeparation, maxLength)
 % Combine events within minSeparation of each other and remove short events
 %
 %  Input:
@@ -33,6 +34,7 @@ function epochedEvents = combineEvents(theseEvents, minLength, minSeparation)
     end
 
     %% Eliminate events that are shorter than minLength seconds
-    eventMask = epochedEvents(:, 2) - epochedEvents(:, 1) < minLength;
+    eventMask = (epochedEvents(:, 2) - epochedEvents(:, 1) < minLength) | ...
+                (epochedEvents(:, 2) - epochedEvents(:, 1) > maxLength);
     epochedEvents(eventMask, :) = [];
 end

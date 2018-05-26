@@ -26,7 +26,7 @@ highFreq = min(ceil(params.srate/2.1), max(params.sdarFrequencies(2)));
 data = getFilteredData(data, params.srate, lowFreq, highFreq);
 minLength = params.spindleLengthMin;
 minSeparation = params.spindleSeparationMin;
-
+maxLength = params.spindleLengthMax;
 %% Calculate the discounted AR model
 order = params.sdarModelOrder;
 discountRate = params.sdarDiscountRate;
@@ -55,7 +55,7 @@ for k = 1:numThresholds
    startEvents = cellfun(@double, eventCells(:, 2));
    endEvents = cellfun(@double, eventCells(:, 3));
    events = [startEvents(:), endEvents(:)];
-   events = combineEvents(events, minLength, minSeparation);
+   events = combineEvents(events, minLength, minSeparation, maxLength);
    spindles(k).events = events;
    [spindles(k).numberSpindles, spindles(k).spindleTime] = getSpindleCounts(events);
 end

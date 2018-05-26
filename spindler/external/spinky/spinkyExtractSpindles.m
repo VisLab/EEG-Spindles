@@ -21,7 +21,7 @@ function [spindles, params, oscil] = spinkyExtractSpindles(data, thresholds, par
 
     %% Get the threshold range
     if isempty(thresholds)
-       frequencyRange = params.spinkySpindleFrequencyRange;
+       frequencyRange = params.spindleFrequencyRange;
        fs = params.srate;
        thresholds = spinkyGetThresholdRange(oscil, fs, frequencyRange);
     end
@@ -37,7 +37,7 @@ function [spindles, params, oscil] = spinkyExtractSpindles(data, thresholds, par
         spindles(k).threshold = spinkySpindles(k).threshold;
         events = epochedToList(spinkySpindles(k).spindleList, epochTime);
         events = combineEvents(events, params.spindleLengthMin, ...
-                               params.spindleSeparationMin);
+                     params.spindleSeparationMin, params.spindleLengthMax);
         spindles(k).events = events;
         if ~isempty(events)
             spindles(k).numberSpindles = size(events, 1);

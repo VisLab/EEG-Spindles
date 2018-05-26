@@ -1,22 +1,24 @@
-function [results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames)
+function [results, dataNames, upperBounds] = ...
+                               consolidateResults(resultsDir,  metricNames)
 %% Consolidate the results for metrics corresponding to methods
 %
 %  Parameters:
 %     
 
 %% Get the data and event file names and check that we have the same number
-    resultFiles = getFiles('FILES', resultsDir, '.mat');
+    resultFiles = getFileListWithExt('FILES', resultsDir, '.mat');
 
 %% Create the array of performance values
+   methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
    results = zeros(length(methodNames), length(metricNames), length(resultFiles));
     upperBounds = zeros(length(methodNames), length(metricNames), length(resultFiles));
     dataNames = cell(length(resultFiles), 1);
-    for k = 1:length(resultFiles)
-       test = load(resultFiles{k});
-       dataNames{k} = test.params.name;
-       results(:, :, k) = consolidate(test.metrics, methodNames, metricNames); 
+    for n = 1:length(resultFiles)
+       test = load(resultFiles{n});
+       dataNames{n} = test.params.name;
+       results(:, :, n) = consolidate(test.metrics, methodNames, metricNames); 
        if isfield(test, 'additionalInfo') && isfield(test.additionalInfo, 'allMetrics')
-           upperBounds(:, :, k) = getUpperBound( ...
+           upperBounds(:, :, n) = getUpperBound( ...
                test.additionalInfo.allMetrics, methodNames, metricNames);
        end
     end

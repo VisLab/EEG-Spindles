@@ -32,21 +32,21 @@ for m = 1:length(trueEvents)
     hitConfusion.fn = hitConfusion.fn + fn;
     
     [tp, tn, fp, fn] = getConfusionIntersects(trueEvents{m}, ...
-        labeledEvents{m}, totalTimes(m), params.intersectTolerance, spindleDuration);
+        labeledEvents{m}, totalTimes(m), params.toleranceIntersect, spindleDuration);
     intersectConfusion.tp = intersectConfusion.tp + tp;
     intersectConfusion.tn = intersectConfusion.tn + tn;
     intersectConfusion.fp = intersectConfusion.fp + fp;
     intersectConfusion.fn = intersectConfusion.fn + fn;
     
     [tp, tn, fp, fn] = getConfusionOnsets(trueEvents{m}, ...
-         labeledEvents{m}, totalTimes(m), params.onsetTolerance, spindleDuration);
+         labeledEvents{m}, totalTimes(m), params.toleranceOnset, spindleDuration);
     onsetConfusion.tp = onsetConfusion.tp + tp;
     onsetConfusion.tn = onsetConfusion.tn + tn;
     onsetConfusion.fp = onsetConfusion.fp + fp;
     onsetConfusion.fn = onsetConfusion.fn + fn;
  
     [tp, tn, fp, fn] = getConfusionTimes(trueEvents{m}, ...
-        labeledEvents{m}, totalTimes(m), params.srate, params.timingTolerance);
+        labeledEvents{m}, totalTimes(m), params.srate, params.toleranceTiming);
     timeConfusion.tp = timeConfusion.tp + tp;
     timeConfusion.tn = timeConfusion.tn + tn;
     timeConfusion.fp = timeConfusion.fp + fp;

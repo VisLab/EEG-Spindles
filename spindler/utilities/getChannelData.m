@@ -1,4 +1,4 @@
-function [data, srateOriginal, channelNumber, channelLabel] = ...
+function [data, srateOriginal, srateActual, channelNumber, channelLabel] = ...
                       getChannelData(fileName, channelLabels, srateTarget)
 %% Extracts a resampled channel of data from an EEG data file
 %
@@ -31,5 +31,6 @@ function [data, srateOriginal, channelNumber, channelLabel] = ...
     if ~isempty(srateTarget) && srateTarget > 0
         EEG =  pop_resample(EEG, srateTarget);
     end
+    srateActual = EEG.srate;
     data = EEG.data;
 end

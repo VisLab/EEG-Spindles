@@ -13,10 +13,10 @@ outDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert1';
 %% Make sure output directory exists
 if ~exist(outDir, 'dir')
     mkdir(outDir);
-end;
+end
 
 %% Get the list of EEG filenames 
-EEGFiles = getFiles('FILES', EEGDir, '.set');
+EEGFiles = getFileListWithExt('FILES', EEGDir, '.set');
 numFiles = length(EEGFiles);
 
 %% Match expert event files with EEG files

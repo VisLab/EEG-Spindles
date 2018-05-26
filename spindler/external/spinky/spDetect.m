@@ -1,6 +1,6 @@
 function [nbr_sp, pos_sp] = spDetect(sig, seuil, params)
     fs = params.srate;
-    frequencyLimits = params.spinkySpindleFrequencyRange;
+    frequencyLimits = params.spindleFrequencyRange;
     frequencies = frequencyLimits(1):0.15:frequencyLimits(2);
     sc = 1./(frequencies/fs); %selon AASM sleep spindles dans la bande [11 16] 62:91;%
     wname='fbsp 20-0.5-1';  

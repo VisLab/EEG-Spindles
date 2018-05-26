@@ -16,13 +16,13 @@ freqType = 'theta';
 excludeLabels = {'EKG'; 'EKG1'};
 
 %% Get the EEG data files
-dataFiles = getFiles('FILES2', dataDir, '.set');
+dataFiles = getFileListWithExt('FILES2', dataDir, '.set');
 
 %% Create the output directories if they doesn't exist
 if ~exist(resultsDir, 'dir')
     fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
-end;
+end
 resultTypeDir = [resultsDir filesep freqType];
 if ~exist(resultTypeDir, 'dir')
     fprintf('Creating results directory %s \n', resultTypeDir);

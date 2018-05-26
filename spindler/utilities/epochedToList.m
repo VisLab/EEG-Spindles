@@ -7,7 +7,7 @@ function events = epochedToList(epochedEvents, epochTime)
 %
 
 %% Process the events
-if isempty(epochedEvents) || ~iscell(epochedEvents)
+if isempty(epochedEvents)
     events = [];
     return;
 elseif ~iscell(epochedEvents)
@@ -20,6 +20,6 @@ eventTime  = 0;
 events = epochedEvents{1};
 for k = 2:numEpochs
     eventTime = eventTime + epochTime;
-    nextEvents = epochedEvents{k} + epochTime;
+    nextEvents = epochedEvents{k} + eventTime;
     events = [events; nextEvents]; %#ok<AGROW>
 end

@@ -8,7 +8,7 @@ eventLists = cell(numAlgs, numTypes);
 for k = 1:numAlgs
     for m = 1:numTypes
         resultsDir = [baseDirs{m} algNames{k}];
-        resultFiles = getFiles('FILES', resultsDir, '.mat');
+        resultFiles = getFileListWithExt('FILES', resultsDir, '.mat');
         numResults = length(resultFiles);
         clear ev;
         ev(numResults) = baseStruct;

@@ -42,7 +42,7 @@ eventDirOut = 'D:\TestData\Alpha\spindleData\bcit\events2ColCSV';
 % figureFormats = {'png', 'fig'};
 % scaleFactor = 15;
 %% Get the data and event file names and check that we have the same number
-eventFiles = getFiles('FILES', eventDir, '.mat');
+eventFiles = getFileListWithExt('FILES', eventDir, '.mat');
 
 %% Create the output directory if it doesn't exist
 if ~exist(eventDirOut, 'dir')

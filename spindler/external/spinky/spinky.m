@@ -1,22 +1,36 @@
-function  [spindles, allMetrics, additionalInfo, params] =  ...
+function  [spindles, additionalInfo, params] =  ...
                               spinky(data, expertEvents, imageDir, params) 
-%% Run the spinky algorithm on the data.  Given
+%% Run the spinky algorithm on the data.
 %
 %  Parameters:
-%     data
-    %% Set the epoch size and number of training frames and epoch the data
+%     data           1 x frames array of EEG data
+%     expertEvents   n x 2 array of start and end times of expert events
+%     imageDir       path to directory to dump images or empty if no dump
+%     params         structure with the parameters for the algorithm
+   
+    %% Set up the parameters and check that the data is not empty
     defaults = concatenateStructs(getGeneralDefaults(), spinkyGetDefaults());
-    params = processParameters('spinky', nargin, 4, params, defaults);   
-    [spindles, params, oscil] = spinkyExtractSpindles(data, [], params);
-    parameterCurves = spinkyGetParameterCurves(spindles, imageDir, params);
+    params = processParameters('spinky', nargin, 4, params, defaults); 
+    if isempty(data)
+       additionalInfo.warningMsgs = 'spinky: data is empty algorithm fails';
+       warning(additionalInfo.warningMsgs);
+       return
+    end
+    
+   %% Calculate the spindle representations for a range of parameters
+    [spindles, params, additionalInfo.oscil] = ...
+                   spinkyExtractSpindles(data, [], params);
   
+    additionalInfo.parameterCurves = ...
+                    spinkyGetParameterCurves(spindles, imageDir, params);
+    
     %% Process the expert events if available
-    metrics = struct('count', NaN, 'hit', NaN, 'intersect', NaN, ...
-                        'onset', NaN, 'time', NaN); 
     if ~isempty(expertEvents)
-        totalTime = length(data)/params.srate;
         numExp = length(spindles);
-        allMetrics(numExp) = metrics;
+        allMetrics(numExp) = ...
+            struct('count', NaN, 'hit', NaN, 'intersect', NaN, ...
+                   'onset', NaN, 'time', NaN);
+        totalTime = length(data)/params.srate;
         for n = 1:numExp
             allMetrics(n) = getPerformanceMetrics(expertEvents, spindles(n).events, ...
                 totalTime, params);
@@ -26,10 +40,9 @@ function  [spindles, allMetrics, additionalInfo, params] =  ...
             spinkyShowMetric(thresholds, allMetrics, params.metricNames{n}, ...
                 imageDir, params);
         end
-      
+    else
+        allMetrics = []; 
     end
-    additionalInfo.spindles = spindles;
-    additionalInfo.parameterCurves = parameterCurves;
-    additionalInfo.metrics = metrics;
-    additionalInfo.thresholds = params.thresholds;
-    additionalInfo.oscil = oscil;
+    
+    additionalInfo.allMetrics = allMetrics;
+end

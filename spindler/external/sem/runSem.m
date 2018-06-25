@@ -16,16 +16,29 @@
 % centralLabels = {'C3-A1', 'CZ-A1'};
 % occipitalLabels = {'O1-A1'};
 % paramsInit = struct();
-
+% paramsInit.spindleFrequencyRange = [11, 17];
+% paramsInit.algorithm = 'sem';
 %% Set up the directory for mass
-stageDir = [];
 dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSem';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Sem_Summary.mat';
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
 centralLabels = {'Cz'};
 occipitalLabels = {'O1'};
 paramsInit = struct();
+paramsInit.spindleFrequencyRange = [11, 17];
+paramsInit.algorithm = 'sem';
+
+eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...
+              paramsInit.algorithm];
+
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
+% resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...
+%               paramsInit.algorithm '_expert1'];
+
+
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert2';
+% resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...
+%               paramsInit.algorithm '_expert2'];
 
 %% Metrics to calculate and methods to use
 paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
@@ -45,44 +58,30 @@ for k = 1:length(dataFiles)
     [~, theName, ~] = fileparts(dataFiles{k});
     params.name = theName;
     params.srateTarget = 0;
-    [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
-           getChannelData(dataFiles{k}, centralLabels, params.srateTarget);
+    [dataCentral, params.srateOriginal, params.srate, params.channelNumber, ...
+        params.channelLabel] = getChannelData(dataFiles{k}, centralLabels, params.srateTarget);
     params.srate = params.srateOriginal;
  
-   [dataOccipital, params.srateOriginal, params.occipitalNumber, ...
-       params.occipitalLabel] = getChannelData(dataFiles{k}, ...
-       centralLabels, params.srateTarget);
+   [dataOccipital, params.srateOriginal,  params.srate, params.occipitalNumber, ...
+        params.occipitalLabel] = getChannelData(dataFiles{k}, ...
+       occipitalLabels, params.srateTarget);
    
-    if isempty(data) || isempty(dataOccipital)
+    if isempty(dataCentral) || isempty(dataOccipital)
         warning('No occipital or central data found for %s\n', dataFiles{k});
         continue;
     end
-   
-       %% Read events and stages if available 
-    expertEvents = [];
-    if ~isempty(eventDir)
-        expertEvents = readEvents([eventDir filesep theName '.mat']);
-    end
+    data = [dataCentral; dataOccipital];
     
-    %% Use the longest stetch in the stage events
-    stageEvents = [];
-    if ~isempty(stageDir)
-        stageStuff = load([stageDir filesep theName '.mat']);
-        stageEvents = stageStuff.stage2Events;
-        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
-        [maxLength, maxInd] = max(stageLengths);
-        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
-                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
-        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
-        startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
-        endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
-        data = data(startFrame:endFrame);
-        dataOccipital = dataOccipital(startFrame:endFrame);
-    end
+    %% Read events and stages if available 
+    expertEvents = readEvents(eventDir, [theName '.mat']);
+    stageEvents = readEvents(stageDir, [theName '.mat']);
     
+    %% Use the longest stretch in the stage events
+    [data, startFrame, endFrame, expertEvents] = ...
+         getMaxStagedData(data, stageEvents, expertEvents, params.srate);
     
     %% Load the file
-    detection = a6_spindle_detection(data(:), dataOccipital(:), params.srate);
+    detection = a6_spindle_detection(data(1, :)', data(2, :)', params.srate);
     events = getMaskEvents(detection, params.srate);
     events = combineEvents(events, params.spindleLengthMin, ...
                  params.spindleSeparationMin, params.spindleLengthMax);
@@ -93,26 +92,13 @@ for k = 1:length(dataFiles)
     else
         metrics = [];
     end
-    additionalInfo = struct();
+    additionalInfo.params = params.algorithm;
+    additionalInfo.allMetrics = metrics;
+    additionalInfo.startFrame = startFrame;
+    additionalInfo.endFrame = endFrame;
+    additionalInfo.srate = params.srate;
+    additionalInfo.stageEvents = stageEvents;
 %% Save the results
-    theFile = [resultsDir filesep theName '_Ch_' params.channelLabel ...
-               '_' params.occipitalLabel '_Sem.mat'];
-    save(theFile, 'events', 'expertEvents', 'metrics', ...
-        'params', 'additionalInfo', '-v7.3');
-
+    theFile = [resultsDir filesep theName '.mat'];
+    save(theFile, 'events', 'expertEvents', 'params', 'additionalInfo', '-v7.3');
 end
-
-%% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = ...
-    consolidateResults(resultsDir, paramsInit.methodNames, paramsInit.metricNames);
-
-%% Save the results
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
-end
-methodNames = params.methodNames;
-metricNames = params.metricNames;
-save(summaryFile, 'results', 'dataNames', 'methodNames', ...
-      'metricNames', 'upperBounds', '-v7.3');

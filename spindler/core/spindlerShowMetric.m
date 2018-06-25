@@ -26,33 +26,18 @@ bestEligibleAtomInd = spindleParameters.bestEligibleAtomInd;
 bestEligibleThresholdInd = spindleParameters.bestEligibleThresholdInd;
 
 %% Extract the values to plot
-[numAtoms, numThresholds] = size(allMetrics);
-countMetric = zeros(numAtoms, numThresholds);
-hitMetric = zeros(numAtoms, numThresholds);
-intersectMetric = zeros(numAtoms, numThresholds);
-onsetMetric = zeros(numAtoms, numThresholds);
-timeMetric = zeros(numAtoms, numThresholds);
+metrics = getMetric(allMetrics, metricName);
 
-for k = 1:numAtoms
-    for j = 1:numThresholds
-        countMetric(k, j) = allMetrics(k, j).count.(metricName);
-        hitMetric(k, j) = allMetrics(k, j).hit.(metricName);
-        intersectMetric(k, j) = allMetrics(k, j).intersect.(metricName);
-        onsetMetric(k, j) = allMetrics(k, j).onset.(metricName);
-        timeMetric(k, j) = allMetrics(k, j).time.(metricName);
-    end
-end
-
-countMetric = [countMetric(:, minInd), countMetric(:, maxInd),  ...
-               countMetric(:, bestEligibleThresholdInd)];       
-hitMetric = [hitMetric(:, minInd), hitMetric(:, maxInd),  ...
-             hitMetric(:, bestEligibleThresholdInd)];
-intersectMetric = [intersectMetric(:, minInd), intersectMetric(:, maxInd) ...
-                   intersectMetric(:, bestEligibleThresholdInd)];
-onsetMetric = [onsetMetric(:, minInd), onsetMetric(:, maxInd), ...
-              onsetMetric(:, bestEligibleThresholdInd)];
-timeMetric = [timeMetric(:, minInd), timeMetric(:, maxInd), ...
-              timeMetric(:, bestEligibleThresholdInd)];
+countMetric = [metrics.count(:, minInd), metrics.count(:, maxInd),  ...
+               metrics.count(:, bestEligibleThresholdInd)];       
+hitMetric = [metrics.hit(:, minInd), metrics.hit(:, maxInd),  ...
+             metrics.hit(:, bestEligibleThresholdInd)];
+intersectMetric = [metrics.intersect(:, minInd), metrics.intersect(:, maxInd) ...
+                   metrics.intersect(:, bestEligibleThresholdInd)];
+onsetMetric = [metrics.onset(:, minInd), metrics.onset(:, maxInd), ...
+               metrics.onset(:, bestEligibleThresholdInd)];
+timeMetric = [metrics.time(:, minInd), metrics.time(:, maxInd), ...
+              metrics.time(:, bestEligibleThresholdInd)];
 
 %% Set up the legends
 legendStrings = {'T_b=0', 'T_b=1', ...

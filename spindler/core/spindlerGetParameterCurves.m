@@ -64,28 +64,53 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     spindleHarmonicMean(spindleMask) = 2*spindleMin(spindleMask).*spindleMax(spindleMask) ...
           ./(spindleMin(spindleMask) + spindleMax(spindleMask));
  
+    %% Get the mean spindle length
+    spindleLen = spindleTime./spindleHits;
+    spindleLen(isnan(spindleLen)) = 0;
+    spindleLenCentral = (spindleLen(:, 1) + spindleLen(:, end))/2;
+    spindleFractionCentral = (spindleFraction(:, 1) + spindleFraction(:, end))/2;
     
     %% Get the standard deviations and slopes of spindle rate
     spindleRateSTD = std(spindleRate, 0, 2);
     spindleRateSTD(isnan(spindleRateSTD)) = 0;
     diffSTD = diff(spindleRateSTD);
-%     diffTopThreshold = diff(spindleRate(:, end));
-%     upperAtomRateInd = find(diffTopThreshold < 0, 1, 'first');
-    upperAtomRateInd = ...
-        find(spindleRate(:, 1) - spindleRate(:, end) > 0, 1, 'first');
-    if isempty(upperAtomRateInd)
-        upperAtomRateInd = numAtoms;
-    end
+
+    %% Determine the lower index for range
     lowerAtomRateInd = find(spindleRateSTD > 0, 1, 'first');
-    if isempty(lowerAtomRateInd) || isempty(upperAtomRateInd) || lowerAtomRateInd >= upperAtomRateInd
+    if isempty(lowerAtomRateInd) 
         warningCodes(end + 1) = 1;
         warningMsgs{end + 1} = ...
             ['Spindles/sec has non standard behavior for low ' ...
-            'spindle length --- algorithm failed, likely because of large artifacts'];
+            'spindle length -- spindler completely failed, ' ...
+            'likely because of large artifacts'];
         warning('getSpinderCurves:BadSpindleRateSTD', warningMsgs{end});
         return;
     end
-
+    lowerAtomRateInd2 = ...
+        find(spindleLen(:, end) > spindleLen(1, end), 1, 'last');
+    if ~isempty(lowerAtomRateInd2)
+        lowerAtomRateInd = max(lowerAtomRateInd, lowerAtomRateInd2);
+    end
+    %% Determine upper index for range relative to lower range
+%     upperAtomRateInd = ...
+%         find(spindleRate(:, 1) - spindleRate(:, end) > 0, 1, 'first');
+%     upperAtomRateInd = ...
+%          find(spindleRate(:, 1) - spindleRate(:, end) < 0.1, 1, 'last');
+    spindleRateRel = spindleRate(lowerAtomRateInd:end, :);
+    upperAtomRateInd = ...
+        find(spindleRateRel(:, 1) - spindleRateRel(:, end) > 0.1, 1, 'first');
+    if isempty(upperAtomRateInd)
+        upperAtomRateInd = numAtoms;
+    else
+        upperAtomRateInd = upperAtomRateInd + lowerAtomRateInd - 1;
+    end
+    diffTopThreshold = diff(spindleRateRel(:, end));
+    upperAtomRateInd2 = find(diffTopThreshold < 0, 1, 'first');
+    if ~isempty(upperAtomRateInd2)
+        upperAtomRateInd = min(upperAtomRateInd, ...
+            upperAtomRateInd2 + lowerAtomRateInd - 1);
+    end
+  
     %% If the STD is not an increasing function of atoms/sec, decomposition bad
     if sum(diffSTD(upperAtomRateInd:end) < 0) > 0
         warningCodes(end + 1) = 2;
@@ -96,26 +121,26 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     end
     %lowerAtomRateInd = max(1, lowerAtomRateInd - 1);
     
-    %% Adjust to narrower region
-    bendSTD = spindleRateSTD(upperAtomRateInd);
-    %upperAtomRateInd = find(spindleRateSTD >= 0.5 * bendSTD, 1, 'first');
-    lowerAtomRateInd = find(spindleRateSTD >= 0.05 * bendSTD, 1, 'first');
+%     %% Adjust to narrower region
+%     bendSTD = spindleRateSTD(upperAtomRateInd);
+%     %upperAtomRateInd = find(spindleRateSTD >= 0.5 * bendSTD, 1, 'first');
+%     lowerAtomRateInd = find(spindleRateSTD >= 0.05 * bendSTD, 1, 'first');
     
-    %% Make sure that the region is at least 0.5 atoms/second
+    %% Eligible region is at least spindlerMinAtomsPerSecondInterval
+    minEligibleRegion = params.spindlerMinAtomsPerSecondInterval;
     upperAtomRate = atomsPerSecond(upperAtomRateInd);
     lowerAtomRate = atomsPerSecond(lowerAtomRateInd);
-    if upperAtomRate - lowerAtomRate < 0.05
-        upperAtomRate = lowerAtomRate + 0.05;
+    if upperAtomRate - lowerAtomRate < minEligibleRegion
+        warningCodes(end + 1) = 3;
+        warningMsgs{end + 1} =   ['Eligible atoms/sec interval too small--' ...
+            'expanding to ' num2str(minEligibleRegion)];
+        warning('spindlerGetParameterCurves:ToosmallEligibleRegion',  warningMsgs{end});
+        upperAtomRate = lowerAtomRate + minEligibleRegion;
         [~, upperAtomRateInd] = min(abs(atomsPerSecond - upperAtomRate));
         upperAtomRate = atomsPerSecond(upperAtomRateInd);
     end
     atomRateRangeInd = [lowerAtomRateInd, upperAtomRateInd];
-    %% Get the mean spindle length
-    meanSpindleLen = spindleTime./spindleHits;
-    meanSpindleLen(isnan(meanSpindleLen)) = 0;
-    meanSpindleLenCentral = (meanSpindleLen(:, 1) + meanSpindleLen(:, end))/2;
-    spindleFractionCentral = (spindleFraction(:, 1) + spindleFraction(:, end))/2;
-    
+
     %% Distances to central spindle fraction
     stdRange = atomRateRangeInd(1):atomRateRangeInd(2);
 %     distances = bsxfun(@minus, meanSpindleLen(stdRange, :), ...
@@ -125,7 +150,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     distances = sum(abs(distances), 1);
     [~, bestEligibleThresholdInd] = min(distances);
     bestEligibleThreshold = thresholds(bestEligibleThresholdInd);
-    testLens = meanSpindleLen(stdRange, bestEligibleThresholdInd);
+    testLens = spindleLen(stdRange, bestEligibleThresholdInd);
     diffTestLens = diff(testLens);
     diffInd = find(diffTestLens >= 0, 1, 'first');
     if isempty(diffInd)
@@ -174,7 +199,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
         num2str(thresholds(bestEligibleThresholdInd))]};
     h1Fig = figure('Name', baseTitle);
     hold on
-    [ax, h1, h2] = plotyy(atomsPerSecond, meanSpindleLen(:, bestEligibleThresholdInd), ...
+    [ax, h1, h2] = plotyy(atomsPerSecond, spindleLen(:, bestEligibleThresholdInd), ...
         atomsPerSecond, spindleRateSTD);
 %     set(ax(1), 'YColor', [0, 0, 0]);
 %     set(ax(2), 'YColor', [0, 0, 0]);
@@ -182,26 +207,26 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
 %     set(h2, 'Color', [0.65, 0.65, 0.65])
     theColor = get(h1, 'Color');
     set(h1, 'Color', [0, 0, 0], 'LineWidth', 3);
-    plot(ax(1), atomsPerSecond, meanSpindleLenCentral, ...
+    plot(ax(1), atomsPerSecond, spindleLenCentral, ...
         'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
-    plot(ax(1), atomsPerSecond, meanSpindleLen(:, 1), ...
+    plot(ax(1), atomsPerSecond, spindleLen(:, 1), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
-    plot(ax(1), atomsPerSecond, meanSpindleLen(:, end), ...
+    plot(ax(1), atomsPerSecond, spindleLen(:, end), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
     yMax = params.spindleLengthMax;
     hLine = line(ax(1), [eligiblePos, eligiblePos], [0, yMax], ... ###
         'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
 
     for k = 1:numThresholds
-        plot(ax(1), atomsPerSecond, meanSpindleLen(:, k), 'Color', theColors(k, :));
+        plot(ax(1), atomsPerSecond, spindleLen(:, k), 'Color', theColors(k, :));
     end
-    plot(ax(1), atomsPerSecond, meanSpindleLenCentral, ...
+    plot(ax(1), atomsPerSecond, spindleLenCentral, ...
         'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
-    plot(ax(1), atomsPerSecond, meanSpindleLen(:, 1), ...
+    plot(ax(1), atomsPerSecond, spindleLen(:, 1), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
-    plot(ax(1), atomsPerSecond, meanSpindleLen(:, end), ...
+    plot(ax(1), atomsPerSecond, spindleLen(:, end), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
-    plot(ax(1), atomsPerSecond, meanSpindleLen(:, bestEligibleThresholdInd),...
+    plot(ax(1), atomsPerSecond, spindleLen(:, bestEligibleThresholdInd),...
         'LineWidth', 3, 'Color', [0, 0, 0]);
     set(h2, 'LineWidth', 3);
     set(ax(1), 'YLimMode', 'auto', 'YTickMode', 'auto')
@@ -232,11 +257,11 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     box(ax(2), 'on')
     hold off
     title(theTitle, 'Interpreter', 'None');
-%     for k = 1:length(params.figureFormats)
-%         thisFormat = params.figureFormats{k};
-%         saveas(h1Fig, [outDir filesep params.name '_AverageSpindleLengthWithSD.' ...
-%             thisFormat], thisFormat);
-%     end
+    for k = 1:length(params.figureFormats)
+        thisFormat = params.figureFormats{k};
+        saveas(h1Fig, [outDir filesep params.name '_spindleLengthWithSD.' ...
+            thisFormat], thisFormat);
+    end
     if params.figureClose
         close(h1Fig);
     end
@@ -258,14 +283,14 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
         num2str(thresholds(bestEligibleThresholdInd))]};
     h1Figa = figure('Name', baseTitle);
     hold on
-    h1 = plot(atomsPerSecond, meanSpindleLen(:, bestEligibleThresholdInd));
+    h1 = plot(atomsPerSecond, spindleLen(:, bestEligibleThresholdInd));
     theColor = get(h1, 'Color');
     set(h1, 'Color', [0, 0, 0], 'LineWidth', 3);
-    plot(atomsPerSecond, meanSpindleLenCentral, ...
+    plot(atomsPerSecond, spindleLenCentral, ...
         'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
-    plot(atomsPerSecond, meanSpindleLen(:, 1), ...
+    plot(atomsPerSecond, spindleLen(:, 1), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
-    plot(atomsPerSecond, meanSpindleLen(:, end), ...
+    plot(atomsPerSecond, spindleLen(:, end), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
     yMax = params.spindleLengthMax;
     set(gca, 'YLim', [0, yMax], 'YLimMode', 'manual');
@@ -285,16 +310,16 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     numEligibleThresholds = length(eligibleThresholdInds);
     for k = 1:numEligibleThresholds
         thisInd = eligibleThresholdInds(k);
-        plot(atomsPerSecond, meanSpindleLen(:, thisInd), ...
+        plot(atomsPerSecond, spindleLen(:, thisInd), ...
             'Color', theColors(thisInd, :));
     end
-    plot(atomsPerSecond, meanSpindleLenCentral, ...
+    plot(atomsPerSecond, spindleLenCentral, ...
         'LineWidth', 3, 'Color', theColor, 'LineStyle', '-');
-    plot(atomsPerSecond, meanSpindleLen(:, 1), ...
+    plot(atomsPerSecond, spindleLen(:, 1), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', '--');
-    plot(atomsPerSecond, meanSpindleLen(:, end), ...
+    plot(atomsPerSecond, spindleLen(:, end), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
-    plot(atomsPerSecond, meanSpindleLen(:, bestEligibleThresholdInd),...
+    plot(atomsPerSecond, spindleLen(:, bestEligibleThresholdInd),...
         'LineWidth', 3, 'Color', [0, 0, 0]);
     
 %     set(gca, 'YLimMode', 'auto', 'YTickMode', 'auto')
@@ -322,7 +347,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     title(theTitle, 'Interpreter', 'None');
     for k = 1:length(params.figureFormats)
         thisFormat = params.figureFormats{k};
-        saveas(h1Figa, [outDir filesep params.name '_AverageSpindleLength.' ...
+        saveas(h1Figa, [outDir filesep params.name '_spindleLength.' ...
             thisFormat], thisFormat);
     end
     if params.figureClose
@@ -496,7 +521,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     title(theTitle, 'Interpreter', 'None');
     for k = 1:length(params.figureFormats)
         thisFormat = params.figureFormats{k};
-        saveas(h1Figa, [outDir filesep params.name '_FractionSpindlingTime.' ...
+        saveas(h1Figa, [outDir filesep params.name '_spindleFraction.' ...
             thisFormat], thisFormat);
     end
     if params.figureClose
@@ -568,7 +593,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     title(theTitle, 'Interpreter', 'None');
     for k = 1:length(params.figureFormats)
         thisFormat = params.figureFormats{k};
-        saveas(h2Fig, [outDir filesep params.name '_AverageSpindlePerMin.' ...
+        saveas(h2Fig, [outDir filesep params.name '_spindleRate.' ...
             thisFormat], thisFormat);
     end
     if params.figureClose
@@ -605,13 +630,13 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
             'LineWidth', 2);
         plot(atomsPerSecond, spindle75(:, k), 'Color', [0.6, 0.6, 0.6], ...
             'LineWidth', 2, 'LineStyle', '--');
-        plot(atomsPerSecond, meanSpindleLen(:, 1), 'Color', [0, 0.4470, 0.7410], ...
+        plot(atomsPerSecond, spindleLen(:, 1), 'Color', [0, 0.4470, 0.7410], ...
             'LineWidth', 3, 'LineStyle', '--');
-        plot(atomsPerSecond, meanSpindleLen(:, end), 'Color', [0, 0.4470, 0.7410], ...
+        plot(atomsPerSecond, spindleLen(:, end), 'Color', [0, 0.4470, 0.7410], ...
             'LineWidth', 3, 'LineStyle', ':');
-        plot(atomsPerSecond, meanSpindleLenCentral, 'Color', [0, 0.4470, 0.7410], ...
+        plot(atomsPerSecond, spindleLenCentral, 'Color', [0, 0.4470, 0.7410], ...
             'LineWidth', 3);
-        plot(atomsPerSecond, meanSpindleLen(:, k), 'Color', [0.0, 0.0, 0.0], ...
+        plot(atomsPerSecond, spindleLen(:, k), 'Color', [0.0, 0.0, 0.0], ...
             'LineWidth', 3);
         line([lowerAtomRate, upperAtomRate], [0.2, 0.2], ...
             'LineWidth', 4, 'Color', [0.85, 0.85, 0.85]);
@@ -649,7 +674,7 @@ titleColor = [0, 0, 0];
         box on
         for f = 1:length(params.figureFormats)
             thisFormat = params.figureFormats{f};
-            saveas(h3Fig, [outDir filesep params.name '_LengthDist_Threshold_' ...
+            saveas(h3Fig, [outDir filesep params.name '_spindleLengthDist_Threshold_' ...
                 convertNumber(thresholds(k), '_') '.' thisFormat], thisFormat);
         end
         if params.figureClose

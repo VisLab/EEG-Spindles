@@ -23,13 +23,15 @@ function spindleCurves = spinkyGetParameterCurves(spindles, outDir, params)
     spindleHits = cellfun(@double, {spindles.numberSpindles});
     spindleTime = cellfun(@double, {spindles.spindleTime});
     spindleRate = 60*spindleHits/totalSeconds;
-
+    spindleFraction = spindleTime/totalSeconds;
+    
     %% Get the mean spindle length
     meanSpindleLen = spindleTime./spindleHits;
     meanSpindleLen(isnan(meanSpindleLen)) = 0;
     spindleCurves.spindleHits = spindleHits;
     spindleCurves.spindleTime = spindleTime;
     spindleCurves.spindleRate = spindleRate;
+    spindleCurves.spindleFraction = spindleFraction;
     spindleCurves.meanSpindleLen = meanSpindleLen;
     spindleCurves.thresholds = thresholds;
     %% Determine whether to display the results
@@ -52,7 +54,7 @@ function spindleCurves = spinkyGetParameterCurves(spindles, outDir, params)
     box on
     for k = 1:length(params.figureFormats)
         thisFormat = params.figureFormats{k};
-        saveas(h1Fig, [outDir filesep params.name '_AverageSpindleLength.' ...
+        saveas(h1Fig, [outDir filesep params.name '_SpindleLength.' ...
             thisFormat], thisFormat);
     end
     if params.figureClose
@@ -74,6 +76,23 @@ function spindleCurves = spinkyGetParameterCurves(spindles, outDir, params)
     end
     if params.figureClose
         close(h2Fig);
+    end
+
+    %% Show the spindle fraction summary values
+    theTitle = [params.name ' Spindle fraction'];
+    h3Fig = figure('Name', theTitle);
+    plot(thresholds, spindleFraction, 'k', 'LineWidth', 2);
+    xlabel('Threshold')
+    ylabel('Spindle fraction (s)');
+    title(theTitle);
+    box on
+    for k = 1:length(params.figureFormats)
+        thisFormat = params.figureFormats{k};
+        saveas(h3Fig, [outDir filesep params.name '_SpindleFraction.' ...
+            thisFormat], thisFormat);
+    end
+    if params.figureClose
+        close(h3Fig);
     end
 
 end

@@ -1,38 +1,34 @@
-function [events, metrics, additionalInfo, params] =  spindler(data, expertEvents, imageDir, params)
+function [spindles, additionalInfo, params] =  spindler(data, expertEvents, imageDir, params)
 %% Calculate the spindles and performance using spindler
 %
 %  Parameters:
 %      data           1 x n data for spindles
 %      expertEvents   events
-%      imageDir       if not empty, dump the parameter curvers
+%      imageDir       if not empty, dump the parameter curves
 %      params         parameters for the algorithm
 %
 %     
-    %% Calculate the spindle representations for a range of parameters
-    events = [];
-    metrics = [];
+   %% Set up the parameters and check that the data is not empty
+    defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
+    params = processParameters('spindler', nargin, 4, params, defaults);
     if isempty(data)
        additionalInfo.warningMsgs = 'spindler: data is empty algorithm fails';
        warning(additionalInfo.warningMsgs);
        return
     end
-    [spindles, params] = spindlerExtractSpindles(data, params);
-    [spindlerCurves, warningMsgs] = ...
-                  spindlerGetParameterCurves(spindles, imageDir, params);
-    if spindlerCurves.bestEligibleAtomInd > 0
-         events = spindles(spindlerCurves.bestEligibleAtomInd, ...
-                           spindlerCurves.bestEligibleThresholdInd).events;
-    else
-        events = [];
-    end
     
+     %% Calculate the spindle representations for a range of parameters
+    [spindles, params] = spindlerExtractSpindles(data, params);
+    [additionalInfo.spindlerCurves, additionalInfo.warningMsgs] = ...
+                  spindlerGetParameterCurves(spindles, imageDir, params);
+ 
     %% Process the expert events if available
-    metrics = struct('count', NaN, 'hit', NaN, 'intersect', NaN, ...
-                        'onset', NaN, 'time', NaN); 
-    if ~isempty(expertEvents)
-        totalTime = length(data)/params.srate;
+    if ~isempty(expertEvents)   
         [numAtoms, numThresholds] = size(spindles);
-        allMetrics(numAtoms, numThresholds) = metrics;
+        allMetrics(numAtoms, numThresholds) = ...
+             struct('count', NaN, 'hit', NaN, 'intersect', NaN, ...
+                        'onset', NaN, 'time', NaN);
+        totalTime = length(data)/params.srate;
         for k = 1:numAtoms
             for j = 1:numThresholds
                 allMetrics(k, j) = getPerformanceMetrics(expertEvents, ...
@@ -41,18 +37,11 @@ function [events, metrics, additionalInfo, params] =  spindler(data, expertEvent
         end
         
         for n = 1:length(params.metricNames)
-            spindlerShowMetric(spindlerCurves, allMetrics, ...
+            spindlerShowMetric(additionalInfo.spindlerCurves, allMetrics, ...
                 params.metricNames{n}, imageDir, params);
         end
-        metrics = struct();
-        if spindlerCurves.bestEligibleThresholdInd > 0 && ...
-           spindlerCurves.bestEligibleAtomInd > 0
-            metrics = allMetrics(spindlerCurves.bestEligibleAtomInd, ...
-                                 spindlerCurves.bestEligibleThresholdInd);
-        end
+    else
+        allMetrics = [];
     end
-    additionalInfo.spindles = spindles;
-    additionalInfo.spindlerCurves = spindlerCurves;
-    additionalInfo.metrics = metrics;
-    additionalInfo.warningMsgs = warningMsgs;  
+    additionalInfo.allMetrics = allMetrics;
 end

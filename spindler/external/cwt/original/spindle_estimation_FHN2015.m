@@ -43,11 +43,11 @@ function [spindles_start_end, detected_spindles] = spindle_estimation_FHN2015(x,
 % tsanasthanasis@gmail.com
 
 %% Set initial defaults (user-specified)
-if nargin<4 || isempty(alg_used), 
-    alg_used = 'a7';
+if nargin<4 || isempty(alg_used) 
+    alg_used = 'cwta7';
 end
 
-if nargin<3 || isempty(spindle_frequency_range), 
+if nargin<3 || isempty(spindle_frequency_range) 
     spindle_frequency_range = 11:16; % spindle frequencies over which to search for the spindles
 end
 
@@ -66,8 +66,6 @@ end
 function [spindles_start_end, detected_spindles] = main_spindles_function(x, fs, spindle_frequency_range, alg_used)
 %% internal algorithmic defaults
 Frq1 = spindle_frequency_range(1); Frq2 = spindle_frequency_range(end); % frequencies of interest to study (11-16 Hz for sleep spindles!)
-
-detected_spindles = [];
 
 % set minimum and maximum spindle duration
 min_spindle_duration = 0.4; max_spindle_duration = 1.5; % expected spindle duration in seconds
@@ -108,13 +106,13 @@ end
 clear spindle*
 
 switch (alg_used)
-    case 'a7'
+    case 'cwta7'
 %         features_spindles.prob_spindle_moving = moving(features_spindles.prob_spindle, movingL, @mean);
         features_spindles.prob_spindle_moving = moving_mean(features_spindles.prob_spindle, movingL);
         features_spindles.prob_spindle_moving = features_spindles.prob_spindle_moving(:)';
         features_spindles.prob_spindle_moving2 = max(features_spindles.prob_spindle, features_spindles.prob_spindle_moving);
 
-    case 'a8'
+    case 'cwta8'
         % Exponential weighted moving average based concept
         movingL=21; y=buffer([zeros(1, floor(movingL/2)), features_spindles.prob_spindle, zeros(1, floor(movingL/2))], movingL, movingL-1, 'nodelay');
         dist_weight = [linspace(0, 1,floor(movingL/2)), 0, linspace(0, 1, floor(movingL/2))]';
@@ -175,6 +173,7 @@ kill_cand_spindles = find(cand_spindle_dur<min_spindle_duration*fs);
 begins(kill_cand_spindles) = []; ends(kill_cand_spindles) = [];
 
 % extract requested spindle characteristics
+detected_spindles = cell(length(begins), 1);
 for i = 1:length(begins)
     detected_spindles{i}.spindle_idx = i;
     detected_spindles{i}.spindle_duration_samples = round(ends(i)./Kfs - begins(i)./Kfs)+1;

@@ -1,8 +1,9 @@
-function events = readEvents(filePath, isEpoched, epochTime)
-%% Reads events in either format and returns expertEvents
+function events = readEvents(theDir, theName, isEpoched, epochTime)
+%% Reads events in either format and returns events
 %
 %  Parameters
-%     filePath      path of the .mat file containing the events 
+%     theDir        directory of the .mat file containing the events 
+%     theName       name of the .mat file containing the events
 %     isEpoched     optional logical parameter indicating whether epoched
 %     events       (output) two-column array with event start and ends
 %                      or a cell array whose entries are two-column arrays
@@ -13,12 +14,13 @@ function events = readEvents(filePath, isEpoched, epochTime)
 %% Perform the operations
 
     events = [];
-    if isempty(filePath) || ~exist(filePath, 'file')
+    if isempty(theDir) || isempty(theName) || ...
+       ~exist([theDir filesep theName], 'file')
         return;
     end
     
-    eventsIn = load(filePath);
-    if nargin > 1 && isEpoched
+    eventsIn = load([theDir filesep theName]);
+    if nargin > 2 && isEpoched
         events = epochedToList(eventsIn, epochTime);
         return;
     end

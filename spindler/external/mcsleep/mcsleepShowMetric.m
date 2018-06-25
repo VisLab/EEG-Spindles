@@ -57,13 +57,16 @@ for n = 1:numLambda2s
 end
 
 %% Set up the legends for plotting versus threshold
-lambda2Pos = [1, round((numLambda2s + 1)/2), numLambda2s];
-legendStrings = {['\lambda_2=' num2str(lambda2s(lambda2Pos(1)))], ...
-                 ['\lambda_2=' num2str(lambda2s(lambda2Pos(2)))], ...
-                 ['\lambda_2=' num2str(lambda2s(lambda2Pos(3)))]};
+lambda2Display = params.mcsleepLambda2Display;
+lambda2Pos = zeros(size(lambda2Display));
+legendStrings = cell(1, length(lambda2Display));
+for n = 1:length(lambda2Display)
+    [~, lambda2Pos(n)] = min(abs(lambda2s - lambda2Display(n)));
+    legendStrings{n} = ['\lambda_2 =' num2str(lambda2s(lambda2Pos(n)))];
+end
 
-legendBoth = cell(1, 15);
-for k = 1:3
+legendBoth = cell(1, 5*length(lambda2Display));
+for k = 1:length(lambda2Display)
     legendBoth{5*k - 4} = ['C:' legendStrings{k}];
     legendBoth{5*k - 3} = ['H:' legendStrings{k}];
     legendBoth{5*k - 2} = ['I:' legendStrings{k}];
@@ -71,12 +74,12 @@ for k = 1:3
     legendBoth{5*k} = ['T:' legendStrings{k}];
 end
 
-theTitle = [datasetName ': ' metricName ' vs threhsold'];
+theTitle = [datasetName ': ' metricName ' vs threshold'];
 figHan = figure('Name', theTitle);
 hold on
 newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.2, 0.8, 0.8; 0.0, 0.6, 0.0; 0.3, 0.3, 0.3];
-lineStyles = {':', '--', '-'};
-for j = 1:3
+lineStyles = {':', '--', '-', '-.'};
+for j = 1:length(lambda2Display)
     pos = lambda2Pos(j);
     plot(thresholds(:), countMetric(pos, :)', 'LineWidth', 2, ...
          'Color', newColors(1, :), 'LineStyle', lineStyles{j});
@@ -100,35 +103,38 @@ box on;
 if ~isempty(imageDir)
     for k = 1:length(params.figureFormats)
        thisFormat = params.figureFormats{k};
-       saveas(figHan, [imageDir filesep theName '_vs_Threshold_Metric_' metricName '.' ...
-            thisFormat], thisFormat);
+       saveas(figHan, [imageDir filesep theName '_Metric_' metricName ...
+           '_VsThreshold.' thisFormat], thisFormat);
     end
 end
 if params.figureClose
    close(figHan);
 end    
 
-%% Set up the legends for plotting versus threshold
-thresholdPos = [1, round((numThresholds + 1)/2), numThresholds];
-legendStringsT = {['T = ' num2str(thresholds(thresholdPos(1)))], ...
-                  ['T = ' num2str(thresholds(thresholdPos(2)))], ...
-                  ['T = ' num2str(thresholds(thresholdPos(3)))]};
+%% Set up the legends for plotting versus lambda2
+thresholdDisplay = params.mcsleepThresholdDisplay;
+thresholdPos = zeros(size(thresholdDisplay));
+legendStrings = cell(1, length(thresholdDisplay));
+for n = 1:length(thresholdDisplay)
+    [~, thresholdPos(n)] = min(abs(thresholds - thresholdDisplay(n)));
+    legendStrings{n} = ['T = ' num2str(thresholds(thresholdPos(n)))];
+end
 
-legendBothT = cell(1, 5);
-for k = 1:3
-    legendBothT{5*k - 4} = ['C:' legendStringsT{k}];
-    legendBothT{5*k - 3} = ['H:' legendStringsT{k}];
-    legendBothT{5*k - 2} = ['I:' legendStringsT{k}];
-    legendBothT{5*k - 1} = ['O:' legendStringsT{k}];
-    legendBothT{5*k} = ['T:' legendStringsT{k}];
+legendBothT = cell(1, 5*length(thresholdDisplay));
+for k = 1:length(thresholdDisplay)
+    legendBothT{5*k - 4} = ['C:' legendStrings{k}];
+    legendBothT{5*k - 3} = ['H:' legendStrings{k}];
+    legendBothT{5*k - 2} = ['I:' legendStrings{k}];
+    legendBothT{5*k - 1} = ['O:' legendStrings{k}];
+    legendBothT{5*k} = ['T:' legendStrings{k}];
 end
 
 theTitle = [datasetName ': ' metricName ' vs Lambda2'];
 figHan = figure('Name', theTitle);
 hold on
 newColors = [0.4, 0.5, 0.8; 0.8, 0.5, 0.4; 0.2, 0.8, 0.8; 0.0, 0.6, 0.0; 0.3, 0.3, 0.3];
-lineStyles = {':', '--', '-'};
-for j = 1:3
+lineStyles = {':', '--', '-', '-.'};
+for j = 1:length(thresholdDisplay)
     pos = thresholdPos(j);
     plot(lambda2s', countMetric(:, pos), 'LineWidth', 2, ...
          'Color', newColors(1, :), 'LineStyle', lineStyles{j});
@@ -152,8 +158,8 @@ box on;
 if ~isempty(imageDir)
     for k = 1:length(params.figureFormats)
        thisFormat = params.figureFormats{k};
-       saveas(figHan, [imageDir filesep theName '_vs_Lambda2_Metric_' metricName '.' ...
-            thisFormat], thisFormat);
+       saveas(figHan, [imageDir filesep theName '_Metric_' metricName ...
+           '_VsLambda2_.' thisFormat], thisFormat);
     end
 end
 if params.figureClose

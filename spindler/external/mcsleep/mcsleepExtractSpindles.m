@@ -10,9 +10,7 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
 % Copyright (c) 2017. Ankit Parekh 
 
 %% Set up the parameters
-    defaults = concatenateStructs(getGeneralDefaults(), mcsleepGetDefaults());
-    params = processParameters('mcsleepExtractSpindles', nargin, 2, ...
-                                params, defaults);
+   
     [params.channels, params.frames] = size(y);
     thresholds = params.mcsleepThresholds;
     lambda2s = params.mcsleepLambda2s;

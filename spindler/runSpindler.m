@@ -63,27 +63,45 @@
 % paramsInit.spindlerGaborFrequencies = 6:0.5:13;
 
 %% Example 5: Set up for the Dreams sleep collection
-% stageDir = [];
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSpindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesSpindler';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Spindler_Summary.mat';
-% channelLabels = {'C3-A1', 'CZ-A1'};
-% paramsInit = struct();
-% paramsInit.spindleFrequencyRange = [11, 17];
-% paramsInit.figureClose = true;
-
-%% Example 6: Mass
-dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-resultsDir = 'D:\TestData\Alpha\spindleData\massNew\resultsSpindler';
-imageDir = 'D:\TestData\Alpha\spindleData\massNew\imagesSpindler';
-summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\massNew_Spindler_Summary.mat';
-channelLabels = {'CZ'};
+stageDir = [];
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+channelLabels = {'C3-A1', 'CZ-A1'};
 paramsInit = struct();
 paramsInit.spindleFrequencyRange = [11, 17];
+paramsInit.algorithm = 'spindler';
+
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler';
+
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert1';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_expert1';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler_expert1';
+
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_expert2';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler_expert2';
+
+%% Example 6: Mass
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+% 
+% channelLabels = {'CZ'};
+% paramsInit = struct();
+% paramsInit.spindleFrequencyRange = [11, 17];
+% paramsInit.algorithm = 'spindler';
+
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler';
+
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler_expert1';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler_expert1';
+
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert2';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler_expert2';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler_expert2';
 
 %% Metrics to calculate
 paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
@@ -104,11 +122,6 @@ if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     fprintf('Creating image directory %s \n', imageDir);
     mkdir(imageDir);
 end
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
-end
 
 %% Process the data
 for k = 1:length(dataFiles)
@@ -123,47 +136,23 @@ for k = 1:length(dataFiles)
         warning('No data found for %s\n', dataFiles{k});
         continue;
     end
-    startFrame = 1;
-    endFrame = length(data);
     
     %% Read events and stages if available 
-    expertEvents = [];
-    if ~isempty(eventDir)
-        expertEvents = readEvents([eventDir filesep theName '.mat']);
-    end
-    stageEvents = [];
-    %% Use the longest stetch in the stage events
-    if ~isempty(stageDir)
-        stageStuff = load([stageDir filesep theName '.mat']);
-        stageEvents = stageStuff.stage2Events;
-        stageLengths = stageEvents(:, 2) - stageEvents(:, 1);
-        [maxLength, maxInd] = max(stageLengths);
-        eventMask = stageEvents(maxInd, 1) <= expertEvents(:, 1) & ...
-                    expertEvents(:, 1) <= stageEvents(maxInd, 2);
-        expertEvents = expertEvents(eventMask, :) - stageEvents(maxInd, 1);
-        startFrame = max(1, round(stageEvents(maxInd, 1)*params.srate));
-        endFrame = min(length(data), round(stageEvents(maxInd, 2)*params.srate));
-        data = data(startFrame:endFrame);
-    end
+    expertEvents = readEvents(eventDir, [theName '.mat']);
+    stageEvents = readEvents(stageDir, [theName '.mat']);
+    
+    %% Use the longest stretch in the stage events
+    [data, startFrame, endFrame, expertEvents] = ...
+         getMaxStagedData(data, stageEvents, expertEvents, params.srate);
     
     %% Call Spindler to find the spindles and metrics
-    [events, metrics, additionalInfo, params] =  ...
+    [spindles, additionalInfo, params] =  ...
                       spindler(data, expertEvents, imageDir, params);
+     additionalInfo.algorithm = params.algorithm;            
      additionalInfo.startFrame = startFrame;
      additionalInfo.endFrame = endFrame;
      additionalInfo.srate = params.srate;
-     totalMin = (startFrame - endFrame)/60/params.srate;
-     fprintf('---%d:%s [%d, %d] %g min %d labeled events %d expert events\n', ...
-         k, theName, startFrame, endFrame, totalMin, size(events, 1), ...
-         size(expertEvents, 1));
-     save([resultsDir filesep theName, '_spindlerResults.mat'], 'events', ...
-         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
+     additionalInfo.stageEvents = stageEvents;
+     theFile = [resultsDir filesep theName, '.mat'];
+     save(theFile, 'spindles', 'expertEvents', 'params', 'additionalInfo', '-v7.3');
 end
-
-%% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = ...
-                  consolidateResults(resultsDir, paramsInit.metricNames);
-
-%% Save the results
-metricNames = params.metricNames;
-save(summaryFile, 'results', 'dataNames', 'metricNames', 'upperBounds', '-v7.3');

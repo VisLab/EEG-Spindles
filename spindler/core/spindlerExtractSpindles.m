@@ -15,8 +15,7 @@ function [spindles, params] = spindlerExtractSpindles(data, params)
 %
 
 %% Process the input parameters and set up the calculation
-defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());
-params = processParameters('spindlerExtractSpindles', nargin, 2, params, defaults);
+
 
 atomsPerSecond = sort(params.spindlerAtomsPerSecond);
 params.spindlerAtomsPerSecond = atomsPerSecond;

@@ -1,16 +1,20 @@
-%% Extracts data for a particular collection
+%% Extract the spindler unsupervised results
 % collection = 'mass';
 % dataDir = 'D:\TestData\Alpha\spindleData\massNew';
 collection = 'dreams';
 dataDir = 'D:\TestData\Alpha\spindleData\dreams';
-algorithms = {'cwta7', 'cwta8', 'sem'};
+algorithms = {'spindler'};
 eventExts = {'combined', 'expert1', 'expert2'};
-summaryDir = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';
-metricNames = 'fdr';
+summaryDir = 'D:\TestData\Alpha\spindleData\summary';
+metricName = 'fdr';
 methodName = 'time';
 
+%% Make summary directory if it doesn't exist
+if ~exist(summaryDir, 'dir')
+    mkdir(summaryDir);
+end
 
-%% Get the data files
+%% Now read the data files and find the file parts
 dataFiles = getFileListWithExt('FILES', [dataDir filesep 'data'], '.set');
 numFiles = length(dataFiles);
 fileNames = cell(numFiles, 1);
@@ -32,15 +36,17 @@ for k = 1:numAlgorithms
            end
            test = load(fileName);
            allMetrics = test.additionalInfo.allMetrics;
-           if isempty(allMetrics)
+           atomInd = test.additionalInfo.spindlerCurves.bestEligibleAtomInd;
+           threshInd = test.additionalInfo.spindlerCurves.bestEligibleThresholdInd;
+           if isempty(allMetrics) || isempty(atomInd) || isempty(threshInd)
                warning('Algorithm: %s file %s has no metrics', ...
                    algorithms{k}, fileName);
                continue;
            end
-           metrics(m) = allMetrics.(methodName).(metricName);
+           theMetric = allMetrics(atomInd, threshInd);
+           metrics(m) = theMetric.(methodName).(metricName);
        end
-       outName = [collection '_' metricName '_' methodName ...
-                  '_' eventExts{n} '_' algorithms{k} '.mat'];
+       outName = [collection '_' metricName '_' methodName '_' eventExts{n} '_' algorithms{k} '.mat'];
        save([summaryDir filesep outName], 'metrics', '-v7.3');
    end
 end

@@ -102,6 +102,7 @@ for k = 1:length(dataFiles)
     additionalInfo.endFrame = endFrame;
     additionalInfo.srate = params.srate;
     additionalInfo.stageEvents = stageEvents;
+    
 %% Save the results
     theFile = [resultsDir filesep theName '.mat'];
     save(theFile, 'events', 'expertEvents', 'params', 'additionalInfo', '-v7.3');

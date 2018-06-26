@@ -14,7 +14,8 @@ function [spindles, params, oscil] = spinkyExtractSpindles(data, thresholds, par
     epochFrames = round(epochTime*params.srate);
     epochedData = epochData(data, epochFrames); 
     fs = params.srate;
-
+    totalTime = (size(epochedData, 1)*size(epochedData, 2))/params.srate;
+    
     %% Get the oscillatory representation of the data.
     fprintf('Computing the oscillatory representation\n');
     oscil = getSpinkySignalDecomposition(epochedData, fs);
@@ -30,14 +31,15 @@ function [spindles, params, oscil] = spinkyExtractSpindles(data, thresholds, par
     spinkySpindles = spinkyCalculateSpindles(oscil, thresholds, params);
     params.thresholds = thresholds;
     numThresholds = length(thresholds);
-    spindles(numThresholds) = struct('threshold', 0, ...
-                   'numberSpindles', 0, 'spindleTime', 0, 'events', NaN);
+    spindles(numThresholds) = struct('threshold', 0, 'numberSpindles', 0, ...
+                       'spindleTime', 0, 'totalTime', 0, 'events', NaN);
     for k = 1:numThresholds
         spindles(k) = spindles(end);
         spindles(k).threshold = spinkySpindles(k).threshold;
         events = epochedToList(spinkySpindles(k).spindleList, epochTime);
         events = combineEvents(events, params.spindleLengthMin, ...
                      params.spindleSeparationMin, params.spindleLengthMax);
+        spindles(k).totalTime = totalTime;
         spindles(k).events = events;
         if ~isempty(events)
             spindles(k).numberSpindles = size(events, 1);

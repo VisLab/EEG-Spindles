@@ -65,7 +65,7 @@ numAtoms = size(theAtoms(:), 1);
 numThresholds = size(thresholds(:), 1);
 spindles(numAtoms, numThresholds) = ...
     struct('atomsPerSecond', 0, 'numberAtoms', 0,  'threshold', 0, ...
-           'numberSpindles', 0, 'spindleTime', 0, 'events', NaN);
+           'numberSpindles', 0, 'spindleTime', 0, 'totalTime', 0, 'events', NaN);
 
 atomsPerSecond = sort(atomsPerSecond);
 currentAtom = 1;
@@ -81,7 +81,8 @@ for k = 1:numAtoms
         spindles(k, j) = spindles(numAtoms, numThresholds);
         spindles(k, j).atomsPerSecond = atomsPerSecond(k);
         spindles(k, j).numberAtoms = theAtoms(k);
-        spindles(k, j).baseThreshold = thresholds(j);
+        spindles(k, j).threshold = thresholds(j);
+        spindles(k, j).totalTime = totalTime;
         events = spindlerDetectEvents(y, params.srate, ...
                 thresholds(j), params.signalTrimFactor);
         events = combineEvents(events, minLength, minSeparation, maxLength);

@@ -71,8 +71,8 @@ paramsInit.spindleFrequencyRange = [11, 17];
 paramsInit.algorithm = 'spindler';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_combined';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler_combined';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert1';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_expert1';
@@ -153,14 +153,9 @@ for k = 1:length(dataFiles)
      additionalInfo.endFrame = endFrame;
      additionalInfo.srate = params.srate;
      additionalInfo.stageEvents = stageEvents;
-     atomInd = additionalInfo.spindlerCurves.bestEligibleAtomInd;
-     threshInd = additionalInfo.spindlerCurves.bestEligibleThresholdInd;
-     if isempty(atomInd) || isempty(threshInd)
-         events = [];
-     else
-         events = spindles(atomInd, threshInd);
-     end
+     atomInd = test.additionalInfo.spindlerCurves.bestEligibleAtomInd;
+           threshInd = test.additionalInfo.spindlerCurves.bestEligibleThresholdInd;
+           if isempty(allMetrics) || isempty(atomInd) || isempty(threshInd)
      theFile = [resultsDir filesep theName, '.mat'];
-     save(theFile, 'events', 'expertEvents', 'params', ...
-         'additionalInfo', 'spindles', '-v7.3');
+     save(theFile, 'spindles', 'expertEvents', 'params', 'additionalInfo', '-v7.3');
 end

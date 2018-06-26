@@ -25,10 +25,11 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
     %% Initialize the structures
     spindles(numLambda2s, numThresholds) = ...
         struct('lambda2', NaN, 'threshold', NaN, 'numberSpindles', 0, ...
-                   'spindleTime', 0, 'events', NaN);
+               'spindleTime', 0, 'totalTime', 0, 'events', NaN);
     %%Convert data for parfor
     numEpochs = floor(params.frames/(fs *epochTime));
-
+    totalTime = numEpochs*epochTime;
+    
     %% Segment input signal into cells of epochTime seconds in length
     Y = cell(numEpochs,1);
     epochFrames = round(epochTime*fs);
@@ -62,6 +63,7 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
             binary = envelopeSpindle > thresholds(m);
             binary = discardOutOfRange(binary);
             spindleMask = [0 binary(:)']; 
+            spindles(n, m).totalTime = totalTime;
             spindles(n, m).events = getMaskEvents(spindleMask, params.srate);
             [spindles(n, m).numberSpindles, spindles(n, m).spindleTime] = ...
                 getSpindleCounts(spindles(n, m).events);

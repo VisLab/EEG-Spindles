@@ -1,9 +1,12 @@
 %% Extract the spindler unsupervised results
 collection = 'mass';
 dataDir = 'D:\TestData\Alpha\spindleData\massNew';
+% collection = 'dreams';
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams';
 algorithms = {'spindler'};
 eventExts = {'combined', 'expert1', 'expert2'};
 summaryDir = 'D:\TestData\Alpha\spindleData\summary';
+baseMetricName = 'f1';
 metricName = 'fdr';
 methodName = 'time';
 
@@ -34,6 +37,8 @@ for k = 1:numAlgorithms
            end
            test = load(fileName);
            allMetrics = test.additionalInfo.allMetrics;
+           metrics = getMetric(allMetrics, baseMetricName);
+           
            atomInd = test.additionalInfo.spindlerCurves.bestEligibleAtomInd;
            threshInd = test.additionalInfo.spindlerCurves.bestEligibleThresholdInd;
            if isempty(allMetrics) || isempty(atomInd) || isempty(threshInd)
@@ -45,7 +50,7 @@ for k = 1:numAlgorithms
            metrics(m) = theMetric.(methodName).(metricName);
        end
        outName = [collection '_' metricName '_' methodName '_' eventExts{n} '_' algorithms{k} '.mat'];
-       save([summaryDir filesep outName], 'metrics', '-v7.3');
+       %save([summaryDir filesep outName], 'metrics', '-v7.3');
    end
 end
            

@@ -8,33 +8,42 @@
 % paramsInit = struct();
 
 %% Set up the directory for dreams
-% stageDir = [];
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsSem';
-% summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Sem_Summary.mat';
-% centralLabels = {'C3-A1', 'CZ-A1'};
-% occipitalLabels = {'O1-A1'};
-% paramsInit = struct();
-% paramsInit.spindleFrequencyRange = [11, 17];
-% paramsInit.algorithm = 'sem';
-%% Set up the directory for mass
-dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-centralLabels = {'Cz'};
-occipitalLabels = {'O1'};
+stageDir = [];
+dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+centralLabels = {'C3-A1', 'CZ-A1'};
+occipitalLabels = {'O1-A1'};
 paramsInit = struct();
 paramsInit.spindleFrequencyRange = [11, 17];
 paramsInit.algorithm = 'sem';
 
-eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...
-              paramsInit.algorithm];
+eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
+resultsDir = ['D:\TestData\Alpha\spindleData\dreams\results_' ...
+              paramsInit.algorithm '_combined'];
+
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert1';
+% resultsDir = ['D:\TestData\Alpha\spindleData\dreams\results_' ...
+%               paramsInit.algorithm '_expert1'];
+
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
+% resultsDir = ['D:\TestData\Alpha\spindleData\dreams\results_' ...
+%               paramsInit.algorithm '_expert2'];
+
+%% Set up the directory for mass
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+% centralLabels = {'Cz'};
+% occipitalLabels = {'O1'};
+% paramsInit = struct();
+% paramsInit.spindleFrequencyRange = [11, 17];
+% paramsInit.algorithm = 'sem';
+% 
+% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
+% resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...
+%               paramsInit.algorithm];
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
 % resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...
 %               paramsInit.algorithm '_expert1'];
-
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert2';
 % resultsDir = ['D:\TestData\Alpha\spindleData\massNew\results_' ...

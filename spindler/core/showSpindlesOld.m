@@ -9,9 +9,9 @@ end
 %% Load the data and initialize variables
 load(theFile)
 atomsPerSecond = params.spindleAtomsPerSecond;
-baseThresholds = params.spindleBaseThresholds;
+thresholds = params.spindleThresholds;
 numberAtoms = length(params.spindleAtomsPerSecond); 
-numberThresholds = length(baseThresholds);
+numberThresholds = length(thresholds);
 spindleHits = cellfun(@double, {spindles.numberSpindles});
 spindleHits = reshape(spindleHits, numberAtoms, numberThresholds);
 spindleTime = cellfun(@double, {spindles.spindleTime});
@@ -40,7 +40,7 @@ theColors = jet(numberThresholds);
 outName = [theName outSuffix];
 legendStrings = cell(1, numberThresholds);
 for k = 1:numberThresholds
-    legendStrings{k} = num2str(baseThresholds(k));
+    legendStrings{k} = num2str(thresholds(k));
 end
 totalSeconds = frames./srate;
 spindleHits = spindleHits/totalSeconds;

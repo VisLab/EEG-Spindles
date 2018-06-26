@@ -98,14 +98,10 @@ for k = 1:length(dataFiles)
         expertEvents = [];
         metrics = [];
     else
-        metrics = struct('hitMetrics', NaN, 'intersectMetrics', NaN, ...
-            'onsetMetrics', NaN, 'timeMetrics', NaN);
         expertEvents = readEvents(eventFiles{k});
         expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        [metrics.hitMetrics, metrics.intersectMetrics, ...
-            metrics.onsetMetrics, metrics.timeMetrics] = ...
-            getPerformanceMetrics(expertEvents, events, params.frames, ...
-            params.srate, params);
+        metrics = getPerformanceMetrics(expertEvents, events, ...
+                                   params.frames/params.srate, params);
     end
     [~, theName, ~] = fileparts(dataFiles{k});
     

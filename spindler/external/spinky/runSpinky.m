@@ -17,8 +17,8 @@
 % paramsInit.algorithm = 'spinky';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spinky';
-% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spinky';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spinky_combined';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spinky_combined';
 % 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
 % resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spinky_expert1';
@@ -42,7 +42,7 @@ paramsInit.algorithm = 'spinky';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_combined';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spinky';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spinky_combined';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert1';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_expert1';

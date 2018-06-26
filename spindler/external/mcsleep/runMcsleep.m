@@ -50,8 +50,8 @@ paramsInit.mcSleepNit = 40;
 paramsInit.algorithm = 'mcsleep';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep';
-% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_mcsleep';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep_combined';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_mcsleep_combined';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert1';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep_expert1';
@@ -79,8 +79,8 @@ imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_mcsleep_expert2';
 % paramsInit.algorithm = 'mcsleep';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_mcsleep';
-% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_mcsleep';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_mcsleep_combined';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_mcsleep_combined';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
 % imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_mcsleep_expert1';

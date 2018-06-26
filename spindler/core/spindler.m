@@ -32,7 +32,7 @@ function [spindles, additionalInfo, params] =  spindler(data, expertEvents, imag
         for k = 1:numAtoms
             for j = 1:numThresholds
                 allMetrics(k, j) = getPerformanceMetrics(expertEvents, ...
-                                 spindles(k, j).events, totalTime, params);
+                          spindles(k, j).events, totalTime, params);
             end
         end
         

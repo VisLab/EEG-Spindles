@@ -63,12 +63,12 @@
 % paramsInit.spindlerGaborFrequencies = 6:0.5:13;
 
 %% Example 5: Set up for the Dreams sleep collection
-stageDir = [];
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-channelLabels = {'C3-A1', 'CZ-A1'};
-paramsInit = struct();
-paramsInit.spindleFrequencyRange = [11, 17];
-paramsInit.algorithm = 'spindler';
+% stageDir = [];
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% channelLabels = {'C3-A1', 'CZ-A1'};
+% paramsInit = struct();
+% paramsInit.spindleFrequencyRange = [11, 17];
+% paramsInit.algorithm = 'spindler';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_combined';
@@ -78,26 +78,26 @@ paramsInit.algorithm = 'spindler';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_expert1';
 % imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler_expert1';
 
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_expert2';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler_expert2';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spindler_expert2';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spindler_expert2';
 
 %% Example 6: Mass
-% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-% 
-% channelLabels = {'CZ'};
-% paramsInit = struct();
-% paramsInit.spindleFrequencyRange = [11, 17];
-% paramsInit.algorithm = 'spindler';
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+
+channelLabels = {'CZ'};
+paramsInit = struct();
+paramsInit.spindleFrequencyRange = [11, 17];
+paramsInit.algorithm = 'spindler';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
-% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler';
-% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler';
+% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler_combined';
+% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler_combined';
 
-% eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
-% resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler_expert1';
-% imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler_expert1';
+eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert1';
+resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler_expert1';
+imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_spindler_expert1';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\expert2';
 % resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spindler_expert2';

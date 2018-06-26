@@ -33,7 +33,7 @@ function  [spindles, additionalInfo, params] =  ...
         for n = 1:numLambda2s
             for m = 1:numThresholds
                 allMetrics(n, m) = getPerformanceMetrics(expertEvents, ...
-                    spindles(n, m).events, totalTime, params);
+                    spindles(n, m).events, spindles(n, m).totalTime, params);
             end
         end
         

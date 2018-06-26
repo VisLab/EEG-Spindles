@@ -243,7 +243,8 @@ function spindleCurves = mcsleepGetParameterCurves(spindles, outDir, params)
 
     for k = 1:length(params.figureFormats)
         thisFormat = params.figureFormats{k};
-        saveas(h1Fig, [outDir filesep params.name '_SpindleFractionVsLambda2.' ...
+        saveas(h1Fig, [outDir filesep params.name ...
+            '_SpindleFractionVsLambda2SelectedThresholds.' ...
             thisFormat], thisFormat);
     end
     if params.figureClose

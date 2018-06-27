@@ -171,7 +171,7 @@ for k = 1:length(dataFiles)
          additionalInfo.threshold = theseSpindles.threshold;
          additionalInfo.numberSpindles = theseSpindles.numberSpindles;
          additionalInfo.spindleTime = theseSpindles.spindleTime;
-         additionalInfo.totalTime = theseSpindles.totalTime;    
+         additionalInfo.totalTime = totalTime    
      end
      theFile = [resultsDir filesep theName, '.mat'];
      save(theFile, 'events', 'expertEvents', 'params', ...

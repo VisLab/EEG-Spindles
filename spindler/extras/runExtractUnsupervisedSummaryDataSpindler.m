@@ -6,8 +6,8 @@ dataDir = 'D:\TestData\Alpha\spindleData\dreams';
 algorithms = {'spindler'};
 eventExts = {'combined', 'expert1', 'expert2'};
 summaryDir = 'D:\TestData\Alpha\spindleData\summary';
-metricName = 'fdr';
-methodName = 'time';
+metricNames = {'f1', 'fdr'};
+methodNames = {'time'};
 
 %% Make summary directory if it doesn't exist
 if ~exist(summaryDir, 'dir')

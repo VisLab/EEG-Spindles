@@ -4,34 +4,6 @@
 defaults = concatenateStructs(getGeneralDefaults(), mcsleepGetDefaults());
 paramsInit = processParameters('runMcsleep', 0, 0, struct(), defaults); 
 
-%% Set up the parameters for BCIT
-% dataDir = 'D:\TestData\Alpha\spindleData\bcit\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\bcit\events';
-% channelLabels = {'PO7'};
-% defaults = concatenateStructs(getGeneralDefaults(), cwtGetDefaults());
-% paramsInit = processParameters('runCwt', 0, 0, struct(), defaults);     
-% paramsInit.srateTarget = 100;
-% paramsInit.cwtAlgorithm = 'a8';
-% paramsInit.cwtSpindleFrequencies = 6:14;
-% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-%     'bcit_Cwt_' paramsInit.cwtAlgorithm '_Summary.mat'];
-% resultsDir = ['D:\TestData\Alpha\spindleData\bcit\resultsCwt_' ...
-%                paramsInit.cwtAlgorithm];
-
-%% Set up for nctu
-% dataDir = 'D:\TestData\Alpha\spindleData\nctu\data';
-% eventDir = 'D:\TestData\Alpha\spindleData\nctu\events';
-% channelLabels = {'P3'};
-% defaults = concatenateStructs(getGeneralDefaults(), cwtGetDefaults());
-% paramsInit = processParameters('runCwt', 0, 0, struct(), defaults);     
-% paramsInit.srateTarget = 100;
-% paramsInit.cwtAlgorithm = 'a8';
-% paramsInit.cwtSpindleFrequencies = 6:14;
-% summaryFile = ['D:\TestData\Alpha\spindleData\ResultSummary\' ...
-%     'nctu_Cwt_' paramsInit.cwtAlgorithm '_Summary.mat'];
-% resultsDir = ['D:\TestData\Alpha\spindleData\nctu\resultsCwt_' ...
-%                paramsInit.cwtAlgorithm];
-
 %% Set up the directory for dreams
 stageDir = [];
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';

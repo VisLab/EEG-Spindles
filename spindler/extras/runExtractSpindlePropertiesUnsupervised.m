@@ -1,10 +1,14 @@
-%% Extracts data for a particular collection
+%% Extracts data for a particular collection of unsupervised algorithms
 collection = 'mass';
 dataDir = 'D:\TestData\Alpha\spindleData\massNew';
 % collection = 'dreams';
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams';
-algorithms = {'cwta7', 'cwta8', 'sem'};
-expert = 'combined';
+algorithms = {'spindler'};
+experts = {'combined', 'expert1', 'expert2'};
+summaryDir = 'D:\TestData\Alpha\spindleData\summary';
+baseMetricName = 'f1';
+metricName = 'fdr';
+methodName = 'time';
 summaryDir = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';
 
 %% Get the data files

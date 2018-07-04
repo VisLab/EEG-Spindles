@@ -3,7 +3,7 @@ function [countConfusion, hitConfusion, intersectConfusion, onsetConfusion, time
 
 %  Written by:  John La Rocco and Kay Robbins, UTSA, 2016-2017
 params = processParameters('getConfusions', ...
-                       nargin, 3, params, getGeneralDefaults());
+                       nargin, 4, params, getGeneralDefaults());
 countConfusion = struct('tp', 0, 'tn', 0, 'fp', 0, 'fn', 0);
 hitConfusion = struct('tp', 0, 'tn', 0, 'fp', 0, 'fn', 0);
 intersectConfusion = struct('tp', 0, 'tn', 0, 'fp', 0, 'fn', 0);

@@ -40,7 +40,7 @@ for m = 1:numFiles
         getEventProperties(eventSummary{m}, totalTimes(m));
     
 end
-outName = [collection '_properties_' algorithms{k} '.mat'];
+outName = [collection '_properties_splindler.mat'];
 save([summaryDir filesep outName], 'totalTimes', 'eventSummary', ...
     'spindleFraction', 'spindleLength', 'spindleRate',  '-v7.3');
 

@@ -1,25 +1,18 @@
-%% Extracts compares data for a particular metric against first
-% collection = 'mass';
-% dataDir = 'D:\TestData\Alpha\spindleData\massNew';
-collection = 'dreams';
-dataDir = 'D:\TestData\Alpha\spindleData\dreams';
+%% Compares spindle properties for each subject
+collection = 'mass';
+dataDir = 'D:\TestData\Alpha\spindleData\massNew';
+% collection = 'dreams';
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams';
 algorithms = {'spindler', 'cwta7', 'cwta8', 'sem'};
 experts = {'combined', 'expert1', 'expert2'};
-summaryDir = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';
+summaryDir = 'D:\TestData\Alpha\spindleData\summary';
 summaryImageDir = 'D:\TestData\Alpha\spindleData\summaryImage';
-summaryStatisticsDir = 'D:\TestData\Alpha\spindleData\summaryStatistics';
-metricName = 'fdr';
-methodName = 'time';
 figureFormats = {'png', 'fig'};
 figureClose = false;
 
 %% Make sure the output directories exist
 if ~exist(summaryImageDir, 'dir')
     mkdir(summaryImageDir);
-end
-
-if ~exist(summaryStatisticsDir, 'dir')
-    mkdir(summaryStatisticsDir)
 end
 
 %% Read in the performance data
@@ -40,8 +33,7 @@ for k = 1:numAlgorithms
 end
  
 %% Set up algorithms
-%algColors = [0.8, 0.8, 0.2; 0, 0, 0.75; 0, 0.7, 0.7; 0.8, 0.8, 0.3];
-algColors = [0, 0, 0; 0, 0.6, 0; 0, 0.7, 0.7; 0, 0, 0.75];
+algColors = [0.8, 0.8, 0.2; 0, 0, 0.75; 0, 0.7, 0.7; 0.8, 0.8, 0.3];
 theTitle = [collection ': ' methodName];
 eventMarkers = {'*', '^', 'v'};
 figHan = figure('Name', theTitle);

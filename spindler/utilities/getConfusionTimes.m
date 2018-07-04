@@ -41,7 +41,7 @@ function [tp, tn, fp, fn] = getConfusionTimes(trueEvents, labeledEvents, ...
     end
     
     for k = 1:length(endMatches)
-        if endMatches(k) == length(matchMask);
+        if endMatches(k) == length(matchMask)
             continue;
         elseif frameMask1(endMatches(k) + 1) == 1
             extendMask1 = extendMask1 | ...

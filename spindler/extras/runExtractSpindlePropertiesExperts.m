@@ -1,11 +1,13 @@
 %% Extracts spindle properties for various expert ratings
 collection = 'mass';
 dataDir = 'D:\TestData\Alpha\spindleData\massNew';
+baseAlgorithm = 'spindler';
 % collection = 'dreams';
 % dataDir = 'D:\TestData\Alpha\spindleData\dreams';
 experts = {'combined', 'expert1', 'expert2'};
 summaryDir = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';
 crossFraction = 0.5;
+
 %% Make the summary directory if it doesn't exist
 if ~exist(summaryDir, 'dir')
     mkdir(summaryDir);
@@ -30,7 +32,7 @@ for n = 1:numExperts
     eventSummary = cell(numFiles, 1);
     totalTimes = nan(numFiles, 1);
     samplingRates = nan(numFiles, 1);
-    dirName = [dataDir filesep 'events' filesep experts{n}];
+    dirName = [dataDir filesep 'results_' baseAlgorithm '_' experts{n}];
     for m = 1:numFiles
         fileName = [dirName filesep fileNames{m} '.mat'];
         if ~exist(fileName, 'file')
@@ -38,12 +40,10 @@ for n = 1:numExperts
         end
         test = load(fileName);
        
-        eventSummary{m} = test.events;
-        
-        %% Load the EEG file to get the total time
-         EEG = pop_loadset(dataFiles{m});
-        totalTimes(m) = (size(EEG.data, 2) - 1)./EEG.srate;
-        samplingRates(m) = EEG.srate;
+        eventSummary{m} = test.expertEvents;
+      
+        totalTimes(m) = test.additionalInfo.totalTime;
+        samplingRates(m) = test.additionalInfo.srate;
         [sFraction, sLength, sRate] = ...
             getEventProperties(eventSummary{m}, totalTimes(m));
        

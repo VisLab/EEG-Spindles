@@ -130,8 +130,8 @@ for p = 1:numProperties
     grid on
     box on
     hold off
-
-%% Plot the unsupervised averaged halves
+    
+    %% Plot the unsupervised averaged halves
     theTitle = [collection ':' propertyNames{p} ' Unsupervised halves averaged'];
     figure('Name', theTitle);
     hold on
@@ -141,7 +141,7 @@ for p = 1:numProperties
         propertyMask = ~isnan(properties1) & ~isnan(properties2);
         theSubjects = subjects(propertyMask);
         theProperties = 0.5*(properties1(propertyMask) + ...
-                         properties2(propertyMask));
+            properties2(propertyMask));
         
         theSizes = repmat(200, size(theSubjects));
         ah = scatter(theSubjects, theProperties, theSizes,  'filled', ...
@@ -156,7 +156,7 @@ for p = 1:numProperties
         propertyMask = ~isnan(properties1) & ~isnan(properties2);
         theSubjects = subjects(propertyMask);
         theProperties = 0.5*(properties1(propertyMask) + ...
-                         properties2(propertyMask));
+            properties2(propertyMask));
         if n == 1
             sizeFactor = 200;
         else
@@ -184,9 +184,9 @@ for p = 1:numProperties
     
     %% Figure supervised
     legendStringsSup = {'spindler-unsup', 'expert1-all', 'expert2-all',  ...
-                    'expert1-half', 'expert1-half'};
+        'expert1-half', 'expert1-half'};
     legendStringsSup = [legendStringsSup, algorithmsSupervised, ...
-                        algorithmsSupervised]; %#ok<*AGROW>
+        algorithmsSupervised]; %#ok<*AGROW>
     sizeFactor = 200;
     theTitle = [collection ':' propertyNames{p} ' Supervised'];
     figure('Name', theTitle);
@@ -213,7 +213,7 @@ for p = 1:numProperties
             'MarkerFaceAlpha', 0.2, ...
             'Marker', expertShapes{n});
     end
-
+    
     for k = 1:numExperts
         expertsFirst = squeeze(propertiesExpertsFirst(:, p, k));
         expertsSecond = squeeze(propertiesExpertsSecond(:, p, k));
@@ -235,8 +235,8 @@ for p = 1:numProperties
     end
     
     for k = 1:numExperts
-       for n = 1:numAlgorithmsSupervised
-            propertiesFirst = squeeze(propertiesSupervisedFirst(:, p, n, k)); 
+        for n = 1:numAlgorithmsSupervised
+            propertiesFirst = squeeze(propertiesSupervisedFirst(:, p, n, k));
             propertyMask = ~isnan(propertiesFirst);
             subjectsFirst = subjects(propertyMask);
             propertiesFirst = propertiesFirst(propertyMask);
@@ -246,13 +246,13 @@ for p = 1:numProperties
             propertiesSecond = propertiesSecond(propertyMask);
             theProperties =[propertiesFirst; propertiesSecond];
             theSubjects = [subjectsFirst; subjectsSecond];
-    
+            
             theSizes = repmat(sizeFactor, size(theSubjects));
             
             scatter(theSubjects, theProperties, theSizes,...
                 'MarkerEdgeColor', supervisedColors(n, :), ...
                 'Marker', expertShapesHalf{k}, 'LineWidth', 2);
-          
+            
         end
     end
     set(gca, 'XTick', 1:length(subjects), 'XTickMode', 'manual');
@@ -264,16 +264,16 @@ for p = 1:numProperties
     box on
     hold off
     title(theTitle)
-
-
-%% Compare supervised averaged properties with experts
+    
+    
+    %% Compare supervised averaged properties with experts
     legendStringsSup = {'expert1-all', 'expert2-all', 'spindler-unsup'};
     
     sizeFactor = 200;
     theTitle = [collection ':' propertyNames{p} ' Supervised averaged halves'];
     figure('Name', theTitle);
     hold on
- 
+    
     for n = 1:numExperts
         theProperties = squeeze(propertiesExperts(:, p, n));
         propertyMask = ~isnan(theProperties);
@@ -285,7 +285,7 @@ for p = 1:numProperties
             'MarkerFaceColor', expertColors(n, :), ...
             'Marker', expertShapes{n});
     end
-     properties1 = squeeze(propertiesUnsupervisedFirst(:, p, 1));
+    properties1 = squeeze(propertiesUnsupervisedFirst(:, p, 1));
     properties2 = squeeze(propertiesUnsupervisedSecond(:, p, 1));
     propertyMask = ~isnan(properties1) & ~isnan(properties2);
     theSubjects = subjects(propertyMask);
@@ -298,20 +298,20 @@ for p = 1:numProperties
     
     
     for k = 1:numExperts
-       for n = 1:numAlgorithmsSupervised
+        for n = 1:numAlgorithmsSupervised
             propertiesFirst = squeeze(propertiesSupervisedFirst(:, p, n, k));
             propertiesSecond = squeeze(propertiesSupervisedSecond(:, p, n, k));
             propertyMask = ~isnan(propertiesFirst) & ~isnan(propertiesSecond);
             theSubjects = subjects(propertyMask);
             theProperties = 0.5*(propertiesFirst(propertyMask) + ...
-                             propertiesSecond(propertyMask));
+                propertiesSecond(propertyMask));
             theSizes = repmat(sizeFactor, size(theSubjects));
             
             scatter(theSubjects, theProperties, theSizes,...
                 'MarkerEdgeColor', supervisedColors(n, :), ...
                 'Marker', expertShapesHalf{k}, 'LineWidth', 2);
             nextLegend = {[algorithmsSupervised{n} '-' experts{k}]};
-           legendStringsSup = [legendStringsSup, nextLegend]; %#ok<*AGROW>
+            legendStringsSup = [legendStringsSup, nextLegend]; %#ok<*AGROW>
         end
     end
     set(gca, 'XTick', 1:length(subjects), 'XTickMode', 'manual');
@@ -328,22 +328,25 @@ end
 %% Compare properties of expert 1 and expert 2
 fprintf('\n\nStatistical comparison of expert properties:\n');
 for m = 1:numProperties
-   properties1 = squeeze(propertiesExperts(:, m, 1));
-   propertiesE = squeeze(propertiesExperts(:, m, 2));
-   expertMask = ~isnan(properties1) & ~isnan(propertiesE);
-   properties1 = properties1(expertMask);
-   propertiesE = propertiesE(expertMask);
-   [h, p, ci, tstats] = ttest(properties1(:), propertiesE(:), 'Tail', 'Both');
+    properties1 = squeeze(propertiesExperts(:, m, 1));
+    properties2 = squeeze(propertiesExperts(:, m, 2));
+    expertMask = ~isnan(properties1) & ~isnan(properties2);
+    properties1 = properties1(expertMask);
+    properties2 = properties2(expertMask);
+    fprintf('Expert 1:\t%g (%g)\tExpert 2\t%g (%g)\n', ...
+        mean(properties1(:)), std(properties1(:)), ...
+        mean(properties2(:)), std(properties2(:)));
+    [h, p, ci, tstats] = ttest(properties1(:), properties2(:), 'Tail', 'Both');
     if ci(1) > 0
-        status = 'significantly greater';
+        status = 'significantly greater than';
     elseif ci(2) < 0
-        status = 'significantly smaller';
+        status = 'significantly smaller than';
     else
-        status = 'Not significantly different';
+        status = 'not significantly different from';
     end
-    fprintf(['%s expert1 is %s than expert2: p=%g  ci=[%g, %g] ' ...
-             'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, status,...
-              p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    fprintf(['%s expert1 is %s expert2:\tp=%g\tci=[%g, %g]\t' ...
+        'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, status,...
+        p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
 end
 
 %% Compare expert properties with unsupervised algorithms
@@ -356,16 +359,19 @@ for m = 1:numProperties
         propertyMask = ~isnan(properties) & ~isnan(propertiesE);
         expert = propertiesE(propertyMask);
         properties = properties(propertyMask);
+        fprintf('Expert %d:\t%g (%g)\t%s\t%g (%g)\n', theExpert, ...
+            mean(propertiesE(:)), std(propertiesE(:)), algorithmsUnsupervised{n}, ...
+            mean(properties(:)), std(properties(:)));
         [h, p, ci, tstats] = ttest(expert(:), properties(:), 'Tail', 'Both');
         if ci(1) > 0
-            status = 'significantly greater';
+            status = 'significantly greater than';
         elseif ci(2) < 0
-            status = 'significantly smaller';
+            status = 'significantly smaller than';
         else
-            status = 'Not significantly different';
+            status = 'not significantly different from';
         end
-        fprintf(['%s expert2 is %s than %s: p=%g  ci=[%g, %g] ' ...
-            'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, status,...
+        fprintf(['%s expert2 is %s %s:\tp=%g\tci=[%g, %g]\t' ...
+            'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, status,...
             algorithmsUnsupervised{n}, p, ci(1), ci(2), tstats.tstat, ...
             tstats.df, tstats.sd);
     end
@@ -381,16 +387,19 @@ for m = 1:numProperties
             propertyMask = ~isnan(properties1) & ~isnan(properties2);
             properties1 = properties1(propertyMask);
             properties2 = properties2(propertyMask);
+            fprintf('%s:\t%g (%g)\t%s\t%g (%g)\n', algorithmsUnsupervised{n}, ...
+                mean(properties1(:)), std(properties1(:)), algorithmsUnsupervised{k}, ...
+                mean(properties2(:)), std(properties2(:)));
             [h, p, ci, tstats] = ttest(properties1(:), properties2(:), 'Tail', 'Both');
             if ci(1) > 0
-                status = 'significantly greater';
+                status = 'significantly greater than';
             elseif ci(2) < 0
-                status = 'significantly smaller';
+                status = 'significantly smaller than';
             else
-                status = 'Not significantly different';
+                status = 'not significantly different from';
             end
-            fprintf(['%s %s is %s than %s: p=%g  ci=[%g, %g] ' ...
-                'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, ...
+            fprintf(['%s %s is %s %s:\tp=%g\tci=[%g, %g]\t' ...
+                'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, ...
                 algorithmsUnsupervised{n}, status, algorithmsUnsupervised{k}, p, ...
                 ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
         end
@@ -400,67 +409,76 @@ end
 %% Compare properties of halves of expert 1 and expert 2
 fprintf('\n\nComparing first and second halfs within experts\n');
 for m = 1:numProperties
-   properties1a = squeeze(propertiesExpertsFirst(:, m, 1));
-   properties1b = squeeze(propertiesExpertsSecond(:, m, 1));
-   properties2a = squeeze(propertiesExpertsFirst(:, m, 2));
-   properties2b = squeeze(propertiesExpertsSecond(:, m, 2));
-   expertMask = ~isnan(properties1a) & ~isnan(properties2a) ...
-                & ~isnan(properties1b) & ~isnan(properties2b);
-   properties1a = properties1a(expertMask);
-   properties2a = properties2a(expertMask);
-   properties1b = properties1b(expertMask);
-   properties2b = properties2b(expertMask);
-   [~, p, ci, tstats] = ttest(properties1a(:), properties1b(:), 'Tail', 'Both');
+    properties1a = squeeze(propertiesExpertsFirst(:, m, 1));
+    properties1b = squeeze(propertiesExpertsSecond(:, m, 1));
+    properties2a = squeeze(propertiesExpertsFirst(:, m, 2));
+    properties2b = squeeze(propertiesExpertsSecond(:, m, 2));
+    expertMask = ~isnan(properties1a) & ~isnan(properties2a) ...
+        & ~isnan(properties1b) & ~isnan(properties2b);
+    properties1a = properties1a(expertMask);
+    properties2a = properties2a(expertMask);
+    properties1b = properties1b(expertMask);
+    properties2b = properties2b(expertMask);
+    fprintf('Expert1a:\t%g (%g)\tExpert1b\t%g (%g)\n', ...
+        mean(properties1a(:)), std(properties1a(:)),  ...
+        mean(properties1b(:)), std(properties1b(:)));
+    [~, p, ci, tstats] = ttest(properties1a(:), properties1b(:), 'Tail', 'Both');
     if ci(1) > 0
-        status = 'significantly greater';
+        status = 'significantly greater than';
     elseif ci(2) < 0
-        status = 'significantly smaller';
+        status = 'significantly smaller than';
     else
-        status = 'Not significantly different';
+        status = 'not significantly different from';
     end
-    fprintf(['%s expert1a is %s than expert1b: p=%g  ci=[%g, %g] ' ...
-             'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, status,...
-              p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    fprintf(['%s expert1a is %s expert1b:\tp=%g\tci=[%g, %g]\t' ...
+        'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, status,...
+        p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    
+    fprintf('Expert2a:\t%g (%g)\tExpert2b\t%g (%g)\n', ...
+        mean(properties2a(:)), std(properties2a(:)),  ...
+        mean(properties2b(:)), std(properties2b(:)));
     [~, p, ci, tstats] = ttest(properties2a(:), properties2b(:), 'Tail', 'Both');
     if ci(1) > 0
-        status = 'significantly greater';
+        status = 'significantly greater than';
     elseif ci(2) < 0
-        status = 'significantly smaller';
+        status = 'significantly smaller than';
     else
-        status = 'Not significantly different';
+        status = 'not significantly different from';
     end
-    fprintf(['%s expert2a is %s than expert2b: p=%g  ci=[%g, %g] ' ...
-             'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, status,...
-              p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    
+    fprintf(['%s expert2a is %s expert2b:\tp=%g\tci=[%g, %g]\t' ...
+        'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, status,...
+        p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    
     [~, p, ci, tstats] = ttest(properties1a(:), properties2a(:), 'Tail', 'Both');
     if ci(1) > 0
-        status = 'significantly greater';
+        status = 'significantly greater than';
     elseif ci(2) < 0
-        status = 'significantly smaller';
+        status = 'significantly smaller than';
     else
-        status = 'Not significantly different';
+        status = 'not significantly different from';
     end
-    fprintf(['%s expert1a is %s than expert2a: p=%g  ci=[%g, %g] ' ...
-             'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, status,...
-              p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    fprintf(['%s expert1a is %s than expert2a:\tp=%g\tci=[%g, %g]\t' ...
+        'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, status,...
+        p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
     [~, p, ci, tstats] = ttest(properties1b(:), properties2b(:), 'Tail', 'Both');
     if ci(1) > 0
-        status = 'significantly greater';
+        status = 'significantly greater than';
     elseif ci(2) < 0
-        status = 'significantly smaller';
+        status = 'significantly smaller than';
     else
-        status = 'Not significantly different';
+        status = 'not significantly different from';
     end
-    fprintf(['%s expert1b is %s than expert2b: p=%g  ci=[%g, %g] ' ...
-             'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, status,...
-              p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
+    fprintf(['%s expert1b is %s expert2b:\tp=%g\tci=[%g, %g]\t' ...
+        'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, status,...
+        p, ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
 end
 
 %% Compare expert properties with supervised algorithms
 fprintf('\n\nComparing supervised with expert %d\n', theExpert);
 for m = 1:numProperties
-   propertiesEa = squeeze(propertiesExpertsFirst(:, m, theExpert));
-   propertiesEb = squeeze(propertiesExpertsSecond(:, m, theExpert));
+    propertiesEa = squeeze(propertiesExpertsFirst(:, m, theExpert));
+    propertiesEb = squeeze(propertiesExpertsSecond(:, m, theExpert));
     for n = 1:numAlgorithmsSupervised
         propertiesFirst = squeeze(propertiesSupervisedFirst(:, m, n, theExpert));
         propertiesSecond = squeeze(propertiesSupervisedSecond(:, m, n, theExpert));
@@ -473,42 +491,54 @@ for m = 1:numProperties
         expertAveraged = 0.5*(experta + expertb);
         propertiesAveraged = 0.5*(propertiesFirst + propertiesSecond);
         
+        fprintf('%s\tExpert %d first half:\t%g (%g)\t%s first half\t%g (%g)\n', ...
+            propertyNames{m}, theExpert, ...
+            mean(experta(:)), std(experta(:)), algorithmsSupervised{n}, ...
+            mean(propertiesFirst(:)), std(propertiesFirst(:)));
         [~, p, ci, tstats] = ttest(experta(:), propertiesFirst(:), 'Tail', 'Both');
         if ci(1) > 0
-            status = 'significantly greater';
+            status = 'significantly greater than';
         elseif ci(2) < 0
-            status = 'significantly smaller';
+            status = 'significantly smaller than';
         else
-            status = 'Not significantly different';
+            status = 'not significantly different from';
         end
-        fprintf(['%s expert %d first half is %s than  first half %s: p=%g  ci=[%g, %g] ' ...
-            'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, theExpert, ...
+        fprintf(['%s\tExpert %d first half is %s first half %s:\tp=%g\tci=[%g, %g]\t' ...
+            'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, theExpert, ...
             status, algorithmsSupervised{n}, p, ci(1), ci(2), ...
             tstats.tstat, tstats.df, tstats.sd);
         
+        fprintf('%s\tExpert %d second half:\t%g (%g)\t%s second half\t%g (%g)\n', ...
+            propertyNames{m}, theExpert, ...
+            mean(expertb(:)), std(expertb(:)), algorithmsSupervised{n}, ...
+            mean(propertiesSecond(:)), std(propertiesSecond(:)));
         [h, p, ci, tstats] = ttest(expertb(:), propertiesSecond(:), 'Tail', 'Both');
         if ci(1) > 0
-            status = 'significantly greater';
+            status = 'significantly greater than';
         elseif ci(2) < 0
-            status = 'significantly smaller';
+            status = 'significantly smaller than';
         else
-            status = 'Not significantly different';
+            status = 'not significantly different from';
         end
-        fprintf(['%s expert %d second half is %s than  second half %s: p=%g  ci=[%g, %g] ' ...
-           'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, theExpert, ...
+        fprintf(['%s\tExpert %d second half is %s second half %s:\tp=%g\tci=[%g, %g]\t' ...
+            'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, theExpert, ...
             status, algorithmsSupervised{n}, p, ci(1), ci(2), ...
             tstats.tstat, tstats.df, tstats.sd);
         
+        fprintf('%s\tExpert %d averaged:\t%g (%g)\t%s averaged\t%g (%g)\n', ...
+            propertyNames{m}, theExpert, ...
+            mean(expertAveraged(:)), std(expertAveraged(:)), algorithmsSupervised{n}, ...
+            mean(propertiesAveraged(:)), std(propertiesAveraged(:)));
         [~, p, ci, tstats] = ttest(expertAveraged(:), propertiesAveraged(:), 'Tail', 'Both');
         if ci(1) > 0
-            status = 'significantly greater';
+            status = 'significantly greater than';
         elseif ci(2) < 0
-            status = 'significantly smaller';
+            status = 'significantly smaller than';
         else
-            status = 'Not significantly different';
+            status = 'not significantly different from';
         end
-        fprintf(['%s expert %d averaged is %s than  averaged %s: p=%g  ci=[%g, %g] ' ...
-            'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, theExpert, ...
+        fprintf(['%s\tExpert %d averaged is %s than  averaged %s:\tp=%g\tci=[%g, %g]\t' ...
+            'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, theExpert, ...
             status, algorithmsSupervised{n}, p, ci(1), ci(2), ...
             tstats.tstat, tstats.df, tstats.sd);
     end
@@ -525,16 +555,21 @@ for k = 1:numExperts
             propertyMask = ~isnan(properties1) & ~isnan(properties2);
             properties1 = properties1(propertyMask);
             properties2 = properties2(propertyMask);
+            fprintf('%s\t%s first half:\t%g (%g)\t%s second half\t%g (%g)\n', ...
+                propertyNames{m}, algorithmsSupervised{n}, ...
+                mean(properties1(:)), std(properties1(:)), algorithmsSupervised{n}, ...
+                mean(properties2(:)), std(properties2(:)));
             [~, p, ci, tstats] = ttest(properties1(:), properties2(:), 'Tail', 'Both');
             if ci(1) > 0
-                status = 'significantly greater';
+                status = 'significantly greater than';
             elseif ci(2) < 0
-                status = 'significantly smaller';
+                status = 'significantly smaller than';
             else
-                status = 'Not significantly different';
+                status = 'not significantly different from';
             end
-            fprintf(['%s first half %s is %s than second half %s for %s: p=%g  ci=[%g, %g] ' ...
-                'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, ...
+            
+            fprintf(['%s\tfirst half %s is %s second half %s for %s:\tp=%g\tci=[%g, %g]\t' ...
+                'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, ...
                 algorithmsSupervised{n}, status, ...
                 algorithmsSupervised{n}, experts{k}, p, ...
                 ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
@@ -553,16 +588,21 @@ for i = 1:numExperts
                 propertyMaskFirst = ~isnan(properties1First) & ~isnan(properties2First);
                 properties1First = properties1First(propertyMaskFirst);
                 properties2First = properties2First(propertyMaskFirst);
+                
+                fprintf('%s\t%s first half:\t%g (%g)\t%s first half\t%g (%g)\n', ...
+                    propertyNames{m}, algorithmsSupervised{n}, ...
+                    mean(properties1First(:)), std(properties1First(:)), algorithmsSupervised{k}, ...
+                    mean(properties2First(:)), std(properties2First(:)));
                 [~, p, ci, tstats] = ttest(properties1First(:), properties2First(:), 'Tail', 'Both');
                 if ci(1) > 0
-                    status = 'significantly greater';
+                    status = 'significantly greater than';
                 elseif ci(2) < 0
-                    status = 'significantly smaller';
+                    status = 'significantly smaller than';
                 else
-                    status = 'Not significantly different';
+                    status = 'not significantly different from';
                 end
-                fprintf(['%s first half %s is %s than first half %s for %s: p=%g  ci=[%g, %g] ' ...
-                    'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, ...
+                fprintf(['%s\tfirst half %s is %s first half %s for %s:\tp=%g\tci=[%g, %g]\t' ...
+                    'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, ...
                     algorithmsSupervised{n}, status, ...
                     algorithmsSupervised{k}, experts{i}, p, ...
                     ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
@@ -572,16 +612,20 @@ for i = 1:numExperts
                 propertyMaskSecond = ~isnan(properties1Second) & ~isnan(properties2Second);
                 properties1Second = properties1Second(propertyMaskSecond);
                 properties2Second = properties2Second(propertyMaskSecond);
+                fprintf('%s\t%s second half:\t%g (%g)\t%s second half\t%g (%g)\n', ...
+                    propertyNames{m}, algorithmsSupervised{n}, ...
+                    mean(properties1Second(:)), std(properties1Second(:)), algorithmsSupervised{k}, ...
+                    mean(properties2Second(:)), std(properties2Second(:)));
                 [~, p, ci, tstats] = ttest(properties1Second(:), properties2Second(:), 'Tail', 'Both');
                 if ci(1) > 0
-                    status = 'significantly greater';
+                    status = 'significantly greater than';
                 elseif ci(2) < 0
-                    status = 'significantly smaller';
+                    status = 'significantly smaller than';
                 else
-                    status = 'Not significantly different';
+                    status = 'not significantly different from';
                 end
-                fprintf(['%s second half %s is %s than second half %s for %s: p=%g  ci=[%g, %g] ' ...
-                    'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, ...
+                fprintf(['%s\tsecond half %s is %s second half %s for %s:\tp=%g\tci=[%g, %g]\t' ...
+                    'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, ...
                     algorithmsSupervised{n}, status, ...
                     algorithmsSupervised{k}, experts{i}, p, ...
                     ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
@@ -590,7 +634,7 @@ for i = 1:numExperts
     end
 end
 
-%% Now compare supervised algorithms averaged to spindler 
+%% Now compare supervised algorithms averaged to spindler
 fprintf('\n\nSpindler unsupervised to supervised averaged\n');
 for k = 1:numExperts
     for m = 1:numProperties
@@ -604,16 +648,20 @@ for k = 1:numExperts
             properties2 = properties2(propertyMask);
             properties = 0.5*(properties1 + properties2);
             spindlerProperties = spindlerProperties(propertyMask);
+            fprintf('%s\tSpindler:\t%g (%g)\t%s averaged\t%g (%g)\n',  ...
+                propertyNames{m}, mean(spindlerProperties(:)), ...
+                std(spindlerProperties(:)), algorithmsSupervised{n}, ...
+                mean(properties(:)), std(properties(:)));
             [~, p, ci, tstats] = ttest(spindlerProperties(:), properties(:), 'Tail', 'Both');
             if ci(1) > 0
-                status = 'significantly greater';
+                status = 'significantly greater than';
             elseif ci(2) < 0
-                status = 'significantly smaller';
+                status = 'significantly smaller than';
             else
-                status = 'Not significantly different';
+                status = 'not significantly different from';
             end
-            fprintf(['%s spindler is %s than averaged %s from %s: p=%g  ci=[%g, %g] ' ...
-                'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, ...
+            fprintf(['%s\tspindler is %s averaged %s from %s:\tp=%g\tci=[%g, %g]\t' ...
+                'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, ...
                 status, algorithmsSupervised{n}, experts{k}, p, ...
                 ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
         end
@@ -637,16 +685,21 @@ for i = 1:numExperts
                 properties2Second = properties2Second(propertyMask);
                 properties1 = 0.5*(properties1First + properties1Second);
                 properties2 = 0.5*(properties2First + properties2Second);
+                fprintf('%s\t%s:\t%g (%g)\t%s\t%g (%g)\n', ...
+                    propertyNames{m}, algorithmsSupervised{n}, ...
+                    mean(properties1(:)), std(properties1(:)), algorithmsSupervised{k}, ...
+                    mean(properties2(:)), std(properties2(:)));
+                
                 [~, p, ci, tstats] = ttest(properties1(:), properties2(:), 'Tail', 'Both');
                 if ci(1) > 0
-                    status = 'significantly greater';
+                    status = 'significantly greater than';
                 elseif ci(2) < 0
-                    status = 'significantly smaller';
+                    status = 'significantly smaller than';
                 else
-                    status = 'Not significantly different';
+                    status = 'not significantly different from';
                 end
-                fprintf(['%s averaged %s is %s than averaged %s from %s: p=%g  ci=[%g, %g] ' ...
-                    'tstat = %g  df = %g sd = %g\n'], propertyNames{m}, ...
+                fprintf(['%s\taveraged %s is %s averaged %s from %s:\tp=%g\tci=[%g, %g]\t' ...
+                    'tstat = %g\tdf = %g\tsd = %g\n'], propertyNames{m}, ...
                     algorithmsSupervised{n}, status, ...
                     algorithmsSupervised{k}, experts{i}, p, ...
                     ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);

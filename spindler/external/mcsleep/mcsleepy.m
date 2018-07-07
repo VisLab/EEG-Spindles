@@ -1,5 +1,5 @@
-function  [spindles, additionalInfo, params] =  ...
-                          mcsleepy(data, expertEvents, imageDir, params) 
+function  [spindles, params, additionalInfo] =  ...
+                   mcsleepy(data, srate, expertEvents, imageDir, params) 
 %% Run the mcsleep algorithm on the data.  
 %
 %  Parameters:
@@ -10,17 +10,20 @@ function  [spindles, additionalInfo, params] =  ...
    
    %% Set up the parameters and check that the data is not empty
     defaults = concatenateStructs(getGeneralDefaults(), mcsleepGetDefaults());
-    params = processParameters('mcsleepy', nargin, 4, params, defaults);
+    params = processParameters('mcsleepy', nargin, 5, params, defaults);
+    additionalInfo = struct('algorithm', 'mcsleepy', 'srate', srate, ...
+        'parameterCurves', nan, 'warningMsgs', [], 'allMetrics', nan);
     if isempty(data)
        additionalInfo.warningMsgs = 'mcsleepy: data is empty algorithm fails';
        warning(additionalInfo.warningMsgs);
        return
     end
+    totalTime = length(data)/srate;
     
     %% Calculate the spindle representations for a range of parameters
-    [spindles, params] = mcsleepExtractSpindles(data, params);
+    [spindles, params] = mcsleepExtractSpindles(data, srate, params);
     additionalInfo.parameterCurves = ...
-                     mcsleepGetParameterCurves(spindles, imageDir, params);
+        mcsleepGetParameterCurves(spindles, totalTime, imageDir, params);
    
     %% Process the expert events if available   
     if ~isempty(expertEvents)
@@ -29,11 +32,10 @@ function  [spindles, additionalInfo, params] =  ...
         allMetrics(numLambda2s, numThresholds) = ...
             struct('count', NaN, 'hit', NaN, 'intersect', NaN, ...
                    'onset', NaN, 'time', NaN);
-        totalTime = length(data)/params.srate;
         for n = 1:numLambda2s
             for m = 1:numThresholds
                 allMetrics(n, m) = getPerformanceMetrics(expertEvents, ...
-                    spindles(n, m).events, spindles(n, m).totalTime, params);
+                    spindles(n, m).events, srate, totalTime, params);
             end
         end
         

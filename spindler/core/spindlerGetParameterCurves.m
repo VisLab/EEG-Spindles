@@ -1,5 +1,5 @@
 function [spindleCurves, warningMsgs, warningCodes] = ...
-                   spindlerGetParameterCurves(spindles, outDir, params)
+            spindlerGetParameterCurves(spindles, totalTime, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -31,7 +31,6 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     thresholds = params.spindlerThresholds;
     numAtoms = length(atomsPerSecond);
     numThresholds = length(thresholds);
-    totalSeconds = params.frames./params.srate;
     spindleCurves.name = params.name;
 
     %% Get the spindle hits and spindle times
@@ -51,8 +50,8 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
             spindle75(k, j) = ptimes(3);
         end
     end
-    spindleFraction = spindleTime./totalSeconds;
-    spindleRate = 60*spindleHits./totalSeconds;
+    spindleFraction = spindleTime./totalTime;
+    spindleRate = 60*spindleHits./totalTime;
 
     spindleRatio = zeros(size(spindle50));
     spindleHarmonicMean = zeros(size(spindle50));
@@ -198,7 +197,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     plot(ax(1), atomsPerSecond, spindleLen(:, end), ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
     yMax = params.spindleLengthMax;
-    hLine = line(ax(1), [eligiblePos, eligiblePos], [0, yMax], ... ###
+    hLine = line([eligiblePos, eligiblePos], [0, yMax], ... ###
         'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
 
     for k = 1:numThresholds
@@ -218,8 +217,8 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     yLimits(2) = max(yLimits(2), params.spindleLengthMax);
     set(hLine, 'YData', [0, yLimits(2)]) %####
     set(ax(1), 'YLim', [0, yLimits(2)], 'YLimMode', 'manual', 'YTickMode', 'auto');
-    yLimits = get(ax(2), 'YLim');
-    line(ax(2), [lowerAtomRate, upperAtomRate], [0.1, 0.1]*yLimits(2), ...
+    yLimits = get(ax(1), 'YLim');
+    line([lowerAtomRate, upperAtomRate], [0.1, 0.1]*yLimits(2), ...
        'LineWidth', 4, 'Color', [0.85, 0.85, 0.85]);
     hleg1 = legend(ax(1), legendStrings, 'Location', 'SouthEast');
     hleg2 = legend(ax(2), 'STD', 'STD range', 'Location', 'NorthEast');
@@ -299,20 +298,13 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
     plot(atomsPerSecond, spindleLen(:, bestEligibleThresholdInd),...
         'LineWidth', 3, 'Color', [0, 0, 0]);
-    
-%     set(gca, 'YLimMode', 'auto', 'YTickMode', 'auto')
-%     yLimits = get(gca, 'YLim');
-%     yLimits(2) = max(yLimits(2), params.spindleLengthMax);
-% %     line(ax(1), [eligiblePos, eligiblePos], [0, yLimits(2)], ... ###
-% %          'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
-%     set(hLine, 'YData', [0, yLimits(2)]) %####
+
     set(hLine1, 'YData', [0.1, 0.1]*yLimits(2));
     set(gca, 'YLim', [0, yLimits(2)], 'YLimMode', 'manual', 'YTickMode', 'auto');
     hleg1 = legend(gca, legendStrings, 'Location', 'SouthEast');
-    %hleg2 = legend(ax(2), 'STD', 'STD range', 'Location', 'NorthEast');
+
     if ~earlyMatlabVersion
         title(hleg1, 'Parameters');
-        %title(hleg2, 'Spindles/min')
     end
     if ~earlyMatlabVersion
         title(hleg1, 'Parameters');
@@ -428,7 +420,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
         'LineWidth', 2, 'Color', theColor, 'LineStyle', ':');
     set(ax(1), 'YLim', [0, 10], 'YLimMode', 'manual', 'YTickMode', 'auto');
     yLimits = get(ax(1), 'YLim');
-    line(ax(1), [eligiblePos, eligiblePos], ... ####
+    line([eligiblePos, eligiblePos], ... ####
         [0, yLimits(2)], ...
         'Color', [0.8, 0.8, 0.2], 'LineWidth', 2);
     set(ax(2), 'YLim', [0, 2], 'YLimMode', 'manual', 'YTickMode', 'auto');
@@ -446,8 +438,8 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
     ylabel(ax(1), 'Spindles/min');
     ylabel(ax(2), 'STD spindles/min wrt threshold');
    
-    yLimits = get(ax(2), 'YLim');
-    line(ax(2), [lowerAtomRate, upperAtomRate], [0.05, 0.05]*yLimits(2), ...
+    yLimits = get(ax(1), 'YLim');
+    line([lowerAtomRate, upperAtomRate], [0.05, 0.05]*yLimits(2), ...
         'LineWidth', 4, 'Color', [0.85, 0.85, 0.85]);
     hleg1 = legend(ax(1), ['T_b=' num2str(bestEligibleThreshold)], 'T_b centered', ...
         'T_b=0', 'T_b=1', ...
@@ -508,7 +500,7 @@ function [spindleCurves, warningMsgs, warningCodes] = ...
         yLimits = get(gca, 'YLim');
         yLimits(1) = 0;
         set(gca, 'YLim', yLimits, 'YLimMode', 'manual', 'YTickMode', 'auto');
-        line(gca, [eligiblePos, eligiblePos], yLimits, 'Color', ...
+        line([eligiblePos, eligiblePos], yLimits, 'Color', ...
             [0.8, 0.8, 0.3], 'LineWidth', 2); %#####
 
         hold off

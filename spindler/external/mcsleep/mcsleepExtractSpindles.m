@@ -1,4 +1,4 @@
-function [spindles, params] = mcsleepExtractSpindles(y, params)
+function [spindles, params] = mcsleepExtractSpindles(y, srate, params)
 % Extracts spindle events for range of lambda2 and threshold values
 %
 % Please cite as: 
@@ -11,28 +11,27 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
 
 %% Set up the parameters
    
-    [params.channels, params.frames] = size(y);
+    [channels, frames] = size(y);
     thresholds = params.mcsleepThresholds;
     lambda2s = params.mcsleepLambda2s;
-    fs = params.srate;
+
     f1 = params.mcsleepSpindleFrequencyRange(1);
     f2 = params.mcsleepSpindleFrequencyRange(2);
-    [B, A] = butter(params.mcsleepFilterOrder, [f1 f2]/(fs/2));
+    [B, A] = butter(params.mcsleepFilterOrder, [f1 f2]/(srate/2));
     numThresholds = length(thresholds);
     numLambda2s = length(lambda2s);
-    epochTime = params.epochLength;
     
     %% Initialize the structures
     spindles(numLambda2s, numThresholds) = ...
         struct('lambda2', NaN, 'threshold', NaN, 'numberSpindles', 0, ...
                'spindleTime', 0, 'totalTime', 0, 'events', NaN);
     %%Convert data for parfor
-    numEpochs = floor(params.frames/(fs *epochTime));
-    totalTime = numEpochs*epochTime;
+    numEpochs = floor(frames/(srate *params.epochLength));
+    totalTime = numEpochs*params.epochLength;
     
     %% Segment input signal into cells of epochTime seconds in length
     Y = cell(numEpochs,1);
-    epochFrames = round(epochTime*fs);
+    epochFrames = round(params.epochLength*srate);
     for i = 1:numEpochs
         Y{i} = y(:, (i-1)*epochFrames + 1: i*epochFrames);
     end
@@ -45,7 +44,7 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
         end
 
         %% Reassemble the signal
-        s = zeros(params.channels, params.frames);
+        s = zeros(channels, frames);
         for i = 1:numEpochs
             s(:, (i-1)*epochFrames + 1:i*epochFrames) = C{i};
         end
@@ -64,7 +63,7 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
             binary = discardOutOfRange(binary);
             spindleMask = [0 binary(:)']; 
             spindles(n, m).totalTime = totalTime;
-            spindles(n, m).events = getMaskEvents(spindleMask, params.srate);
+            spindles(n, m).events = getMaskEvents(spindleMask, srate);
             [spindles(n, m).numberSpindles, spindles(n, m).spindleTime] = ...
                 getSpindleCounts(spindles(n, m).events);
         end
@@ -100,9 +99,9 @@ function [spindles, params] = mcsleepExtractSpindles(y, params)
         end
         
         [binary,~,~] = minimum_duration(binary, begins, ends, ...
-                       params.spindleLengthMin, fs);
+                       params.spindleLengthMin, srate);
         [binaryDiscard,~,~] = maximum_duration(binary, begins, ends, ...
-                       params.spindleLengthMax, fs);
+                       params.spindleLengthMax, srate);
     end
 
     function y = T( x )

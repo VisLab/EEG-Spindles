@@ -1,8 +1,7 @@
 function events = spindlerDetectEvents(data, srate, threshold, trimFactor)
-%% Detect events where scaled MP signal above a threshold
+%% Detect events where scaled MP signal is above a threshold
 %
 % Parameters:
-%
 %   data             A row vector of data to threshold.
 %   srate            Signal sampling rate in Hz.
 %   threshold        Threshold for considering data in the event

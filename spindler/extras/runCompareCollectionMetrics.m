@@ -1,4 +1,4 @@
-%% Extracts data for a particular collection of unsupervised algorithms
+%% Compares performance for different algorithms
 collection = 'mass';
 dataDir = 'D:\TestData\Alpha\spindleData\massNew';
 % collection = 'dreams';
@@ -9,6 +9,7 @@ experts = {'expert1', 'expert2'};
 baseMetricName = 'f1';
 methodName = 'time';
 metricNames = {'f1', 'fdr'};
+propertyNames = {'SpindleFraction', 'Spindle length(s)', 'Spindles/min'};
 summaryDirUnsupervised = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';
 summaryDirSupervised = 'D:\TestData\Alpha\spindleData\summarySupervised';
 supervisedFileBase = ...
@@ -72,7 +73,10 @@ metricsSupervisedFirst = nan(numFiles, numMetrics, ...
                              numAlgorithmsSupervised, numExperts);
 metricsSupervisedSecond = nan(numFiles, numMetrics, ...
     numAlgorithmsSupervised, numExperts);
-
+propetiesSupervisedFirst = nan(numFiles, numProperties, ...
+                     numAlgorithmsSupervised, numExperts);
+propetiesSupervisedSecond = nan(numFiles, numProperties, ...
+                     numAlgorithmsSupervised, numExperts);
 for k = 1:numAlgorithmsSupervised
     for n = 1:numExperts
         fileName = [supervisedFileBase experts{n} '_' algorithmsSupervised{k} '.mat'];
@@ -90,6 +94,18 @@ for k = 1:numAlgorithmsSupervised
                 metricsSupervisedSecond(i, m, k, n) = ...
                     results(i).metricsSecondFromFirst(pos);
             end
+              for m = 1:numMetrics
+                pos = strcmpi(results(i).metricNames, metricNames{m});
+                if isempty(pos) || isnan(results(i).valueAll)
+                    continue;
+                end
+                
+                metricsSupervisedFirst(i, m, k, n) = ...
+                    results(i).metricsFirstFromSecond(pos);
+                metricsSupervisedSecond(i, m, k, n) = ...
+                    results(i).metricsSecondFromFirst(pos);
+            end
+            
         end
     end
 end
@@ -125,14 +141,14 @@ for n = 1:numExperts
                     algorithmsUnsupervised{i}, mean(metrics2), std(metrics2));
                 [~, p, ci, tstats] = ttest(metrics1(:), metrics2(:), 'Tail', 'Both');
                 if ci(1) > 0
-                    status = 'significantly greater';
+                    status = 'significantly greater than';
                 elseif ci(2) < 0
-                    status = 'significantly smaller';
+                    status = 'significantly smaller than';
                 else
-                    status = 'Not significantly different';
+                    status = 'not significantly different from';
                 end
-                fprintf(['%s %s is %s than %s: p=%g  ci=[%g, %g] ' ...
-                    'tstat = %g  df = %g sd = %g\n'], metricNames{m}, ...
+                fprintf(['%s %s is %s %s:\tp=%g\tci=[%g, %g]\t' ...
+                    'tstat = %g\tdf = %g\tsd = %g\n'], metricNames{m}, ...
                     algorithmsUnsupervised{k}, status, algorithmsUnsupervised{i}, p, ...
                     ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
             end
@@ -154,19 +170,18 @@ for m = 1:numMetrics
             mean(metrics2), std(metrics2));
         [~, p, ci, tstats] = ttest(metrics1(:), metrics2(:), 'Tail', 'Both');
         if ci(1) > 0
-            status = 'significantly greater';
+            status = 'significantly greater than';
         elseif ci(2) < 0
-            status = 'significantly smaller';
+            status = 'significantly smaller than';
         else
-            status = 'Not significantly different';
+            status = 'not significantly different from';
         end
-        fprintf(['%s %s expert 1 is %s than expert 2: p=%g  ci=[%g, %g] ' ...
-            'tstat = %g  df = %g sd = %g\n'], metricNames{m}, ...
+        fprintf(['%s %s expert 1 is %s than expert 2\tp=%g\tci=[%g, %g]\t' ...
+            'tstat = %g\tdf = %g\tsd = %g\n'], metricNames{m}, ...
             algorithmsUnsupervised{k}, status, p, ...
             ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
     end
 end
-
 
 %% Now compare supervised algorithms self
 for n = 1:numExperts
@@ -180,14 +195,14 @@ for n = 1:numExperts
             metrics2 = metrics2(metricMask);
             [~, p, ci, tstats] = ttest(metrics1(:), metrics2(:), 'Tail', 'Both');
             if ci(1) > 0
-                status = 'significantly greater';
+                status = 'significantly greater than';
             elseif ci(2) < 0
-                status = 'significantly smaller';
+                status = 'significantly smaller than';
             else
-                status = 'Not significantly different';
+                status = 'not significantly different from';
             end
-            fprintf(['%s first half %s is %s than second half %s for %s: p=%g  ci=[%g, %g] ' ...
-                'tstat = %g  df = %g sd = %g\n'], metricNames{m}, ...
+            fprintf(['%s first half %s is %s second half %s for %s\tp=%g\tci=[%g, %g]\t' ...
+                'tstat = %g\tdf = %g\tsd = %g\n'], metricNames{m}, ...
                 algorithmsSupervised{k}, status, ...
                 algorithmsSupervised{k}, experts{n}, p, ...
                 ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
@@ -215,20 +230,19 @@ for m = 1:numMetrics
             mean(metrics2), std(metrics2));
         [~, p, ci, tstats] = ttest(metrics1(:), metrics2(:), 'Tail', 'Both');
         if ci(1) > 0
-            status = 'significantly greater';
+            status = 'significantly greater than';
         elseif ci(2) < 0
-            status = 'significantly smaller';
+            status = 'significantly smaller than';
         else
-            status = 'Not significantly different';
+            status = 'not significantly different from';
         end
-        fprintf(['%s expert 1 average %s is %s than expert 2 average: p=%g  ci=[%g, %g] ' ...
-            'tstat = %g  df = %g sd = %g\n'], metricNames{m}, ...
+        fprintf(['%s expert 1 average %s is %s expert 2 average\tp=%g\tci=[%g, %g]\t' ...
+            'tstat = %g\tdf = %g\tsd = %g\n'], metricNames{m}, ...
             algorithmsSupervised{k}, status, p, ...
             ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
         
     end
 end
-
 
 %% Now compare supervised algorithms averaged to spindler 
 for n = 1:numExperts
@@ -245,17 +259,17 @@ for n = 1:numExperts
             spindlerMetrics = spindlerMetrics(metricMask);
             [~, p, ci, tstats] = ttest(spindlerMetrics(:), metrics(:), 'Tail', 'Both');
             if ci(1) > 0
-                status = 'significantly greater';
+                status = 'significantly greater than';
             elseif ci(2) < 0
-                status = 'significantly smaller';
+                status = 'significantly smaller than';
             else
-                status = 'Not significantly different';
+                status = 'not significantly different from';
             end
             fprintf('Spindler: %g(%g)   %s: %g(%g)\n', mean(spindlerMetrics), ...
                 std(spindlerMetrics), algorithmsSupervised{k}, ...
                 mean(metrics), std(metrics));
-            fprintf(['%s spindler is %s than averaged %s from %s: p=%g  ci=[%g, %g] ' ...
-                'tstat = %g  df = %g sd = %g\n'], metricNames{m}, ...
+            fprintf(['%s spindler is %s averaged %s %s:\tp=%g\tci=[%g, %g]\t' ...
+                'tstat = %g\tdf = %g\tsd = %g\n'], metricNames{m}, ...
                 status, algorithmsSupervised{k}, experts{n}, p, ...
                 ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);
         end
@@ -281,14 +295,14 @@ for i = 1:numExperts
                 metrics2 = 0.5*(metrics2First + metrics2Second);
                 [~, p, ci, tstats] = ttest(metrics1(:), metrics2(:), 'Tail', 'Both');
                 if ci(1) > 0
-                    status = 'significantly greater';
+                    status = 'significantly greater than';
                 elseif ci(2) < 0
-                    status = 'significantly smaller';
+                    status = 'significantly smaller than';
                 else
-                    status = 'Not significantly different';
+                    status = 'not significantly different from';
                 end
-                fprintf(['%s averaged %s is %s than averaged %s from %s: p=%g  ci=[%g, %g] ' ...
-                    'tstat = %g  df = %g sd = %g\n'], metricNames{m}, ...
+                fprintf(['%s averaged %s is %s than averaged %s %s:\tp=%g\tci=[%g, %g]\t' ...
+                    'tstat = %g\tdf = %g\tsd = %g\n'], metricNames{m}, ...
                     algorithmsSupervised{n}, status, ...
                     algorithmsSupervised{k}, experts{i}, p, ...
                     ci(1), ci(2), tstats.tstat, tstats.df, tstats.sd);

@@ -1,12 +1,16 @@
-function figHan = spindlerShowMetric(spindleParameters, allMetrics, ...
+function figHan = spindlerShowMetric(spindlerCurves, allMetrics, ...
                                      metricName, imageDir, params)
 %% Plot the specified metric for the different evaluation methods
 %
 %  Parameters:
-%     spindleParameters     structure from getSpindlerParameters
-%     methods               structure from getSpindlerPerformance
-%     metricName            name of the metric to plot
-
+%     spindlerCurves       structure from spindlerGetParameterCurves
+%     allMetrics           structure containing all metrecis 
+%     metricName           name of the metric to plot
+%     imageDir             directory to save images
+%     params               structure containing figure defaults and name
+%
+% Written by: Kay Robbins, UTSA  2017-2018
+%
 %% Set up image directory if saving
 defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());     
 params = processParameters('spindlerShowMetric', nargin, 5, params, defaults);
@@ -16,14 +20,14 @@ end
 theName = params.name;
 
 %% Figure out the thresholds to plot and calculate the mean
-datasetName = spindleParameters.name;
-atomsPerSecond = spindleParameters.atomsPerSecond;
-thresholds = spindleParameters.thresholds;
+datasetName = spindlerCurves.name;
+atomsPerSecond = spindlerCurves.atomsPerSecond;
+thresholds = spindlerCurves.thresholds;
 [~, minInd] = min(thresholds);
 [~, maxInd] = max(thresholds);
-spindleRateSTD = spindleParameters.spindleRateSTD;
-bestEligibleAtomInd = spindleParameters.bestEligibleAtomInd;
-bestEligibleThresholdInd = spindleParameters.bestEligibleThresholdInd;
+spindleRateSTD = spindlerCurves.spindleRateSTD;
+bestEligibleAtomInd = spindlerCurves.bestEligibleAtomInd;
+bestEligibleThresholdInd = spindlerCurves.bestEligibleThresholdInd;
 
 %% Extract the values to plot
 metrics = getMetric(allMetrics, 'count', metricName);
@@ -44,7 +48,7 @@ timeMetric = [metrics(:, minInd), metrics(:, maxInd), ...
 
 %% Set up the legends
 legendStrings = {'T_b=0', 'T_b=1', ...
-                 ['T_b=' num2str(spindleParameters.bestEligibleThreshold)]};
+                 ['T_b=' num2str(spindlerCurves.bestEligibleThreshold)]};
 
 %% set up the graphics
 legendBoth = cell(1, 15);
@@ -75,10 +79,9 @@ for j = 1:3
 end
 plot(atomsPerSecond, spindleRateSTD/max(spindleRateSTD(:)), ...
     'LineWidth', 2, 'Color', [0.7, 0.7, 0.7]);
-%ePos = atomsPerSecond(bestAtomInd);
+
 yLimits = [0, 1];
-%line([ePos, ePos], yLimits, 'Color', [0.8, 0.8, 0.8]);
-line(spindleParameters.atomRateRange, [0.1, 0.1], ...
+line(spindlerCurves.atomRateRange, [0.1, 0.1], ...
     'LineWidth', 4, 'Color', [0.8, 0.8, 0.8]);
 eligiblePos = atomsPerSecond(bestEligibleAtomInd);
 line([eligiblePos, eligiblePos], yLimits, ...

@@ -1,8 +1,8 @@
 %% Extracts specified metrics for unsupervised spindler
-collection = 'mass';
-dataDir = 'D:\TestData\Alpha\spindleData\massNew';
-% collection = 'dreams';
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams';
+% collection = 'mass';
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew';
+collection = 'dreams';
+dataDir = 'D:\TestData\Alpha\spindleData\dreams';
 algorithm = 'spindler';
 experts = {'combined', 'expert1', 'expert2'};
 summaryDir = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';

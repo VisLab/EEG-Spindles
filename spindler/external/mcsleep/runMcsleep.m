@@ -5,21 +5,21 @@ defaults = concatenateStructs(getGeneralDefaults(), mcsleepGetDefaults());
 paramsInit = processParameters('runMcsleep', 0, 0, struct(), defaults); 
 
 %% Set up the directory for dreams
-stageDir = [];
-dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
-channelLabelsFrontal = {'FP1-A1'};
-channelLabelsCentral = {'C3-A1', 'CZ-A1'};
-channelLabelsOccipital = {'O1-A1'};
-paramsInit.srateTarget = 0;
-paramsInit.mcsleepK = 200;
-paramsInit.mcsleepO = 100;
-paramsInit.mcsleepLambda0 = 0.3;
-paramsInit.mcsleepLambda1 = 7;
-paramsInit.mcsleepLambda2s = 20:50;
-paramsInit.mcsleepThresholds = 0.5:0.1:3.0;
-paramsInit.mcsleepMu = 0.5;
-paramsInit.mcSleepNit = 40;
-paramsInit.algorithm = 'mcsleep';
+% stageDir = [];
+% dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
+% channelLabelsFrontal = {'FP1-A1'};
+% channelLabelsCentral = {'C3-A1', 'CZ-A1'};
+% channelLabelsOccipital = {'O1-A1'};
+% paramsInit.srateTarget = 0;
+% paramsInit.mcsleepK = 200;
+% paramsInit.mcsleepO = 100;
+% paramsInit.mcsleepLambda0 = 0.3;
+% paramsInit.mcsleepLambda1 = 7;
+% paramsInit.mcsleepLambda2s = 20:50;
+% paramsInit.mcsleepThresholds = 0.5:0.1:3.0;
+% paramsInit.mcsleepMu = 0.5;
+% paramsInit.mcSleepNit = 40;
+
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep_combined';
@@ -29,26 +29,25 @@ paramsInit.algorithm = 'mcsleep';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep_expert1';
 % imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_mcsleep_expert1';
 
-eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep_expert2';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_mcsleep_expert2';
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_mcsleep_expert2';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_mcsleep_expert2';
 
 %% MASS parameters
-% stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
-% dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
-% channelLabelsFrontal = {'Fp1'};
-% channelLabelsCentral = {'Cz'};
-% channelLabelsOccipital = {'O1'};
-% paramsInit.srateTarget = 0;
-% paramsInit.mcsleepK = 256;
-% paramsInit.mcsleepO = 128;
-% paramsInit.mcsleepLambda0 = 0.6;
-% paramsInit.mcsleepLambda1 = 7;
-% paramsInit.mcsleepLambda2s = 20:50;
-% paramsInit.mcsleepThresholds = 0.5:0.1:3.0;
-% paramsInit.mcsleepMu = 0.5;
-% paramsInit.mcSleepNit = 40;
-% paramsInit.algorithm = 'mcsleep';
+stageDir = 'D:\TestData\Alpha\spindleData\massNew\events\stage2Events';
+dataDir = 'D:\TestData\Alpha\spindleData\massNew\data';
+channelLabelsFrontal = {'Fp1'};
+channelLabelsCentral = {'Cz'};
+channelLabelsOccipital = {'O1'};
+paramsInit.srateTarget = 0;
+paramsInit.mcsleepK = 256;
+paramsInit.mcsleepO = 128;
+paramsInit.mcsleepLambda0 = 0.6;
+paramsInit.mcsleepLambda1 = 7;
+paramsInit.mcsleepLambda2s = 20:50;
+paramsInit.mcsleepThresholds = 0.5:0.1:3.0;
+paramsInit.mcsleepMu = 0.5;
+paramsInit.mcSleepNit = 40;
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
 % imageDir = 'D:\TestData\Alpha\spindleData\massNew\images_mcsleep_combined';
@@ -88,19 +87,16 @@ for k = 1:length(dataFiles)
     [~, theName, ~] = fileparts(dataFiles{k});
     params.name = theName;
  
-    [dataCentral, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
+    [dataCentral, srateOriginal, srate, channelNumber, channelLabel] = ...
         getChannelData(dataFiles{k}, channelLabelsCentral, params.srateTarget);
-    [dataFrontal, params.srateOriginal, params.channelNumberFrontal, ...
-        params.channelLabelFrontal] = getChannelData(dataFiles{k}, ...
-        channelLabelsFrontal, params.srateTarget);  
-    [dataOccipital, params.srateOriginal, params.channelNumberOccipital, ...
-        params.channelLabelOccipital] = getChannelData(dataFiles{k}, ...
-        channelLabelsOccipital, params.srateTarget);     
+    [dataFrontal, ~, ~, channelNumberFrontal, channelLabelFrontal] = ...
+        getChannelData(dataFiles{k}, channelLabelsFrontal, params.srateTarget);  
+    [dataOccipital, ~, ~, channelNumberOccipital, channelLabelOccipital] = ...
+        getChannelData(dataFiles{k}, channelLabelsOccipital, params.srateTarget);     
     if isempty(dataCentral) || isempty(dataFrontal) || isempty(dataOccipital)
         warning('Missing frontral, occipital or central data for %s\n', dataFiles{k});
         continue;
     end
-    params.srate = params.srateOriginal;
     data = [dataFrontal; dataCentral; dataOccipital];
     %% Read events and stages if available 
     expertEvents = readEvents(eventDir, [theName '.mat']);
@@ -108,16 +104,22 @@ for k = 1:length(dataFiles)
     
     %% Use the longest stretch in the stage events
     [data, startFrame, endFrame, expertEvents] = ...
-         getMaxStagedData(data, stageEvents, expertEvents, params.srate);
+         getMaxStagedData(data, stageEvents, expertEvents, srate);
    
-    %% Now call mcsleep
-    [spindles, additionalInfo, params] =  ...
-               mcsleepy(data, expertEvents, imageDir, params);
-    additionalInfo.algorithm = params.algorithm;
+     %% Now call mcsleep
+     [spindles, params, additionalInfo] =  ...
+         mcsleepy(data, srate, expertEvents, imageDir, params);
+     additionalInfo.srate = srate;
+     additionalInfo.srateOriginal = srate;
+     additionalInfo.channelNumber = channelNumber;
+     additionalInfo.channelLabel = channelLabel;
+     additionalInfo.channelNumberFrontal = channelNumberFrontal;
+     additionalInfo.channelLabelFrontal = channelLabelFrontal;
+     additionalInfo.channelNumberOccipital = channelNumberOccipital;
+     additionalInfo.channelLabelOccipital = channelLabelOccipital;
      additionalInfo.startFrame = startFrame;
      additionalInfo.endFrame = endFrame;
-     additionalInfo.srate = params.srate;
-    additionalInfo.stageEvents = stageEvents;
-    theFile = [resultsDir filesep theName '.mat'];
-    save(theFile, 'spindles', 'expertEvents', 'params', 'additionalInfo', '-v7.3');
-end   
+     additionalInfo.stageEvents = stageEvents;
+     theFile = [resultsDir filesep theName '.mat'];
+     save(theFile, 'spindles', 'expertEvents', 'params', 'additionalInfo', '-v7.3');
+end

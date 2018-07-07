@@ -1,11 +1,12 @@
 function stats = getPairedStatistics(results, baseIndex, algorithms, ...
                                      experts, metricName, methodName)
-%% Performs paired statistics tests base Index to others.
+%% Performs paired statistics tests baseIndex to others for combined experts.
 %
 %   Parameters:
 %       results        algorithms x experts cell array of results
 %       baseIndex      index of algorithm to use as the base
 %       algorithms     cell array of algorithm names
+%       experts        cell array with names of the experts
 %       metricName     name of the metric
 %       methodName     name of the method for comparing ground truth
 %% Consolidate the data into an array for the paired ttest
@@ -48,13 +49,13 @@ for k = 1:numAlgs - 1
     [stats(k).h, stats(k).p, stats(k).ci, stats(k).tstats] = ...
         ttest(baseData(:), otherData(:, k), 'Tail', 'Both');
     if stats(k).ci(1) > 0
-        status = 'significantly greater';
+        status = 'significantly greater than';
     elseif stats(k).ci(2) < 0
-        status = 'significantly smaller';
+        status = 'significantly smaller than';
     else
-        status = 'Not significantly different than';
+        status = 'not significantly different from';
     end
-    status = sprintf('%s %s %s: p=%g  ci=[%g, %g] tstat = %g', ...
+    status = sprintf('%s %s %s:\tp=%g\tci=[%g, %g]\ttstat = %g', ...
         baseAlgorithm,  status, stats(k).algorithm, ...
         stats(k).p, stats(k).ci(1), stats(k).ci(2), stats(k).tstats.tstat);
     fprintf('%s\n', status);

@@ -1,8 +1,8 @@
-function [nbr_sp, pos_sp] = spDetect(sig, seuil, params)
-    fs = params.srate;
+function [nbr_sp, pos_sp] = spDetect(sig, srate, seuil, params)
+%% Function adapted from original Spinky toolbox
     frequencyLimits = params.spindleFrequencyRange;
     frequencies = frequencyLimits(1):0.15:frequencyLimits(2);
-    sc = 1./(frequencies/fs); %selon AASM sleep spindles dans la bande [11 16] 62:91;%
+    sc = 1./(frequencies/srate); %selon AASM sleep spindles dans la bande [11 16] 62:91;%
     wname='fbsp 20-0.5-1';  
     W=cwt(sig,sc,wname);
     CTF=abs(W);
@@ -29,7 +29,7 @@ function [nbr_sp, pos_sp] = spDetect(sig, seuil, params)
             (dBS(ii,jj)>seuil));
         ord = mod(ind-1, length(ii))+2;    % +2 is because ii and jj start at 2
         axe = floor((ind-1)/length(ii))+2;
-        len= round(fs*30);
+        len= round(srate*30);
         
         if numel(ord)==0
             nbr=0;
@@ -40,7 +40,7 @@ function [nbr_sp, pos_sp] = spDetect(sig, seuil, params)
         com2=0;
         pos1=1;
         pos2=1;
-        n=fs*30;
+        n=srate*30;
         fin = zeros(1, length(ord));
         debut = zeros(1, length(ord));
         for kk=1:length(ord)
@@ -99,7 +99,7 @@ function [nbr_sp, pos_sp] = spDetect(sig, seuil, params)
         %
         pos_spindle(1)=0;
         pos_spindle(end)=0;
-        duree = round(params.spindleLengthMin*fs);
+        duree = round(params.spindleLengthMin*srate);
         y=pos_spindle;
         sa=sign(diff([-inf y]));
         sb=sign(diff([-inf y(end:-1:1)]));

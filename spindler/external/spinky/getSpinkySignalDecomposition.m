@@ -4,7 +4,11 @@ function oscil = getSpinkySignalDecomposition(data, fs)
 %  Parameters:
 %     data  epochs x epochSize array of data
 %     fs    sampling frequency
-%     oscil  epochs x epochSize signal decomposition.
+%     oscil  (output) epochs x epochSize signal decomposition.
+%
+% Revised from original Spinky implementation
+%
+%% Set up the parameters
     numEpochs = size(data, 1);
     oscil = zeros(size(data));
     for k = 1:numEpochs

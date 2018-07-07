@@ -7,7 +7,8 @@ function dataFiltered = getFilteredData(data, srate, lowFreq, highFreq)
 %      lowFreq        lower end of band pass (empty or zero if no lower end)
 %      highFreq       high end of band pass (empty or zero if no upper end)
 %      dataFiltered   (output) filtered data
-
+%
+%  Written by: Kay Robbins UTSA 2017-2018
 %% Convert data to a one-channel EEG dataset.
 EEG = eeg_emptyset();
 EEG.data = data(:)';

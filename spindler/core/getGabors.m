@@ -3,22 +3,20 @@ function [gabors, sigmaFreq] = ...
 %% Create a dictionary of zero-phase Gabor atoms for specified parameters
 %
 %  Parameters:
-%     srate            sampling rate in Hz of the Gabor dictionary
-%     params           structure with optional parameters
-%        gaborFrequencies
-%        gaborScales
-%        gaborSupportFactor
+%     srate             sampling rate in Hz of the Gabor dictionary
+%     atomSupportFactor total width of non-zero portion of Gabor atom
+%     atomScales        2xsigma of the Gaussian envelop of Gabor atoms
+%     atomFrequencies   vector of frequencies of gabor atoms
 %
 %  Output:
 %     gabors         K x L array containing K gabor atoms of length L
 %     sigmaFreq      K x 2 array containing SD and frequency of the
-%                      K Gabor atoms in the columns
+%                    K Gabor atoms in the columns
 %  
 %  Written by:  Kay Robbins, 2015-2017, UTSA
 %
 
 %% Set up the parameters
-
 numberScales = length(atomScales);
 numberFreq = length(atomFrequencies);
 numberGabors = numberFreq*numberScales;

@@ -1,29 +1,29 @@
-function spindleCurves = spinkyGetParameterCurves(spindles, outDir, params)
+function spindleCurves = ...
+           spinkyGetParameterCurves(spindles, totalTime, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
 %     spindles     Spindler structure with results of MP decomposition
+%     totalTime    total time in seconds of the data
 %     outDir       Optional argument (If present and non empty, saves a
 %                  plot of the parameter selection results in outDir)
+%     params       Parameter structure that holds figure parameters
 %     spindleCurves (output) Structure containing results of parameter
 %                  selection
-%     warningMsgs (output) Cell array of warning messages
-%     warningCodes (output) Integer array of corresponding error codes
 %
-%  Written by:  Kay Robbins 
+%  Written by:  Kay Robbins, UTSA 2018
 
 %% Set up the defaults
     defaults = concatenateStructs(getGeneralDefaults(), spinkyGetDefaults());
-    params = processParameters('spinkyGetParameterCurves', nargin, 2, params, defaults);
+    params = processParameters('spinkyGetParameterCurves', nargin, 4, params, defaults);
 
     thresholds = unique(cellfun(@double, {spindles.threshold}));
-    totalSeconds = params.frames./params.srate;
 
     %% Get the spindle hits and spindle times
     spindleHits = cellfun(@double, {spindles.numberSpindles});
     spindleTime = cellfun(@double, {spindles.spindleTime});
-    spindleRate = 60*spindleHits/totalSeconds;
-    spindleFraction = spindleTime/totalSeconds;
+    spindleRate = 60*spindleHits/totalTime;
+    spindleFraction = spindleTime/totalTime;
     
     %% Get the mean spindle length
     meanSpindleLen = spindleTime./spindleHits;

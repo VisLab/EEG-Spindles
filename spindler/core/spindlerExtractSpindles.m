@@ -1,27 +1,28 @@
-function [spindles, params] = spindlerExtractSpindles(data, params)
+function [spindles, params, atomParams, sigmaFreq, scaledGabors] = ...
+                            spindlerExtractSpindles(data, srate, params)
 %% Calculate Gabor representation and corresponding spindle events 
 %  
 %  Parameters:
 %    data             1 x n data
+%    srate            data sampling rate
 %    params           (Input/Output) Structure with parameters for algorithm 
 %                              (See getSpindleDefaults)
-%    spindles         (Output) Structure with spindles as a function of 
-%                              number of atoms/sec and threshold.
+%    spindles         (Output) Structure with spindles as a structure on
+%                              grid of number of atoms/sec and threshold.
 %    atomParams       (Output) Array of frequency, scale, and phase indices
 %    sigmaFreq        (Output) Table of Gabor frequency and scales
 %    scaledGabors     (Output) Gabor atoms that form the dictionary.
 %
-%  Written by:     J. LaRocco, K. Robbins, UTSA 2016-2017
+%  Written by:     J. LaRocco, K. Robbins, UTSA 2016-2018
 %
 
 %% Process the input parameters and set up the calculation
-
-
 atomsPerSecond = sort(params.spindlerAtomsPerSecond);
 params.spindlerAtomsPerSecond = atomsPerSecond;
 minLength = params.spindleLengthMin;
 minSeparation = params.spindleSeparationMin;
 maxLength = params.spindleLengthMax;
+
 %% Handle the thresholds (making sure thresholds 0 and 1 are included)
 thresholds = params.spindlerThresholds;
 thresholds = sort(thresholds);
@@ -35,20 +36,20 @@ params.spindlerThresholds = thresholds;
 
 %% Extract the channels and filter the signal before MP
 numFrames = length(data);
-totalTime = (numFrames - 1)/params.srate;
-params.frames = numFrames;
+totalTime = (numFrames - 1)/srate;
+%params.frames = numFrames;
 
 %% Generate the Gabor dictionary for the MP decomposition
 freqLow = params.spindleFrequencyRange(1);
 freqHigh = params.spindleFrequencyRange(2);
 freqRes = params.spindlerGaborFrequencyResolution;
 params.spindlerGaborFrequencies = freqLow:freqRes:freqHigh;
-[gabors, sigmaFreq] = getGabors(params.srate, ...
+[gabors, sigmaFreq] = getGabors(srate, ...
     params.spindlerGaborSupportFactor, params.spindlerGaborScales, ...
     params.spindlerGaborFrequencies);
 
 %% Bandpass filter the data using pop_eegfiltnew
-dataBand = getFilteredData(data, params.srate, ...
+dataBand = getFilteredData(data, srate, ...
     params.spindlerGaborFrequencies(1), params.spindlerGaborFrequencies(end));
 
 %% Reconstruct the signal using MP with a Gabor dictionary
@@ -83,7 +84,7 @@ for k = 1:numAtoms
         spindles(k, j).numberAtoms = theAtoms(k);
         spindles(k, j).threshold = thresholds(j);
         spindles(k, j).totalTime = totalTime;
-        events = spindlerDetectEvents(y, params.srate, ...
+        events = spindlerDetectEvents(y, srate, ...
                 thresholds(j), params.signalTrimFactor);
         events = combineEvents(events, minLength, minSeparation, maxLength);
         spindles(k, j).events = events;
@@ -91,7 +92,3 @@ for k = 1:numAtoms
                 getSpindleCounts(events);     
     end
 end
-
-params.atomParams = atomParams;
-params.sigmaFreq = sigmaFreq;
-params.scaledGabors = scaledGabors;

@@ -61,7 +61,3 @@ for k = 1:length(channelNumbers)
     [ws(k,:,:),reconstructed(k,:),atomParams(k,:,:)] = ...
         temporalMP(EEG.data(channelNumbers(k),:)', gabors, false, numberAtoms); 
 end
-
-
-
-

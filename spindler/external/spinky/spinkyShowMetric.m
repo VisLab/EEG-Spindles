@@ -1,34 +1,38 @@
-function figHan = spinkyShowMetric(thresholds, methods, metricName, ...
+function figHan = spinkyShowMetric(thresholds, allMetrics, metricName, ...
                              imageDir, params)
-%% Plot the specified metric for the different evaluation methods
+%% Plot the specified spinky metric for the different evaluation methods
 %
 %  Parameters:
-%     spindleParameters     structure from getSpindlerParameters
-%     methods               structure from getSpindlerPerformance
-%     metricName            name of the metric to plot
-
+%     thresholds     array of threshold values
+%     allMetrics     structure with metrics for different match methods
+%     metricName     name of the metric to plot
+%     imageDir             directory to save images
+%     params               structure containing figure defaults and name
+%
+% Written by Kay Robbins, UTSA 2017-2018
+%
 %% Set up image directory if saving
 defaults = concatenateStructs(getGeneralDefaults(), spindlerGetDefaults());     
-params = processParameters('showSpindlerMetric', nargin, 4, params, defaults);
+params = processParameters('showSpindlerMetric', nargin, 5, params, defaults);
 if ~isempty(imageDir) && ~exist(imageDir, 'dir')
     mkdir(imageDir);
 end
 theName = params.name;
 
 %% Make sure the metrics structure has all methods and specified metric
-if ~isfield(methods, 'time') || ~isfield(methods, 'hit') || ...
-   ~isfield(methods, 'intersect') || ~isfield(methods, 'count') || ...
-   ~isfield(methods, 'onset') 
+if ~isfield(allMetrics, 'time') || ~isfield(allMetrics, 'hit') || ...
+   ~isfield(allMetrics, 'intersect') || ~isfield(allMetrics, 'count') || ...
+   ~isfield(allMetrics, 'onset') 
     warning('showSpindlerMetric:MissingMethod', 'Performance method not available');
     return;
 end
 
 %% Get the metrics data
-sCounts = {methods.count};
-sHits = {methods.hit};
-sIntersects = {methods.intersect};
-sOnsets = {methods.onset};
-sTimes = {methods.time};
+sCounts = {allMetrics.count};
+sHits = {allMetrics.hit};
+sIntersects = {allMetrics.intersect};
+sOnsets = {allMetrics.onset};
+sTimes = {allMetrics.time};
 
 if ~isfield(sCounts{1}, metricName) || ...
    ~isfield(sHits{1}, metricName) || ...

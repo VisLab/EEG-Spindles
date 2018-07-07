@@ -13,8 +13,6 @@
 % paramsInit.srateTarget = 0;
 % paramsInit.figureFormats = {'png', 'fig'};
 % paramsInit.spindleFrequencyRange = [11, 17];
-% paramsInit.figureClose = true;
-% paramsInit.algorithm = 'spinky';
 
 % eventDir = 'D:\TestData\Alpha\spindleData\massNew\events\combinedUnion';
 % resultsDir = 'D:\TestData\Alpha\spindleData\massNew\results_spinky_combined';
@@ -37,8 +35,7 @@ paramsInit = struct();
 paramsInit.srateTarget = 0;
 paramsInit.figureFormats = {'png', 'fig'};
 paramsInit.spindleFrequencyRange = [11, 17];
-paramsInit.figureClose = true;
-paramsInit.algorithm = 'spinky';
+paramsInit.figureClose = false;
 
 % eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\combinedUnion';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_combined';
@@ -48,9 +45,14 @@ paramsInit.algorithm = 'spinky';
 % resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_expert1';
 % imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spinky_expert1';
 
+% eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
+% resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_expert2';
+% imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spinky_expert2';
+
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events\expert2';
-resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_expert2';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spinky_expert2';
+resultsDir = 'D:\TestData\Alpha\spindleData\dreams\results_spinky_expert2Temp2';
+imageDir = 'D:\TestData\Alpha\spindleData\dreams\images_spinky_expert2Temp2';
+
 %% Metrics to calculate and methods to use
 paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
 
@@ -67,9 +69,8 @@ for k = 1:length(dataFiles)
     params = paramsInit;
     [~, theName, ~] = fileparts(dataFiles{k});
     params.name = theName;
-    [data, params.srateOriginal, params.channelNumber, params.channelLabel] = ...
+    [data, srateOriginal, srate, channelNumber, channelLabel] = ...
            getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
-    params.srate = params.srateOriginal;
     if isempty(data)
         warning('No data found for %s\n', dataFiles{k});
         continue;
@@ -81,16 +82,18 @@ for k = 1:length(dataFiles)
     
      %% Use the longest stretch in the stage events
     [data, startFrame, endFrame, expertEvents] = ...
-         getMaxStagedData(data, stageEvents, expertEvents, params.srate);
+         getMaxStagedData(data, stageEvents, expertEvents, srate);
  
     %% Now call spinky
     params.frames = size(data, 2);
-    [spindles, additionalInfo, params] =  ...
-                             spinky(data, expertEvents, imageDir, params); 
-    additionalInfo.algorithm = params.algorithm;
+    [spindles, params, additionalInfo] =  ...
+         spinky(data, srate, expertEvents, imageDir, params); 
+    additionalInfo.srate = srate;
+    additionalInfo.srateOriginal = srate;
+    additionalInfo.channelNumber = channelNumber;
+    additionalInfo.channelLabel = channelLabel;
     additionalInfo.startFrame = startFrame;
     additionalInfo.endFrame = endFrame;
-    additionalInfo.srate = params.srate;
     additionalInfo.stageEvents = stageEvents;
     theFile = [resultsDir filesep theName '.mat'];
     save(theFile, 'spindles', 'expertEvents', 'params', 'additionalInfo', '-v7.3');

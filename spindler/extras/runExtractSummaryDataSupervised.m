@@ -1,11 +1,9 @@
 %% Extracts specified metrics from a collection for various methods
-collection = 'mass';
-dataDir = 'D:\TestData\Alpha\spindleData\massNew';
-% collection = 'dreams';
-% dataDir = 'D:\TestData\Alpha\spindleData\dreams';
-%algorithms = {'spindler'};
-%algorithms = {'mcsleep'};
-algorithms = {'spinky'};
+% collection = 'mass';
+% dataDir = 'D:\TestData\Alpha\spindleData\massNew';
+collection = 'dreams';
+dataDir = 'D:\TestData\Alpha\spindleData\dreams';
+algorithms = {'spindler', 'mcsleep', 'spinky'};
 experts = {'combined', 'expert1', 'expert2'};
 summaryDir = 'D:\TestData\Alpha\spindleData\summarySupervised';
 baseMetricName = 'f1';

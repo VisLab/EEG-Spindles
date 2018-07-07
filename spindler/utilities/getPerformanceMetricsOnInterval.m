@@ -1,6 +1,6 @@
 function [allMetrics, expertEvents, spindleEvents, totalTime] = ...
               getPerformanceMetricsOnInterval(expertEvents, ...
-                               spindles, startTime, endTime, params)
+                      spindles, srate, startTime, endTime, params)
                       
     if isempty(expertEvents)
         allMetrics = [];
@@ -17,7 +17,7 @@ function [allMetrics, expertEvents, spindleEvents, totalTime] = ...
             theseSpindles = ...
                 getEventsOnInterval(spindles(k, j).events - startTime, 0, totalTime);
             allMetrics(k, j) = getPerformanceMetrics(expertEvents, ...
-                theseSpindles, totalTime, params);
+                theseSpindles, srate, totalTime, params);
             spindleEvents{k, j} = theseSpindles;
         end
     end

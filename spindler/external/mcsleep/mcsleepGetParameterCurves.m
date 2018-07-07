@@ -1,4 +1,5 @@
-function spindleCurves = mcsleepGetParameterCurves(spindles, outDir, params)
+function spindleCurves = ...
+    mcsleepGetParameterCurves(spindles, totalTime, outDir, params)
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
 %  Parameters:
@@ -18,7 +19,7 @@ function spindleCurves = mcsleepGetParameterCurves(spindles, outDir, params)
     thresholds = params.mcsleepThresholds;
     numLambda2s = length(lambda2s);
     numThresholds = length(thresholds);
-    totalSeconds = params.frames./params.srate;
+    
     spindleCurves.name = params.name;
 
     %% Get the spindle hits and spindle times
@@ -26,8 +27,8 @@ function spindleCurves = mcsleepGetParameterCurves(spindles, outDir, params)
     spindleHits = reshape(spindleHits, numLambda2s, numThresholds);
     spindleTime = cellfun(@double, {spindles.spindleTime});
     spindleTime = reshape(spindleTime, numLambda2s, numThresholds);
-    spindleFraction = spindleTime./totalSeconds;
-    spindleRate = 60*spindleHits/totalSeconds;
+    spindleFraction = spindleTime./totalTime;
+    spindleRate = 60*spindleHits/totalTime;
     meanSpindleLen = spindleTime./spindleHits;
     spindleCurves.spindleHits = spindleHits;
     spindleCurves.spindleTime = spindleTime;

@@ -7,7 +7,7 @@ baseAlgorithm = 'spindler';
 experts = {'combined', 'expert1', 'expert2'};
 summaryDir = 'D:\TestData\Alpha\spindleData\summaryUnsupervised';
 crossFraction = 0.5;
-
+propertyNames = {'SpindleFraction', 'Spindle length(s)', 'Spindles/min'}; %#ok<NASGU>
 %% Make the summary directory if it doesn't exist
 if ~exist(summaryDir, 'dir')
     mkdir(summaryDir);
@@ -41,27 +41,35 @@ for n = 1:numExperts
         test = load(fileName);
        
         eventSummary{m} = test.expertEvents;
-      
+        
         totalTimes(m) = test.additionalInfo.totalTime;
         samplingRates(m) = test.additionalInfo.srate;
+        if isempty(eventSummary{m})
+            continue;
+        end
         [sFraction, sLength, sRate] = ...
             getEventProperties(eventSummary{m}, totalTimes(m));
        
         spindleProperties(m, :) = [sFraction, sLength, sRate];
+        
         newEvents = getEventsOnInterval(eventSummary{m}, 0, ...
             totalTimes(m)*crossFraction);
+        if ~isempty(newEvents)
         [sFraction, sLength, sRate] = ...
             getEventProperties(newEvents, totalTimes(m)*crossFraction);
         spindlePropertiesFirst(m, :) = [sFraction, sLength, sRate];
+        end
         newEvents = getEventsOnInterval(eventSummary{m}, ...
             totalTimes(m)*crossFraction, totalTimes(m));
+        if ~isempty(newEvents)
         [sFraction, sLength, sRate] = ...
             getEventProperties(newEvents, totalTimes(m)*(1 - crossFraction));
         spindlePropertiesSecond(m, :) = [sFraction, sLength, sRate];
+        end
     
     end
     outName = [collection '_properties_' experts{n} '.mat'];
     save([summaryDir filesep outName], 'totalTimes', 'samplingRates',  ...
-       'eventSummary', 'spindleProperties', 'crossFraction',  ...
+       'eventSummary', 'spindleProperties', 'crossFraction',  'propertyNames', ...
        'spindlePropertiesFirst', 'spindlePropertiesSecond',  '-v7.3');
 end      

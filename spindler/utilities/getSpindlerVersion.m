@@ -7,65 +7,14 @@ end
 
 function changeLog = getChangeLog()
  
-    changeLog(6) = ...
+    changeLog(1) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
-    changeLog(6).version = '1.0.6';
-    changeLog(6).status = 'Released';
-    changeLog(6).date = '09/06/2017';
-    changeLog(6).changes = { ...
-       'Handled case when algorithm can not find an eligible index because of artifacts'};
-   
-    changeLog(5) = ...
-     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
-
-    changeLog(5).version = '1.0.5';
-    changeLog(5).status = 'Released';
-    changeLog(5).date = '09/05/2017';
-    changeLog(5).changes = { ...
-       'Handled case when EEG with no channels given to spindlerAllChannels'};
-   
-    changeLog(4) = ...
-     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
-
-    changeLog(4).version = '1.0.4';
-    changeLog(4).status = 'Released';
-    changeLog(4).date = '09/04/2017';
-    changeLog(4).changes = { ...
-       'Fixed isempty misspelling on removeChannels'; ...
-       'Added a runSpindleStats function'; ...
-       'Fixed removing channelLabel field in saving params'; ...
-       'Added function for plotting statistics'};
-
-   changeLog(3) = ...
-     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
-
-    changeLog(3).version = '1.0.3';
-    changeLog(3).status = 'Released';
-    changeLog(3).date = '09/02/2017';
-    changeLog(3).changes = { ...
-       'Fixed resampling issue in spindlerExtractSpindles when ICA present'; ...
-       'Added warningCodes to spindlerExtractSpindles'; ...
-       'Added a generic spindlerAllChannels with example run functions'; ...
-       'Improved documentation on various functions'};
-   
-    changeLog(2) = ...
-   struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
-    changeLog(2).version = '1.0.2';
-    changeLog(2).status = 'Released';
-    changeLog(2).date = '08/25/2017';
-    changeLog(2).changes = { ...
-       'Renamed getChannelNumbers as getChannelNumbersFromLabels'};
-
-    changeLog(1).version = '1.0.1';
+    changeLog(1).version = '2.0.0';
     changeLog(1).status = 'Released';
-    changeLog(1).date = '08/25/2017';
+    changeLog(1).date = '07/08/2018';
     changeLog(1).changes = { ...
-       'Changed params and spindlerExtractSpindles to just handle a single channel'; ...
-       'Added ''basic'' figureLevel value that only plots key curves'; ...
-       'Added getSpindlerVersion function'; ...
-       'Now treat invalid atomRange as an error in spindlerGetParameterCurves'};
-
+       'Reorganized toolbox and generalized parameter curves'};
 end
 
 function markdown = getMarkdown(changeLog)

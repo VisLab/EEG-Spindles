@@ -1,4 +1,4 @@
-function spindleCurves = sdarGetParameterCurves(spindles, outDir, params)
+function spindleCurves = sdarGetParameterCurves(spindles, totalTime, outDir, params)
 
 %% Show behavior of spindle counts as a function of threshold and atoms/sec 
 %
@@ -19,13 +19,12 @@ function spindleCurves = sdarGetParameterCurves(spindles, outDir, params)
     defaults = concatenateStructs(getGeneralDefaults(), sdarGetDefaults());
     params = processParameters('sdarGetParameterCurves', nargin, 3, params, defaults);
     baseThresholds = cellfun(@double, {spindles.baseThresholds});
-    totalSeconds = params.frames./params.srate;
     theName = params.name;
 
     %% Get the spindle hits and spindle times
     spindleHits = cellfun(@double, {spindles.numberSpindles});
     spindleTime = cellfun(@double, {spindles.spindleTime});
-    spindleRate = 60*spindleHits/totalSeconds;
+    spindleRate = 60*spindleHits/totalTime;
     meanSpindleLength = spindleTime./spindleHits;
     meanSpindleLength(isnan(meanSpindleLength)) = 0;
     thresholdFraction = baseThresholds/max(baseThresholds);
@@ -66,7 +65,6 @@ function spindleCurves = sdarGetParameterCurves(spindles, outDir, params)
         close(h1Fig);
     end
 
-    %% Plot the spindle rate
     %% Plot the average spindle length
     baseTitle = [theName ':Spindles/min'];
     h2Fig = figure('Name', baseTitle);

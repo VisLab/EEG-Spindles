@@ -21,7 +21,7 @@
 dataDir = 'D:\TestData\Alpha\spindleData\dreams\data';
 eventDir = 'D:\TestData\Alpha\spindleData\dreams\events';
 resultsDir = 'D:\TestData\Alpha\spindleData\dreams\resultsAsd';
-imageDir = 'D:\TestData\Alpha\spindleData\dreams\imagesAsd';
+imageDirBase = 'D:\TestData\Alpha\spindleData\dreams\imagesAsd';
 summaryFile = 'D:\TestData\Alpha\spindleData\ResultSummary\dreams_Asd_Summary.mat';
 channelLabels = {'C3-A1', 'CZ-A1'};
 paramsInit = struct();
@@ -29,81 +29,50 @@ paramsInit.AsdPeakFrequencyRange = 10:16;
 paramsInit.spindlerOnsetTolerance = 0.3;
 paramsInit.spindlerTimingTolerance = 0.1;
 
-%% Metrics to calculate and methods to use
-metricNames = {'f1', 'f2', 'G'};
-methodNames = {'hitMetrics', 'intersectMetrics', 'onsetMetrics', 'timeMetrics'};
+%% Common initialization
+paramsInit.figureFormats = {'png', 'fig'};
+paramsInit.srateTarget = 0;
+paramsInit = processParameters('runSem', 0, 0, paramsInit, getGeneralDefaults());
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFileListWithExt('FILES', dataDir, '.set');
-if isempty(eventDir)
-    eventFiles = {};
-else
-    eFiles = getFileListWithExt('FILES', eventDir, '.mat');
-    [eventFiles, leftOvers] = matchFileNames(dataFiles, eFiles);
-    if ~isempty(leftOvers)
-        warning('%d event files were not matched with data files', length(leftOvers));
-        for k = 1:length(leftOvers)
-            fprintf('---%s\n', leftOvers{k});
-        end
-    end
-    for k = 1:length(eventFiles)
-        if isempty(eventFiles{k})
-            warning('Data file %s does not have expert events', dataFiles{k});
-        end
-    end
-end
 
-%% Create the output and summary directories if they don't exist
-if ~exist(resultsDir, 'dir')
+%% Create the output directory if it doesn't exist
+if ~isempty(resultsDir) && ~exist(resultsDir, 'dir')
+    fprintf('Creating results directory %s \n', resultsDir);
     mkdir(resultsDir);
-end;
-[summaryDir, ~, ~] = fileparts(summaryFile);
-if ~isempty(summaryDir) && ~exist(summaryDir, 'dir')
-    fprintf('Creating summary directory %s \n', summaryDir);
-    mkdir(summaryDir);
 end
-
-paramsInit.figureClose = false;
-paramsInit.figureFormats = {'png', 'fig', 'pdf', 'eps'};
-badMask = false(length(dataFiles), 1);
-
+if ~isempty(imageDir) && ~exist(imageDir, 'dir')
+    fprintf('Creating image directory %s \n', imageDir);
+    mkdir(imageDir);
+end
 
 %% Process the data
 for k = 1:length(dataFiles)
-    %% Load data file
-    EEG = pop_loadset(dataFiles{k});
+   %% Read in the EEG and find the correct channel number
+    params = paramsInit;
     [~, theName, ~] = fileparts(dataFiles{k});
-    %% Load the event file
-    if isempty(eventFiles) || isempty(eventFiles{k})
-        expertEvents = [];
-        metrics = [];
-    else
-        expertEvents = readEvents(eventFiles{k});
-    end
-    
-    %% Calculate the spindle representations for a range of parameters
-    [channelNumber, channelLabel] = getChannelNumber(EEG, channelLabels);
-    if isempty(channelNumber)
-        warning('%d: %s does not have the channel in question, cannot compute....', k, dataFiles{k});
+    params.name = theName;
+    [data, srateOriginal, srate, channelNumber, channelLabel] = ...
+        getChannelData(dataFiles{k}, channelLabels, params.srateTarget);
+    if isempty(data)
+        warning('No data found for %s\n', dataFiles{k});
         continue;
     end
-    paramsInit.AsdImagePathPrefix = ...
-        [imageDir filesep theName '_Ch_' num2str(channelLabel)];
+   imageDir = [imageDirBase filesep theName '_Ch_' num2str(channelLabel)];
+    %% Read events and stages if available
+    expertEvents = readEvents(eventDir, [theName '.mat']);
+    stageEvents = readEvents(stageDir, [theName '.mat']);
+    
+    %% Use the longest stretch in the stage events
+    [data, startFrame, endFrame, expertEvents] = ...
+        getMaxStagedData(data, srate, stageEvents, expertEvents);
+    
     [events, params, additionalInfo] = ...
-                      asdExtractSpindles(EEG, channelNumber, paramsInit);
-    params.name = theName;
-    frames = params.frames;
-    %% Deal with ground truth if available
-    if isempty(eventFiles) || isempty(eventFiles{k})
-        expertEvents = [];
-        metrics = [];
-    else
-        expertEvents = readEvents(eventFiles{k});
-        expertEvents = removeOverlapEvents(expertEvents, params.eventOverlapMethod);
-        metrics = getPerformanceMetrics(expertEvents, events, ...
-                                   params.frames/params.srate, params);
-    end
-    [~, theName, ~] = fileparts(dataFiles{k});
+         asdExtractSpindles(data, srate, expertEvents, imageDir, params);
+    additionalInfo.startFrame = startFrame;
+    additionalInfo.endFrame = endFrame;
+    additionalInfo.stageEvents = stageEvents;
     
     %% Save the results
     [~, fileName, ~] = fileparts(dataFiles{k});
@@ -111,8 +80,3 @@ for k = 1:length(dataFiles)
         'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
     
 end
-
-%% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = consolidateResults(resultsDir, methodNames, metricNames);
-save(summaryFile, 'results', 'dataNames', 'methodNames', 'metricNames', ...
-    'upperBounds', '-v7.3');

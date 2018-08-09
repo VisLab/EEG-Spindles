@@ -1,4 +1,4 @@
-function [spindles, params] = sdarExtractSpindles(data, params)
+function [spindles, params] = sdarExtractSpindles(data, srate, params)
 %% Calculate spindle events from different Gabor reconstructions 
 %  
 %  Parameters:
@@ -18,12 +18,12 @@ function [spindles, params] = sdarExtractSpindles(data, params)
 
 %% Process the input parameters and set up the calculation
 defaults = concatenateStructs(getGeneralDefaults(), sdarGetDefaults());
-params = processParameters('sdarExtractSpindles', nargin, 2, params, defaults);
+params = processParameters('sdarExtractSpindles', nargin, 3, params, defaults);
 
 %% Bandpass the data to start
-lowFreq = max(1, params.sdarFrequencies(1));
-highFreq = min(ceil(params.srate/2.1), max(params.sdarFrequencies(2)));
-data = getFilteredData(data, params.srate, lowFreq, highFreq);
+lowFreq = max(1, params.spindleFrequencyRange(1));
+highFreq = min(ceil(srate/2.1), max(params.spindleFrequencyRange(2)));
+data = getFilteredData(data, srate, lowFreq, highFreq);
 minLength = params.spindleLengthMin;
 minSeparation = params.spindleSeparationMin;
 maxLength = params.spindleLengthMax;
@@ -34,7 +34,6 @@ initialPoints = params.sdarInitialPoints;
 [mu, sigma, loss, ~] = SDARv3(data, order, discountRate, initialPoints);
 params.mu = mu;
 params.sigma = sigma;
-params.frames = length(data);
 
 %% Smooth the model
 smoothed = moving_average(loss, params.sdarSmoothWindow);
@@ -51,7 +50,7 @@ spindles(numThresholds) = struct('baseThresholds', NaN', ...
 for k = 1:numThresholds
    spindles(k) = spindles(end);
    spindles(k).baseThresholds = baseThresholds(k);
-   eventCells =  applyThreshold(smoothed, params.srate, baseThresholds(k), 1/3);
+   eventCells =  applyThreshold(smoothed, srate, baseThresholds(k), 1/3);
    startEvents = cellfun(@double, eventCells(:, 2));
    endEvents = cellfun(@double, eventCells(:, 3));
    events = [startEvents(:), endEvents(:)];

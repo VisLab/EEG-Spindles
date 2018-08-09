@@ -82,7 +82,7 @@ for k = 1:length(dataFiles)
     
      %% Use the longest stretch in the stage events
     [data, startFrame, endFrame, expertEvents] = ...
-         getMaxStagedData(data, stageEvents, expertEvents, srate);
+         getMaxStagedData(data, srate, stageEvents, expertEvents);
  
     %% Now call spinky
     params.frames = size(data, 2);

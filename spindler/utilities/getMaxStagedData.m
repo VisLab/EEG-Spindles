@@ -1,12 +1,12 @@
 function [data, startFrame, endFrame, expertEvents] = ...
-                 getMaxStagedData(data, stageEvents, expertEvents, srate)
+                 getMaxStagedData(data, srate, stageEvents, expertEvents)
 %% Find the data from the longest interval of staged data.
 %
 %  Parameters:
 %      data         channels x frames array of data to extract from
+%      srate        sampling frequency of the data in Hz
 %      stageEvents  n x 2 array of start and end times of stage events
 %      expertEvents m x 2 array of start and end times of expert events
-%      srate        sampling frequency of the data in Hz
 %      startFrame   starting frame of interval in original data
 %      endFrame     ending frame of interval in original data
 %

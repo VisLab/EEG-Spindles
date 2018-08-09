@@ -12,6 +12,7 @@ function [data, srateOriginal, srateActual, channelNumber, channelLabel] = ...
 %     channelNumber    (output) channel number of the data
 %     channelLabel     (output) channel label of the data
 %
+% Written by: Kay Robbins, UTSA 2017-2018
 %%  Read the EEG file
     EEG = pop_loadset(fileName);
     srateOriginal = EEG.srate;

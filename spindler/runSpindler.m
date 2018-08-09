@@ -100,7 +100,7 @@ for k = 1:length(dataFiles)
     
     %% Use the longest stretch in the stage events
     [data, startFrame, endFrame, expertEvents] = ...
-        getMaxStagedData(data, stageEvents, expertEvents, srate);
+        getMaxStagedData(data, srate, stageEvents, expertEvents);
     
     %% Call Spindler to find the spindles and metrics
     [spindles, params, additionalInfo] =  ...

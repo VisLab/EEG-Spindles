@@ -1,4 +1,4 @@
-function [spindles, params, additionalInfo] =  ...
+function [spindles, additionalInfo, params] =  ...
                     spindler(data, srate, expertEvents, imageDir, params)
 %% Calculate the spindles and performance using spindler
 %
@@ -48,8 +48,7 @@ function [spindles, params, additionalInfo] =  ...
             spindlerShowMetric(additionalInfo.parameterCurves, allMetrics, ...
                 params.metricNames{n}, imageDir, params);
         end
-    else
-        allMetrics = [];
+        additionalInfo.allMetrics = allMetrics;
     end
-    additionalInfo.allMetrics = allMetrics;
+    
 end

@@ -46,9 +46,8 @@ function  [spindles, params, additionalInfo] =  ...
             spinkyShowMetric(additionalInfo.thresholds, ...
                 allMetrics, params.metricNames{n}, imageDir, params);
         end
-    else
-        allMetrics = []; 
+        additionalInfo.allMetrics = allMetrics;
     end
     
-    additionalInfo.allMetrics = allMetrics;
+    
 end

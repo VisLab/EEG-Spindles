@@ -132,13 +132,3 @@ for k = 1%:length(dataFiles)
      save([resultsDir filesep theName, '_sdarResults.mat'], 'events', ...
          'expertEvents', 'metrics', 'params', 'additionalInfo', '-v7.3');
 end
-
-%% Now consolidate the events for the collection and create a summary
-[results, dataNames, upperBounds] = ...
-    consolidateResults(resultsDir, paramsInit.methodNames, paramsInit.metricNames);
-
-%% Save the results
-methodNames = params.methodNames;
-metricNames = params.metricNames;
-save(summaryFile, 'results', 'dataNames', 'methodNames', ...
-    'metricNames', 'upperBounds', '-v7.3');

@@ -65,10 +65,9 @@ paramsInit.mcSleepNit = 40;
 paramsInit.mcsleepFiltOrder = 4;
 paramsInit.mcsleepCalculateCost = false;
 paramsInit.figureFormats = {'png', 'fig'};
-paramsInit.figureClose = true;
-%% Metrics to calculate and methods to use
-paramsInit.metricNames = {'f1', 'f2', 'G', 'precision', 'recall', 'fdr'};
-paramsInit.methodNames = {'count', 'hit', 'intersect', 'onset', 'time'};
+
+%% Initialize the default parameters
+paramsInit = processParameters('runMcSleep', 0, 0, paramsInit, getGeneralDefaults());
 
 %% Get the data and event file names and check that we have the same number
 dataFiles = getFileListWithExt('FILES', dataDir, '.set');
@@ -104,7 +103,7 @@ for k = 1:length(dataFiles)
     
     %% Use the longest stretch in the stage events
     [data, startFrame, endFrame, expertEvents] = ...
-         getMaxStagedData(data, stageEvents, expertEvents, srate);
+         getMaxStagedData(data, srate, stageEvents, expertEvents);
    
      %% Now call mcsleep
      [spindles, params, additionalInfo] =  ...

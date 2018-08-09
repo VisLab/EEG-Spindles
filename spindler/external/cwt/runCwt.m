@@ -80,28 +80,26 @@ for k = 1:length(dataFiles)
     
     %% Use the longest stretch in the stage events
     [data, startFrame, endFrame, expertEvents] = ...
-         getMaxStagedData(data, stageEvents, expertEvents, srate);
+         getMaxStagedData(data, srate, stageEvents, expertEvents);
        
 %% Now call the algorithm and calculate performance
+    additionalInfo = struct('algorithm', params.algorithm, 'srate', srate, ...
+                           'warningMsgs', [], 'allMetrics', nan);
     [eventFrames, additionalInfo.spindleParameters] = ...
-        spindle_estimation_FHN2015(data, srate, ...
-        params.spindleFrequencyRange, params.algorithm); 
+             spindle_estimation_FHN2015(data, srate, ...
+             params.spindleFrequencyRange, params.algorithm); 
     events = (eventFrames - 1)/srate;
     events = combineEvents(events, params.spindleLengthMin, ...
                     params.spindleSeparationMin, params.spindleLengthMax);
     totalTime = length(data)/srate;
     if ~isempty(expertEvents)
-        metrics = ...
-            getPerformanceMetrics(expertEvents, events, srate, totalTime, params);
-    else
-        metrics = [];
+        additionalInfo.allMetrics = getPerformanceMetrics(expertEvents, ...
+             events, srate, totalTime, params);
     end
-    additionalInfo.algorithm = params.algorithm;
-    additionalInfo.srate = srate;
     additionalInfo.srateOriginal = srate;
     additionalInfo.channelNumber = channelNumber;
     additionalInfo.channelLabel = channelLabel;
-    additionalInfo.allMetrics = metrics;
+
     additionalInfo.startFrame = startFrame;
     additionalInfo.endFrame = endFrame;
     additionalInfo.stageEvents = stageEvents;

@@ -43,9 +43,6 @@ function  [spindles, params, additionalInfo] =  ...
             mcsleepShowMetric(allMetrics, params.metricNames{n}, ...
                               imageDir, params);
         end
-    else
-        allMetrics = [];
-    end
-    
-    additionalInfo.allMetrics = allMetrics;
+        additionalInfo.allMetrics = allMetrics;
+    end   
 end

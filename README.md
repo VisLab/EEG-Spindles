@@ -7,8 +7,9 @@ The EEG-Spindles toolbox is freely available under the GNU General Public
 License. Please cite the following publication if using:  
   
 > Spindler: A framework for parametric analysis and detection of
-> spindles in EEG with application to sleep spindles (2018 under review)  
+> spindles in EEG with application to sleep spindles (2018)  
 > J LaRocco, P Franaszczuk, S Kerick and K Robbins  
+> Journal of Neural Engineering 15(6): 066015 (15pp).  
 
 ### To use  
 You should have EEGLAB (https://sccn.ucsd.edu/eeglab/index.php) in your

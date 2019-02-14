@@ -9,7 +9,8 @@ License. Please cite the following publication if using:
 > Spindler: A framework for parametric analysis and detection of
 > spindles in EEG with application to sleep spindles (2018)  
 > J LaRocco, P Franaszczuk, S Kerick and K Robbins  
-> Journal of Neural Engineering 15(6): 066015 (15pp).  
+> Journal of Neural Engineering 15(6): 066015 (15pp) 
+> https://iopscience.iop.org/article/10.1088/1741-2552/aadc1c. 
 
 ### To use  
 You should have EEGLAB (https://sccn.ucsd.edu/eeglab/index.php) in your

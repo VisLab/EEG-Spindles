@@ -6,10 +6,16 @@ function [currentVersion, changeLog, markdown] = getSpindlerVersion()
 end
 
 function changeLog = getChangeLog()
- 
-    changeLog(1) = ...
+
+    changeLog(2) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
+    changeLog(2).version = '2.0.1';
+    changeLog(2).status = 'Released';
+    changeLog(2).date = '03/14/2019';
+    changeLog(2).changes = { ...
+       'Changed return value order on spindler call';
+       'Changed the name spindlerCurves to parameterCurves in additionalInfo'};
     changeLog(1).version = '2.0.0';
     changeLog(1).status = 'Released';
     changeLog(1).date = '07/08/2018';

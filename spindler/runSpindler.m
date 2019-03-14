@@ -103,7 +103,7 @@ for k = 1:length(dataFiles)
         getMaxStagedData(data, srate, stageEvents, expertEvents);
     
     %% Call Spindler to find the spindles and metrics
-    [spindles, params, additionalInfo] =  ...
+    [spindles, additionalInfo, params] =  ...
         spindler(data, srate, expertEvents, imageDir, params);
     additionalInfo.srate = srate;
     additionalInfo.srateOriginal = srate;
@@ -112,8 +112,8 @@ for k = 1:length(dataFiles)
     additionalInfo.startFrame = startFrame;
     additionalInfo.endFrame = endFrame;
     additionalInfo.stageEvents = stageEvents;
-    atomInd = additionalInfo.spindlerCurves.bestEligibleAtomInd;
-    threshInd = additionalInfo.spindlerCurves.bestEligibleThresholdInd;
+    atomInd = additionalInfo.parameterCurves.bestEligibleAtomInd;
+    threshInd = additionalInfo.parameterCurves.bestEligibleThresholdInd;
     if isempty(atomInd) || isempty(threshInd)
         events = nan;
         additionalInfo.atomsPerSecond = nan;

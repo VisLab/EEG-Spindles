@@ -25,6 +25,11 @@ array of start and end times of the events.
 ### Version  
 Version 2.0.0 Released 07/08/2018 
  * Reorganized toolbox and generalized parameter curves
+
+### Version
+Version 2.0.1 Released 03/14/2019
+ * Corrected return value order on spindler.
+ * Changed the field name spindlerCurves to parameterCurves.
        
 ### Support      	
 This research was sponsored by the Army Research Laboratory and
